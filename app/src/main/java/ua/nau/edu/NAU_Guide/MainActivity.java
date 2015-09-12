@@ -3,7 +3,9 @@ package ua.nau.edu.NAU_Guide;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
@@ -115,7 +117,6 @@ public class MainActivity extends ActionBarActivity  {
         setContentView(R.layout.activity_main);
 
         getDrawer();
-
     }
 
     @Override
@@ -169,6 +170,10 @@ public class MainActivity extends ActionBarActivity  {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }
 
 /*

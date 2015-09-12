@@ -9,7 +9,7 @@
         android:theme="@style/AppTheme" >
 
         <activity
-            android:name="ua.nau.edu.NAU_Guide.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/MainActivity_label"  >
 
             <meta-data
@@ -17,14 +17,15 @@
                 android:value=".SearchActivity" />
 
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="com.tutorial.CLEARSCREEN"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
 
         <activity
             android:name=".SearchActivity"
-            android:label="@string/SearchActivity_label">
+            android:label="@string/SearchActivity_label"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
 
             <meta-data
                 android:name="android.app.searchable"
@@ -34,7 +35,16 @@
                 <action android:name="android.intent.action.SEARCH" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+        </activity>
 
+        <activity
+            android:name=".SplashActivity"
+            android:label="@string/SplashActivity_label">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
 
     </application>
