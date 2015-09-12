@@ -2,33 +2,29 @@ package ua.nau.edu.NAU_Guide;
 
 import android.app.Activity;
 import android.app.SearchManager;
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.TextView;
 import android.widget.Toast;
+
 import com.mikepenz.iconics.typeface.FontAwesome;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 
-public class MainActivity extends ActionBarActivity  {
+public class SearchActivity extends ActionBarActivity {
 
     protected Drawer.Result drawerResult = null;
-    private static long back_pressed;
-    private SearchView searchView;
 
     private void getDrawer () {
         // Инициализируем Toolbar
@@ -57,8 +53,8 @@ public class MainActivity extends ActionBarActivity  {
                     @Override
                     public void onDrawerOpened(View drawerView) {
                         // Скрываем клавиатуру при открытии Navigation Drawer
-                        InputMethodManager inputMethodManager = (InputMethodManager) MainActivity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
-                        inputMethodManager.hideSoftInputFromWindow(MainActivity.this.getCurrentFocus().getWindowToken(), 0);
+                        InputMethodManager inputMethodManager = (InputMethodManager) SearchActivity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+                        inputMethodManager.hideSoftInputFromWindow(SearchActivity.this.getCurrentFocus().getWindowToken(), 0);
                     }
 
                     @Override
@@ -100,7 +96,7 @@ public class MainActivity extends ActionBarActivity  {
                     // Обработка длинного клика, например, только для SecondaryDrawerItem
                     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
                         if (drawerItem instanceof SecondaryDrawerItem) {
-                            Toast.makeText(MainActivity.this, MainActivity.this.getString(((SecondaryDrawerItem) drawerItem).getNameRes()), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SearchActivity.this, SearchActivity.this.getString(((SecondaryDrawerItem) drawerItem).getNameRes()), Toast.LENGTH_SHORT).show();
                         }
                         return false;
                     }
@@ -110,12 +106,12 @@ public class MainActivity extends ActionBarActivity  {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_search);
 
+        handleIntent(getIntent());
         getDrawer();
-
     }
 
     @Override
@@ -136,6 +132,19 @@ public class MainActivity extends ActionBarActivity  {
         return true;
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            TextView text = (TextView) findViewById(R.id.textView);
+            String query = text.getText() + intent.getStringExtra(SearchManager.QUERY);
+            text.setText(query);
+        }
+    }
+
     public void toastShowLong (String TEXT) {
         Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
     }
@@ -144,46 +153,4 @@ public class MainActivity extends ActionBarActivity  {
         Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
     }
 
-    // Заглушка, работа с меню
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
-
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    // Заглушка, работа с меню
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
-    }
-
 }
-
-/*
-    <item name="colorPrimary">@color/material_drawer_primary</item>
-    <item name="colorPrimaryDark">@color/material_drawer_primary_dark</item>
-    <item name="colorAccent">@color/material_drawer_accent</item>
-    <!-- MaterialDrawer specific values -->
-    <item name="material_drawer_background">@color/material_drawer_background</item>
-    <item name="material_drawer_icons">@color/material_drawer_icons</item>
-    <item name="material_drawer_primary_text">@color/material_drawer_primary_text</item>
-    <item name="material_drawer_primary_icon">@color/material_drawer_primary_icon</item>
-    <item name="material_drawer_secondary_text">@color/material_drawer_secondary_text</item>
-    <item name="material_drawer_hint_text">@color/material_drawer_hint_text</item>
-    <item name="material_drawer_divider">@color/material_drawer_divider</item>
-    <item name="material_drawer_selected">@color/material_drawer_selected</item>
-    <item name="material_drawer_selected_text">@color/material_drawer_selected_text</item>
-    <item name="material_drawer_header_selection_text">@color/material_drawer_header_selection_text</item>
-*/
