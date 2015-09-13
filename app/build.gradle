@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 23
+    buildToolsVersion '19.1.0'
 
     defaultConfig {
         applicationId "ua.nau.edu.NAU_Guide"
@@ -20,11 +20,11 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile('com.mikepenz.materialdrawer:library:0.9.5@aar') {
         transitive = true
     }
-
-    compile 'com.android.support:appcompat-v7:22.2.0'
-    compile 'com.android.support:support-v4:22.2.0'
+    compile 'com.android.support:support-v4:23.0.1'
+    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.google.android.gms:play-services:7.5.0'
 }

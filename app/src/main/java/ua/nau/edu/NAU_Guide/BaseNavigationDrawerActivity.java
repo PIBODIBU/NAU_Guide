@@ -127,6 +127,7 @@ public class BaseNavigationDrawerActivity extends ActionBarActivity {
                             String CURRENT_CLASS = BaseNavigationDrawerActivity.this.getClass().getSimpleName();
                             String MAIN_CLASS = "MainActivity";
                             String SEARCH_CLASS = "SearchActivity";
+                            String MAP_CLASS = "MapsActivity";
 
                             switch (drawerItem.getIdentifier()) {
                                 case 0: {
@@ -136,6 +137,10 @@ public class BaseNavigationDrawerActivity extends ActionBarActivity {
                                         startActivity(new Intent(BaseNavigationDrawerActivity.this, MainActivity.class)
                                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                     }
+                                    break;
+                                }
+                                case 1: {
+                                    startActivity(new Intent(BaseNavigationDrawerActivity.this, MapsActivity.class));
                                     break;
                                 }
                                 case 4: {
