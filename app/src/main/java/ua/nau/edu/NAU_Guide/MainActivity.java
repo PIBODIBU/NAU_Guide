@@ -18,7 +18,7 @@ import android.widget.Toast;
 public class MainActivity extends BaseNavigationDrawerActivity {
     private SearchView searchView;
     private InputMethodManager inputMethodManager = null;
-// for commit
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (getIntent().getBooleanExtra("EXIT", false)) {
