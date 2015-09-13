@@ -4,6 +4,9 @@
     <string name="MainActivity_label">NAU Guide</string>
     <string name="SearchActivity_label">Поиск</string>
     <string name="SplashActivity_label">NAU Guide</string>
+    <string name="SettingsActivity_label">Настройки</string>
+
+    <string name="settings_title">Настройки</string>
 
     <string name="search_title">Поиск</string>
     <string name="search_hint">Поиск</string>
@@ -12,6 +15,6 @@
     <string name="drawer_item_map">Карта</string>
     <string name="drawer_item_download">Загрузки</string>
     <string name="drawer_item_settings">Настройки</string>
-    <string name="drawer_item_contact">Контакты</string>
+    <string name="drawer_item_search">Поиск</string>
     <string name="drawer_item_exit">Выход</string>
 </resources>
