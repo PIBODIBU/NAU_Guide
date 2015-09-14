@@ -1,21 +1,35 @@
 package ua.nau.edu.NAU_Guide;
 
-import android.support.v4.app.FragmentActivity;
+import android.app.FragmentManager;
+import android.graphics.drawable.ColorDrawable;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.ViewGroup;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity {
+public class MapsActivity extends BaseNavigationDrawerActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        getDrawer();
+
+
         setUpMapIfNeeded();
     }
 
@@ -61,5 +75,23 @@ public class MapsActivity extends FragmentActivity {
      */
     private void setUpMap() {
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+
     }
+
+    public boolean onMarkerClick(Marker marker) {
+
+        //Manually open the window
+        marker.showInfoWindow();
+
+        //Animate to center
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+
+        //Consume the method
+        return true;
+    }
+
+
+
+
+
 }

@@ -39,6 +39,9 @@ public class BaseNavigationDrawerActivity extends ActionBarActivity {
                 drawerResult.setSelection(5);
                 break;
             }
+            case "MapsActivity":{
+                drawerResult.setSelection(1);
+            }
             default:
             {
                 drawerResult.setSelection(-1);
@@ -53,11 +56,13 @@ public class BaseNavigationDrawerActivity extends ActionBarActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+
         // Инициализируем Navigation Drawer
         final PrimaryDrawerItem home = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_home)
                 .withIcon(FontAwesome.Icon.faw_home)
                 .withIdentifier(0);
+
 
         final PrimaryDrawerItem map = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_map)
@@ -140,8 +145,12 @@ public class BaseNavigationDrawerActivity extends ActionBarActivity {
                                     break;
                                 }
                                 case 1: {
-                                    startActivity(new Intent(BaseNavigationDrawerActivity.this, MapsActivity.class));
-                                    break;
+                                    if(CURRENT_CLASS.equals(MAP_CLASS)){
+                                        break;
+                                    } else {
+                                        startActivity(new Intent(BaseNavigationDrawerActivity.this, MapsActivity.class));
+                                        break;
+                                    }
                                 }
                                 case 4: {
                                     startActivity(new Intent(BaseNavigationDrawerActivity.this, SettingsActivity.class));
@@ -210,8 +219,10 @@ public class BaseNavigationDrawerActivity extends ActionBarActivity {
             if (keyCode == KeyEvent.KEYCODE_MENU) {
                 if (drawerResult.isDrawerOpen())
                     drawerResult.closeDrawer();
-                else
+                else {
                     drawerResult.openDrawer();
+
+                }
             } else if (keyCode == KeyEvent.KEYCODE_BACK) {
                 if (drawerResult.isDrawerOpen())
                     drawerResult.closeDrawer();
