@@ -16,7 +16,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Toast;
 import com.mikepenz.iconics.typeface.FontAwesome;
-import com.mikepenz.materialdrawer.Drawer;
+import ua.nau.edu.Drawer.*;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
@@ -123,6 +123,8 @@ public class BaseNavigationDrawerActivity extends ActionBarActivity {
                         if (wasInputActive)
                             inputMethodManager.showSoftInput(getCurrentFocus(), 0);
                     }
+
+
                 })
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
