@@ -7,14 +7,23 @@ import android.os.Bundle;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
 
-public class MapsActivity extends BaseNavigationDrawerActivity {
+import java.util.HashMap;
+
+import ua.nau.edu.University.NAU;
+import ua.nau.edu.University.University;
+
+public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback{
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private NAU university;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        university = new NAU();
+        university.init();
 
         getDrawer();
 
@@ -47,8 +56,13 @@ public class MapsActivity extends BaseNavigationDrawerActivity {
     private void setUpMap() {
         LatLng nau = new LatLng(50.437476,30.428322);
 
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(nau,15));
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(nau,18));
+        for(Integer i : university.getCorps().keySet()){
+            mMap.addMarker(new MarkerOptions()
+            .position(university.getCorps().get(i))
+            .title(i+" "+getString(R.string.corp)));
+        }
     }
 
     public boolean onMarkerClick(Marker marker) {
@@ -61,5 +75,10 @@ public class MapsActivity extends BaseNavigationDrawerActivity {
 
         //Consume the method
         return true;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
     }
 }

@@ -259,7 +259,14 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         mSignOutButton.setEnabled(true);
 
         Person user = Plus.PeopleApi.getCurrentPerson(mClient);
-        plus_user.setText(user.getDisplayName());
+
+        if(user == null){
+            createErrorDialog().show();
+            mSignInButoon.setEnabled(true);
+            mSignOutButton.setEnabled(false);
+        } else {
+            plus_user.setText(user.getDisplayName());
+        }
 
         Plus.PeopleApi.loadVisible(mClient, null)
                 .setResultCallback(this);
@@ -315,6 +322,8 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
         mCirclesList.clear();
         mCirclesAdapter.notifyDataSetChanged();
+        mClient.disconnect();
+        mClient.connect();
     }
 
     private void resolveSignInError() {
