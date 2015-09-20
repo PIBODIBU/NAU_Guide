@@ -126,7 +126,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
     private ArrayList<String> mCirclesList;
     private ArrayAdapter<String> mCirclesAdapter;
-
+//
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (getIntent().getBooleanExtra("EXIT", false)) {
