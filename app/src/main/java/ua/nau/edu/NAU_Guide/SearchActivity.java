@@ -26,7 +26,7 @@ public class SearchActivity extends BaseNavigationDrawerActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

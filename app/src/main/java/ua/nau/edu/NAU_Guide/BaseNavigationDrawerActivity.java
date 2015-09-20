@@ -5,7 +5,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
@@ -15,54 +15,55 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Toast;
+
 import com.mikepenz.iconics.typeface.FontAwesome;
+
 import ua.nau.edu.Drawer.*;
+
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 
-public class BaseNavigationDrawerActivity extends ActionBarActivity {
+public class BaseNavigationDrawerActivity extends AppCompatActivity {
     protected Drawer.Result drawerResult = null;
     private InputMethodManager inputMethodManager = null;
     private SearchView searchView;
     private boolean wasInputActive = false;
 
     public void getCurrentSelection() {
-        switch(BaseNavigationDrawerActivity.this.getClass().getSimpleName()) {
+        switch (BaseNavigationDrawerActivity.this.getClass().getSimpleName()) {
             case "MainActivity": {
                 drawerResult.setSelection(0);
+                break;
+            }
+            case "MapsActivity": {
+                drawerResult.setSelection(1);
                 break;
             }
             case "SearchActivity": {
                 drawerResult.setSelection(5);
                 break;
             }
-            case "MapsActivity":{
-                drawerResult.setSelection(1);
-            }
-            default:
-            {
+            default: {
                 drawerResult.setSelection(-1);
                 break;
             }
         }
     }
 
-    public void getDrawer () {
+    public void getDrawer() {
         // Инициализируем Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 
         // Инициализируем Navigation Drawer
         final PrimaryDrawerItem home = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_home)
                 .withIcon(FontAwesome.Icon.faw_home)
                 .withIdentifier(0);
-
 
         final PrimaryDrawerItem map = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_map)
@@ -123,8 +124,6 @@ public class BaseNavigationDrawerActivity extends ActionBarActivity {
                         if (wasInputActive)
                             inputMethodManager.showSoftInput(getCurrentFocus(), 0);
                     }
-
-
                 })
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -147,7 +146,7 @@ public class BaseNavigationDrawerActivity extends ActionBarActivity {
                                     break;
                                 }
                                 case 1: {
-                                    if(CURRENT_CLASS.equals(MAP_CLASS)){
+                                    if (CURRENT_CLASS.equals(MAP_CLASS)) {
                                         break;
                                     } else {
                                         startActivity(new Intent(BaseNavigationDrawerActivity.this, MapsActivity.class));
@@ -233,19 +232,18 @@ public class BaseNavigationDrawerActivity extends ActionBarActivity {
                 else
                     super.onBackPressed();
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             super.onBackPressed();
         }
         return true;
     }
 
-    public void toastShowShort (String TEXT) {
+    public void toastShowShort(String TEXT) {
         Toast.makeText(BaseNavigationDrawerActivity.this, TEXT, Toast.LENGTH_SHORT).show();
     }
 
-    public void toastShowLong (String TEXT) {
+    public void toastShowLong(String TEXT) {
         Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
     }
 
