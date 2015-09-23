@@ -15,13 +15,13 @@ public abstract class University {
     private String fullName;
 
     private HashMap<Integer, LatLng> Corps;
-    private HashMap<Integer,Set> lectureHalls;
+    private HashMap<Integer, Set> lectureHalls;
 
-    public University(){
+    public University() {
 
     }
 
-    public University(String fullName,String nameAbbreviation){
+    public University(String fullName, String nameAbbreviation) {
         this.fullName = fullName;
         this.nameAbbreviation = nameAbbreviation;
     }

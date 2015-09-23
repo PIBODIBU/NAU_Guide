@@ -37,7 +37,7 @@ public class SettingsActivity extends PreferenceActivity {
 
         setTheme(R.style.DarkText);
 
-        LinearLayout root = (LinearLayout)findViewById(android.R.id.list).getParent().getParent().getParent();
+        LinearLayout root = (LinearLayout) findViewById(android.R.id.list).getParent().getParent().getParent();
         Toolbar bar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.settings_toolbar, root, false);
         root.addView(bar, 0); // insert at top
 

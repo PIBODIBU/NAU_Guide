@@ -47,11 +47,11 @@ public class SearchActivity extends BaseNavigationDrawerActivity {
         }
     }
 
-    public void toastShowLong (String TEXT) {
+    public void toastShowLong(String TEXT) {
         Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
     }
 
-    public void toastShowShort (String TEXT) {
+    public void toastShowShort(String TEXT) {
         Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
     }
 

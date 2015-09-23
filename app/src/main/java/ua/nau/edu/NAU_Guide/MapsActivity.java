@@ -12,7 +12,7 @@ import java.util.HashMap;
 import ua.nau.edu.University.NAU;
 import ua.nau.edu.University.University;
 
-public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback{
+public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private NAU university;
@@ -34,14 +34,11 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     protected void onResume() {
         super.onResume();
 
-       setUpMapIfNeeded();
+        setUpMapIfNeeded();
     }
 
 
     private void setUpMapIfNeeded() {
-
-
-
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
@@ -53,15 +50,18 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
             }
         }
     }
+
     private void setUpMap() {
-        LatLng nau = new LatLng(50.437476,30.428322);
+        LatLng nau = new LatLng(50.437476, 30.428322);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(nau,15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(nau, 15));
 
-        for(Integer i : university.getCorps().keySet()){
+        for (Integer i : university.getCorps().keySet()) {
             mMap.addMarker(new MarkerOptions()
-            .position(university.getCorps().get(i))
-            .title(i+" "+getString(R.string.corp)));
+                    .position(university.getCorps().get(i))
+                    .title(i + " " + getString(R.string.corp)))
+                    .setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker)); // Custom icon
+                    //.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)) // Default icons
         }
     }
 

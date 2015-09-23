@@ -14,7 +14,8 @@
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -63,7 +64,8 @@
         android:enabled="false"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="100dp"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:background="#ff939393" />
 
     <ListView
         android:id="@+id/circles_list"
@@ -72,5 +74,15 @@
         android:orientation="vertical"
         android:padding="0dip"
         android:visibility="invisible"/>
+
+    <Button
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="Restart"
+        android:id="@+id/button_restart"
+        android:background="#ff00aa13"
+        android:layout_below="@+id/linearLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp" />
 
 </RelativeLayout>

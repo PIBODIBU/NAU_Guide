@@ -54,14 +54,12 @@ import java.util.Set;
 public class MainActivity extends BaseNavigationDrawerActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         ResultCallback<People.LoadPeopleResult>, View.OnClickListener,
-        CheckBox.OnCheckedChangeListener, GoogleApiClient.ServerAuthCodeCallbacks{
+        CheckBox.OnCheckedChangeListener, GoogleApiClient.ServerAuthCodeCallbacks {
     private SearchView searchView;
     private InputMethodManager inputMethodManager = null;
 
     /**
-     *
      * Google Plus Variables
-     *
      */
     private GoogleApiClient mClient;
 
@@ -126,7 +124,8 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
     private ArrayList<String> mCirclesList;
     private ArrayAdapter<String> mCirclesAdapter;
-//
+
+    //
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (getIntent().getBooleanExtra("EXIT", false)) {
@@ -140,6 +139,17 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         //
 
         getDrawer(); // Load Navigation Drawer
+
+        Button restart = (Button) findViewById(R.id.button_restart);
+        restart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+                
+                startActivity(new Intent(MainActivity.this, SplashActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        });
 
         // Get Started Button
         Button button = (Button) findViewById(R.id.get_started);
@@ -157,7 +167,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
         mClient = buildGoogleApiClient();
 
-        mSignInButoon = (SignInButton)findViewById(R.id.sign_in_button);
+        mSignInButoon = (SignInButton) findViewById(R.id.sign_in_button);
         mSignInButoon.setOnClickListener(this);
 
         mSignOutButton = (Button) findViewById(R.id.sign_out_button);
@@ -168,7 +178,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         mCirclesListView = (ListView) findViewById(R.id.circles_list);
 
 
-
         mCirclesList = new ArrayList<>();
         mCirclesAdapter = new ArrayAdapter<String>(
                 this, R.layout.circle_member, mCirclesList);
@@ -177,22 +186,22 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
     }
 
-    public void toastShowLong (String TEXT) {
+    public void toastShowLong(String TEXT) {
         Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
     }
 
-    public void toastShowShort (String TEXT) {
+    public void toastShowShort(String TEXT) {
         Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
         mClient.connect();
     }
 
     @Override
-    protected void onStop(){
+    protected void onStop() {
         mClient.disconnect();
 
         super.onStop();
@@ -205,19 +214,17 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     }
 
     /**
-     *
-     *GOogle plus
-     *
+     * GOogle plus
      */
 
-    private GoogleApiClient buildGoogleApiClient(){
+    private GoogleApiClient buildGoogleApiClient() {
         GoogleApiClient.Builder builder = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Plus.API, Plus.PlusOptions.builder().build())
                 .addScope(Plus.SCOPE_PLUS_LOGIN);
 
-        if(mRequestServerAuthCode){
+        if (mRequestServerAuthCode) {
 
             builder = builder.requestServerAuthCode(WEB_CLIENT_ID, this);
         }
@@ -227,7 +234,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
     @Override
     public void onClick(View view) {
-        if(!mClient.isConnecting()) {
+        if (!mClient.isConnecting()) {
             switch (view.getId()) {
 
                 case R.id.sign_in_button:
@@ -244,7 +251,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                     break;
 
                 case R.id.get_started:
-                    startActivity(new Intent(getBaseContext(),MapsActivity.class));
+                    startActivity(new Intent(getBaseContext(), MapsActivity.class));
                     break;
 
                 default:
@@ -260,7 +267,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
         Person user = Plus.PeopleApi.getCurrentPerson(mClient);
 
-        if(user == null){
+        if (user == null) {
             createErrorDialog().show();
             mSignInButoon.setEnabled(true);
             mSignOutButton.setEnabled(false);
