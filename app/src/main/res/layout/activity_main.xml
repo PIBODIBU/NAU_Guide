@@ -85,4 +85,13 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FloorActivity"
+        android:id="@+id/button_floor"
+        android:layout_above="@+id/button_restart"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
 </RelativeLayout>

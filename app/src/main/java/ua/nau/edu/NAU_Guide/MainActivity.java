@@ -140,12 +140,20 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
         getDrawer(); // Load Navigation Drawer
 
+        Button floor = (Button) findViewById(R.id.button_floor);
+        floor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, FloorActivity.class));
+            }
+        });
+
         Button restart = (Button) findViewById(R.id.button_restart);
         restart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
-                
+
                 startActivity(new Intent(MainActivity.this, SplashActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }

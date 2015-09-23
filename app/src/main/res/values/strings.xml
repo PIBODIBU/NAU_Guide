@@ -5,9 +5,9 @@
     <string name="SearchActivity_label">Поиск</string>
     <string name="SplashActivity_label">NAU Guide</string>
     <string name="SettingsActivity_label">Настройки</string>
+    <string name="FloorActivity_label">Floor</string>
 
     <string name="settings_title">Настройки</string>
-
     <string name="search_title">Поиск</string>
     <string name="search_hint">Поиск</string>
 
@@ -22,4 +22,7 @@
     <string name="close_app">Закрыть</string>
     <string name="sign_out_button_name">Sign out</string>
     <string name="corp">-й корпус</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 </resources>
