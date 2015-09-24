@@ -5,7 +5,7 @@
     <color name="material_drawer_primary_text">@color/grey</color>
     <color name="grey">#ff737373</color>
     <color name="white">#ffffff</color>
-    <color name="main_blue">#6c9bff</color>
+    <color name="main_blue">#4183D7</color>
     <color name="black">#000000</color>
     <color name="tsyan">#18E3FF</color>
 

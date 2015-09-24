@@ -3,6 +3,7 @@ package ua.nau.edu.NAU_Guide;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
@@ -60,13 +61,13 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
             mMap.addMarker(new MarkerOptions()
                     .position(university.getCorps().get(i))
                     .title(i + " " + getString(R.string.corp)))
+
                     .setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker)); // Custom icon
-                    //.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)) // Default icons
+                    //.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)); // Default icons
         }
     }
 
-    public boolean onMarkerClick(Marker marker) {
-
+    public boolean onMarkerClick (Marker marker) {
         //Manually open the window
         marker.showInfoWindow();
 
