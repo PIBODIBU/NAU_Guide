@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
@@ -17,10 +19,24 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vk.sdk.VKAccessToken;
+import com.vk.sdk.VKAccessTokenTracker;
+import com.vk.sdk.VKCallback;
+import com.vk.sdk.VKScope;
+import com.vk.sdk.VKSdk;
+import com.vk.sdk.api.VKApi;
+import com.vk.sdk.api.VKApiConst;
+import com.vk.sdk.api.VKError;
+import com.vk.sdk.api.VKParameters;
+import com.vk.sdk.api.VKRequest;
+import com.vk.sdk.api.VKResponse;
+import com.vk.sdk.api.model.VKApiUserFull;
+import com.vk.sdk.api.model.VKList;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -48,9 +64,14 @@ import com.google.android.gms.plus.model.people.PersonBuffer;
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKCallback;
 import com.vk.sdk.VKSdk;
+import com.vk.sdk.api.VKApi;
+import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
+import com.vk.sdk.api.VKParameters;
+import com.vk.sdk.api.VKRequest;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -130,22 +151,52 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private ArrayList<String> mCirclesList;
     private ArrayAdapter<String> mCirclesAdapter;
 
+// VKONTAKTE SDK VARIABLES
+    private int appId = 5084652;
+    VKRequest request_info = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_50, photo_100, photo_200"));
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (!VKSdk.onActivityResult(requestCode, resultCode, data, new VKCallback<VKAccessToken>() {
             @Override
             public void onResult(VKAccessToken res) {
-                // Пользователь успешно авторизовался
-                toastShowLong("OK");
+// Пользователь успешно авторизовался
+
+                request_info.executeWithListener(new VKRequest.VKRequestListener() {
+                    @Override
+                    public void onComplete(VKResponse response) {
+//Do complete stuff
+                        TextView text = (TextView) findViewById(R.id.textView2);
+                        VKApiUserFull user = ((VKList<VKApiUserFull>) response.parsedModel).get(0);
+
+                        text.setText("Name: " + user.first_name + " " + user.last_name + "\n Id: " + user.id);
+
+                        ImageView avatar = (ImageView) findViewById(R.id.imageView2);
+                        new ImageDownloader(avatar).execute(user.photo_200);
+                    }
+
+                    @Override
+                    public void onError(VKError error) {
+//Do error stuff
+                    }
+
+                    @Override
+                    public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
+//I don't really believe in progress
+                    }
+                });
             }
 
             @Override
             public void onError(VKError error) {
-                // Произошла ошибка авторизации (например, пользователь запретил авторизацию)
-                toastShowLong("BAD");
+// Произошла ошибка авторизации (например, пользователь запретил авторизацию)
+                TextView text = (TextView) findViewById(R.id.textView2);
+                text.setText("SOMETHING WRONG, BRO");
             }
-        }))
+        })) {
             super.onActivityResult(requestCode, resultCode, data);
+        }
 
         switch (requestCode) {
             case RC_SIGN_IN:
@@ -166,9 +217,45 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                 }
                 break;
         }
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
-    String scope;
+// Image DownLoader
+    class ImageDownloader extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public ImageDownloader(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String url = urls[0];
+            Bitmap mIcon = null;
+            try {
+                InputStream in = new java.net.URL(url).openStream();
+                mIcon = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+            }
+            return mIcon;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
+    }
+// ****************
+
+    VKAccessTokenTracker vkAccessTokenTracker = new VKAccessTokenTracker() {
+        @Override
+        public void onVKAccessTokenChanged(VKAccessToken oldToken, VKAccessToken newToken) {
+            if (newToken == null) {
+// VKAccessToken is invalid
+                toastShowLong("Invalid access token");
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,22 +263,29 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
             finish();
         }
         super.onCreate(savedInstanceState);
+
+//VK initialize
+        vkAccessTokenTracker.startTracking();
+        VKSdk.initialize(getApplicationContext(), appId, "");
+//
         setContentView(R.layout.activity_main);
 
-        // Get system services
+// Get system services
         inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-        //
 
-        getDrawer(); // Load Navigation Drawer
+// Load Navigation Drawer
+        getDrawer();
 
+// VK sing in button
         Button vk_log_in = (Button) findViewById(R.id.button_vk_log_in);
         vk_log_in.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, VKActivity.class));
+// VK login execute
+                VKSdk.login(MainActivity.this, VKScope.EMAIL, VKScope.PHOTOS);
             }
         });
-
+//
         Button restart = (Button) findViewById(R.id.button_restart);
         restart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -202,10 +296,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
-
-        // Get Started Button
-        Button button = (Button) findViewById(R.id.get_started);
-        button.setOnClickListener(this);
 
         /**
          *
@@ -300,10 +390,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                         mClient.disconnect();
                     }
                     onSignedOut();
-                    break;
-
-                case R.id.get_started:
-                    startActivity(new Intent(getBaseContext(), MapsActivity.class));
                     break;
 
                 default:

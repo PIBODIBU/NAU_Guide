@@ -72,10 +72,6 @@
             android:label="@string/MapsActivity_label" />
 
         <activity
-            android:name=".VKActivity"
-            android:label="VKActivity" />
-
-        <activity
             android:name="com.vk.sdk.VKServiceActivity"
             android:label="ServiceActivity"
             android:theme="@style/VK.Transparent" />
