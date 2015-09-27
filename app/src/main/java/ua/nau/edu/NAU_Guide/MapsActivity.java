@@ -94,4 +94,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     @Override
     public void onMapReady(GoogleMap googleMap) {
     }
+
+
 }

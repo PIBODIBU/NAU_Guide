@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -44,6 +45,10 @@ import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
+import com.vk.sdk.VKAccessToken;
+import com.vk.sdk.VKCallback;
+import com.vk.sdk.VKSdk;
+import com.vk.sdk.api.VKError;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -125,7 +130,46 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private ArrayList<String> mCirclesList;
     private ArrayAdapter<String> mCirclesAdapter;
 
-    //
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (!VKSdk.onActivityResult(requestCode, resultCode, data, new VKCallback<VKAccessToken>() {
+            @Override
+            public void onResult(VKAccessToken res) {
+                // Пользователь успешно авторизовался
+                toastShowLong("OK");
+            }
+
+            @Override
+            public void onError(VKError error) {
+                // Произошла ошибка авторизации (например, пользователь запретил авторизацию)
+                toastShowLong("BAD");
+            }
+        }))
+            super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case RC_SIGN_IN:
+                if (resultCode == RESULT_OK) {
+                    // If the error resolution was successful we should continue
+                    // processing errors.
+                    mSignInProgress = STATE_SIGN_IN;
+                } else {
+                    // If the error resolution was not successful or the user canceled,
+                    // we should stop processing errors.
+                    mSignInProgress = STATE_DEFAULT;
+                }
+
+                if (!mClient.isConnecting()) {
+                    // If Google Play services resolved the issue with a dialog then
+                    // onStart is not called so we need to re-attempt connection here.
+                    mClient.connect();
+                }
+                break;
+        }
+    }
+
+    String scope;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (getIntent().getBooleanExtra("EXIT", false)) {
@@ -140,11 +184,11 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
         getDrawer(); // Load Navigation Drawer
 
-        Button floor = (Button) findViewById(R.id.button_floor);
-        floor.setOnClickListener(new View.OnClickListener() {
+        Button vk_log_in = (Button) findViewById(R.id.button_vk_log_in);
+        vk_log_in.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, FloorActivity.class));
+                startActivity(new Intent(MainActivity.this, VKActivity.class));
             }
         });
 
@@ -222,7 +266,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     }
 
     /**
-     * GOogle plus
+     * Google plus
      */
 
     private GoogleApiClient buildGoogleApiClient() {
@@ -529,30 +573,4 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
             Log.e("", "Error requesting visible circles: " + peopleData.getStatus());
         }
     }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode,
-                                    Intent data) {
-        switch (requestCode) {
-            case RC_SIGN_IN:
-                if (resultCode == RESULT_OK) {
-                    // If the error resolution was successful we should continue
-                    // processing errors.
-                    mSignInProgress = STATE_SIGN_IN;
-                } else {
-                    // If the error resolution was not successful or the user canceled,
-                    // we should stop processing errors.
-                    mSignInProgress = STATE_DEFAULT;
-                }
-
-                if (!mClient.isConnecting()) {
-                    // If Google Play services resolved the issue with a dialog then
-                    // onStart is not called so we need to re-attempt connection here.
-                    mClient.connect();
-                }
-                break;
-        }
-    }
-
-
 }
