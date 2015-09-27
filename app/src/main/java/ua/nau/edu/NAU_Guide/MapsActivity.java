@@ -1,6 +1,5 @@
 package ua.nau.edu.NAU_Guide;
 
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -52,22 +51,36 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         }
     }
 
+    private void addMarker_custom(Integer i, int icon, String title) {
+        mMap.addMarker(new MarkerOptions()
+                .position(university.getCorps().get(i))
+                .title(title))
+
+                .setIcon(BitmapDescriptorFactory.fromResource(icon));
+    }
+
     private void setUpMap() {
         LatLng nau = new LatLng(50.437476, 30.428322);
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(nau, 15));
 
+        //.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)); // Default icons
         for (Integer i : university.getCorps().keySet()) {
-            mMap.addMarker(new MarkerOptions()
-                    .position(university.getCorps().get(i))
-                    .title(i + " " + getString(R.string.corp)))
-
-                    .setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker)); // Custom icon
-                    //.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)); // Default icons
+            if (i == 1 || i == 2 || i == 3 || i == 4 || i == 5 || i == 6 || i == 7 || i == 8 || i == 9 || i == 10 || i == 11 || i == 12) {
+                addMarker_custom(i, R.drawable.mark_corp, i + getString(R.string.corp));
+            } else if (i == 13) { // CKI
+                addMarker_custom(i, R.drawable.mark_cki, getString(R.string.cki));
+            } else if (i == 14) { // BISTRO
+                addMarker_custom(i, R.drawable.mark_bistro, getString(R.string.bistro));
+            } else if (i == 15) { // MED CENTER
+                addMarker_custom(i, R.drawable.mark_med, getString(R.string.med));
+            } else if (i == 16) { // SPORT
+                addMarker_custom(i, R.drawable.mark_sport, getString(R.string.sport));
+            }
         }
     }
 
-    public boolean onMarkerClick (Marker marker) {
+    public boolean onMarkerClick(Marker marker) {
         //Manually open the window
         marker.showInfoWindow();
 
@@ -80,6 +93,5 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
     }
 }

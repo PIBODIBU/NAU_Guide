@@ -9,4 +9,4 @@
     android:background="@color/main_blue"
     android:minHeight="?attr/actionBarSize"
     app:navigationIcon="?attr/homeAsUpIndicator"
-    app:title="@string/settings_title" />
+    app:title="@string/settings_toolbar_title" />

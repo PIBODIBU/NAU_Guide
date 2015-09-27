@@ -6,10 +6,12 @@
     <string name="SplashActivity_label">NAU Guide</string>
     <string name="SettingsActivity_label">Настройки</string>
     <string name="FloorActivity_label">Floor</string>
+    <string name="MapsActivity_label">Карта</string>
 
-    <string name="settings_title">Настройки</string>
+    <string name="settings_toolbar_title">Настройки</string>
     <string name="search_title">Поиск</string>
     <string name="search_hint">Поиск</string>
+    <string name="action_settings">Settings</string>
 
     <string name="drawer_item_home">Домой</string>
     <string name="drawer_item_map">Карта</string>
@@ -17,12 +19,15 @@
     <string name="drawer_item_settings">Настройки</string>
     <string name="drawer_item_search">Поиск</string>
     <string name="drawer_item_exit">Выход</string>
-    <string name="title_activity_maps">Map</string>
+
     <string name="plus_signed_id">Вы ввошли как: </string>
     <string name="close_app">Закрыть</string>
     <string name="sign_out_button_name">Sign out</string>
-    <string name="corp">-й корпус</string>
 
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="corp">-й корпус</string>
+    <string name="cki">ЦКИ</string>
+    <string name="med">Медцентр</string>
+    <string name="sport">Спорткомплекс</string>
+    <string name="bistro">Бистро</string>
+
 </resources>

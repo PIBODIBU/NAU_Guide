@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MainActivity">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/search"
-        android:title="@string/search_title"
+    <item
+        android:id="@+id/search"
         android:icon="@drawable/search_icon"
-        app:showAsAction="always|collapseActionView"
+        android:title="@string/search_title"
         app:actionViewClass="android.support.v7.widget.SearchView"
-    />
+        app:showAsAction="always|collapseActionView" />
 
 </menu>
