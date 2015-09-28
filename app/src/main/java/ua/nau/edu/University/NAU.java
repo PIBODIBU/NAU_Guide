@@ -36,9 +36,9 @@ public class NAU extends University {
 
         // MED CENTER
         Corps.put(15, new LatLng(50.440592, 30.433082));
-        
+
         // SPORT
-        Corps.put(16, new LatLng(50.435363, 30.423836));
+        Corps.put(16, new LatLng(50.436868, 30.422972));
 
         this.setCorps(Corps);
     }
