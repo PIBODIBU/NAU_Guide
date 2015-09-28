@@ -2,20 +2,24 @@ package ua.nau.edu.NAU_Guide;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.HashMap;
 
 import ua.nau.edu.University.NAU;
 import ua.nau.edu.University.University;
 
-public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback {
+public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback,GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private NAU university;
+
+    private SlidingUpPanelLayout slidingUpPanelLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +32,12 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         getDrawer();
 
         setUpMapIfNeeded();
+
+        initSlidingPanel();
+
+        Toast toast = Toast.makeText(getApplicationContext(),
+                "Пора покормить кота!", Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     @Override
@@ -52,11 +62,13 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     }
 
     private void addMarker_custom(Integer i, int icon, String title) {
-        mMap.addMarker(new MarkerOptions()
+
+
+           mMap.addMarker(new MarkerOptions()
                 .position(university.getCorps().get(i))
                 .title(title))
-
-                .setIcon(BitmapDescriptorFactory.fromResource(icon));
+                .setIcon(BitmapDescriptorFactory.fromResource(icon)
+                );
     }
 
     private void setUpMap() {
@@ -78,11 +90,26 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                 addMarker_custom(i, R.drawable.mark_sport, getString(R.string.sport));
             }
         }
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                    Toast toast = Toast.makeText(getApplicationContext(),
+                            String.valueOf(slidingUpPanelLayout.isShown()), Toast.LENGTH_SHORT);
+                    toast.show();
+
+                slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+                return false;
+            }
+        });
     }
 
+    @Override
     public boolean onMarkerClick(Marker marker) {
         //Manually open the window
+
         marker.showInfoWindow();
+
 
         //Animate to center
         mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
@@ -95,5 +122,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     public void onMapReady(GoogleMap googleMap) {
     }
 
+    private void initSlidingPanel(){
+        this.slidingUpPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+    }
 
 }

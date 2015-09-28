@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Toast;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import com.mikepenz.iconics.typeface.FontAwesome;
 
@@ -51,6 +52,9 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 break;
             }
         }
+    }
+
+    public void getSlidingPanel(){
     }
 
     public void getDrawer() {
