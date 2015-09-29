@@ -41,10 +41,18 @@
 
 </RelativeLayout>
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:gravity="center|top"
-        android:text="The Awesome Sliding Up Panel"
-        android:textSize="16sp" />
+    <GridLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView android:src="@drawable/header_png"/>
+        <TextView
+            android:id="@+id/titleSlidingLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center|top"
+            android:text="The Awesome Sliding Up Panel"
+            android:textSize="16sp" />
+
+    </GridLayout>
+
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>
