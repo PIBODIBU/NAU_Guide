@@ -28,7 +28,8 @@ public class SearchActivity extends BaseNavigationDrawerActivity {
 
         getDrawer(
                 settings.getString("VK_INFO_KEY", ""),
-                settings.getString("VK_PHOTO_KEY", "")
+                settings.getString("VK_PHOTO_KEY", ""),
+                settings.getString("VK_EMAIL_KEY", "")
         );
 
         handleIntent(getIntent());
@@ -67,7 +68,7 @@ public class SearchActivity extends BaseNavigationDrawerActivity {
 
     @Override
     protected void onResume() {
-        //getCurrentSelection();
+        getCurrentSelection();
         super.onResume();
     }
 

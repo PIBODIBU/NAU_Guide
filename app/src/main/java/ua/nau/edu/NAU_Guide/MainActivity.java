@@ -186,6 +186,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
                         editor.putString(VK_INFO_KEY, users.first_name + " " + users.last_name);
                         editor.putString(VK_PHOTO_KEY, users.photo_200);
+                        editor.putString(VK_EMAIL_KEY, VKSdk.getAccessToken().email);
 
                         editor.apply();
 /********** < /setShared Preferences> **********/
@@ -240,10 +241,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-// Image DownLoader
-    Bitmap b = null;
-// ****************
-
     VKAccessTokenTracker vkAccessTokenTracker = new VKAccessTokenTracker() {
         @Override
         public void onVKAccessTokenChanged(VKAccessToken oldToken, VKAccessToken newToken) {
@@ -263,9 +260,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
 /********** < getShared Preferences> **********/
         SharedPreferences settings = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
-        //TextView signed_in_as = (TextView) findViewById(R.id.textView2);
-        ImageView avatar = (ImageView) findViewById(R.id.imageView2);
-
 /********** </getShared Preferences> **********/
 
 //VK initialize
@@ -286,7 +280,8 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
         getDrawer(
                 settings.getString(VK_INFO_KEY, ""),
-                settings.getString(VK_PHOTO_KEY, "")
+                settings.getString(VK_PHOTO_KEY, ""),
+                settings.getString(VK_EMAIL_KEY, "")
         );
 //
 
@@ -314,8 +309,8 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         /**
          *
          * Google plus
-         *
-         */
+         **/
+
         if (savedInstanceState != null) {
             mSignInProgress = savedInstanceState
                     .getInt(SAVED_PROGRESS, STATE_DEFAULT);
@@ -365,7 +360,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
     @Override
     protected void onResume() {
-        //getCurrentSelection();
+        getCurrentSelection();
         super.onResume();
     }
 

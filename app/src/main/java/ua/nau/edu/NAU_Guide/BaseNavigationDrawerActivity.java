@@ -45,7 +45,7 @@ import java.net.URL;
 
 public class BaseNavigationDrawerActivity extends AppCompatActivity {
     protected Drawer drawerResult = null;
-    private InputMethodManager inputMethodManager = null;
+    private InputMethodManager MethodManager = null;
     private SearchView searchView;
     private boolean wasInputActive = false;
 
@@ -60,7 +60,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         this.ACCOUNT_PHOTO = ACCOUNT_PHOTO;
     }*/
 
-    /*public void getCurrentSelection() {
+    public void getCurrentSelection() {
         switch (BaseNavigationDrawerActivity.this.getClass().getSimpleName()) {
             case "MainActivity": {
                 drawerResult.setSelection(0);
@@ -79,9 +79,10 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 break;
             }
         }
-    }*/
+    }
 
-    public void getDrawer(String ACCOUNT_NAME, String ACCOUNT_PHOTO) {
+    public void getDrawer(String ACCOUNT_NAME, String ACCOUNT_PHOTO, String ACCOUNT_EMAIL) {
+
 // Инициализируем Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -117,8 +118,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withIcon(FontAwesome.Icon.faw_close)
                 .withIdentifier(7);
 
-        toastShowLong(ACCOUNT_PHOTO);
-
+// Image Downloader for Drawer
         DrawerImageLoader.init(new DrawerImageLoader.IDrawerImageLoader() {
             @Override
             public void set(ImageView imageView, Uri uri, Drawable placeholder) {
@@ -140,13 +140,14 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 return null;
             }
         });
+//
 
 // Create the AccountHeader
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header_png)
                 .addProfiles(
-                        new ProfileDrawerItem().withName(ACCOUNT_NAME).withEmail("your_email@gmail.com").withIcon(ACCOUNT_PHOTO)
+                        new ProfileDrawerItem().withName(ACCOUNT_NAME).withEmail(ACCOUNT_EMAIL).withIcon(ACCOUNT_PHOTO)
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
@@ -178,8 +179,8 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                     @Override
                     public void onDrawerOpened(View drawerView) {
                         // Скрываем клавиатуру при открытии Navigation Drawer
-                        if (inputMethodManager.isAcceptingText()) {
-                            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                        if (MethodManager.isAcceptingText()) {
+                            MethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
                             wasInputActive = true;
                         } else {
                             wasInputActive = false;
@@ -190,7 +191,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                     public void onDrawerClosed(View drawerView) {
                         // Показать клавиатуру при закрытии Navigation Drawer, если она была открыта
                         if (wasInputActive)
-                            inputMethodManager.showSoftInput(getCurrentFocus(), 0);
+                            MethodManager.showSoftInput(getCurrentFocus(), 0);
                     }
 
                     @Override
@@ -284,7 +285,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                     }
                 })*/
                 .build();
-        //getCurrentSelection();
+        getCurrentSelection();
     }
 
     @Override
@@ -337,6 +338,6 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+        MethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
     }
 }

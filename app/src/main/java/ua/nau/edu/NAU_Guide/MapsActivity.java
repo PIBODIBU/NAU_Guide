@@ -16,9 +16,9 @@ import java.util.HashMap;
 import ua.nau.edu.University.NAU;
 import ua.nau.edu.University.University;
 
-public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback,GoogleMap.OnMarkerClickListener {
+public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
-    public MapsActivity(){
+    public MapsActivity() {
     }
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -39,7 +39,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
         getDrawer(
                 settings.getString("VK_INFO_KEY", ""),
-                settings.getString("VK_PHOTO_KEY", "")
+                settings.getString("VK_PHOTO_KEY", ""),
+                settings.getString("VK_EMAIL_KEY", "")
         );
 
         setUpMapIfNeeded();
@@ -75,9 +76,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     private void addMarker_custom(Integer i, int icon, String title) {
 
 
-           mMap.addMarker(new MarkerOptions()
-                   .position(university.getCorps().get(i))
-                   .title(title))
+        mMap.addMarker(new MarkerOptions()
+                .position(university.getCorps().get(i))
+                .title(title))
                 .setIcon(BitmapDescriptorFactory.fromResource(icon)
                 );
     }
@@ -125,7 +126,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         //Manually open the window
         marker.showInfoWindow();
 
-
         //Animate to center
         mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
 
@@ -137,7 +137,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     public void onMapReady(GoogleMap googleMap) {
     }
 
-    private void initSlidingPanel(){
+    private void initSlidingPanel() {
         this.slidingUpPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
 
         //Высота слайдера в закрытом режиме
@@ -152,15 +152,14 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         this.slidingUpPanelLayout.setParalaxOffset(0);
 
 
-
         this.titleSlidingLayout = (TextView) findViewById(R.id.titleSlidingLayout);
     }
 
     //Получение айди маркера
-    private int getMarkerId(Marker marker){
+    private int getMarkerId(Marker marker) {
         String s = marker.getId();
-        s = s.substring(1,s.length());
-        Integer i = Integer.parseInt(s,10);
+        s = s.substring(1, s.length());
+        Integer i = Integer.parseInt(s, 10);
         i++;
         return i;
     }
