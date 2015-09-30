@@ -2,9 +2,13 @@ package ua.nau.edu.NAU_Guide;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.Toast;
 
 public class SplashActivity extends Activity {
+    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
+    private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -13,13 +17,21 @@ public class SplashActivity extends Activity {
 
         Thread background = new Thread() {
             public void run() {
+                SharedPreferences settings = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
                 try {
                     // Thread will sleep for 1 seconds
-                    sleep(1 * 1000);
+                    sleep(1000);
 
                     // After 1 seconds redirect to another intent
-                    Intent i = new Intent(getBaseContext(), MainActivity.class);
-                    startActivity(i);
+                    if (settings.getBoolean(FIRST_LAUNCH_KEY, true)) {
+                        startActivity(new Intent(getBaseContext(), FirstLaunchActivity.class));
+
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putBoolean(FIRST_LAUNCH_KEY, false);
+                        editor.apply();
+                    } else {
+                        startActivity(new Intent(getBaseContext(), MainActivity.class));
+                    }
 
                     //Remove activity
                     finish();

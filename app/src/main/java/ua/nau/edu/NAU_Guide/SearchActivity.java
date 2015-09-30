@@ -29,7 +29,8 @@ public class SearchActivity extends BaseNavigationDrawerActivity {
         getDrawer(
                 settings.getString("VK_INFO_KEY", ""),
                 settings.getString("VK_PHOTO_KEY", ""),
-                settings.getString("VK_EMAIL_KEY", "")
+                settings.getString("VK_EMAIL_KEY", ""),
+                settings.getBoolean("VK_SIGNED_KEY", false)
         );
 
         handleIntent(getIntent());

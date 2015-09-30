@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -165,7 +166,10 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     public static final String VK_INFO_KEY = "VK_INFO_KEY";
     public static final String VK_PHOTO_KEY = "VK_PHOTO_KEY";
     public static final String VK_EMAIL_KEY = "VK_EMAIL_KEY";
+    private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
+    private boolean SIGNED_IN;
     VKRequest request_info = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_50, photo_100, photo_200"));
+//
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -179,8 +183,9 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                     public void onComplete(VKResponse response) {
 //Do complete stuff
                         VKApiUserFull users = ((VKList<VKApiUserFull>) response.parsedModel).get(0);
+                        SIGNED_IN = true;
 
-/********** < setShared Preferences> **********/
+/********** <setShared Preferences> **********/
                         SharedPreferences settings = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
                         SharedPreferences.Editor editor = settings.edit();
 
@@ -188,8 +193,13 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                         editor.putString(VK_PHOTO_KEY, users.photo_200);
                         editor.putString(VK_EMAIL_KEY, VKSdk.getAccessToken().email);
 
+                        editor.putBoolean(VK_SIGNED_KEY, SIGNED_IN);
+
                         editor.apply();
-/********** < /setShared Preferences> **********/
+/********** </setShared Preferences> **********/
+
+                        startActivity(new Intent(MainActivity.this, MainActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 
                         super.onComplete(response);
                     }
@@ -271,7 +281,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 // Get system services
         inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
 
-// Load Navigation Drawer
+// Create object and load Navigation Drawer
         /*BaseNavigationDrawerActivity NavigationDrawer = new BaseNavigationDrawerActivity(
                 settings.getString(VK_INFO_KEY, ""),
                 settings.getString(VK_PHOTO_KEY, ""));*/
@@ -281,12 +291,13 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         getDrawer(
                 settings.getString(VK_INFO_KEY, ""),
                 settings.getString(VK_PHOTO_KEY, ""),
-                settings.getString(VK_EMAIL_KEY, "")
+                settings.getString(VK_EMAIL_KEY, ""),
+                settings.getBoolean(VK_SIGNED_KEY, false)
         );
 //
 
 // VK sing in button
-        Button vk_log_in = (Button) findViewById(R.id.button_vk_log_in);
+        Button vk_log_in = (Button) findViewById(R.id.vk_sign_in);
         vk_log_in.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -295,6 +306,33 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
             }
         });
 //
+
+// VK sign out button
+        Button vk_log_out = (Button) findViewById(R.id.vk_sign_out);
+        vk_log_out.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedPreferences settings = getSharedPreferences(VK_PREFERENCES, BaseNavigationDrawerActivity.MODE_PRIVATE);
+                SharedPreferences.Editor editor = settings.edit();
+
+                editor.putBoolean(VK_SIGNED_KEY, false);
+
+                editor.apply();
+
+                /*startActivity(new Intent(MainActivity.this, MainActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));*/
+
+                getDrawer(
+                        settings.getString(VK_INFO_KEY, ""),
+                        settings.getString(VK_PHOTO_KEY, ""),
+                        settings.getString(VK_EMAIL_KEY, ""),
+                        settings.getBoolean(VK_SIGNED_KEY, false)
+                );
+
+            }
+        });
+//
+
         Button restart = (Button) findViewById(R.id.button_restart);
         restart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -303,6 +341,23 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
                 startActivity(new Intent(MainActivity.this, SplashActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        });
+
+        Button restart_first = (Button) findViewById(R.id.restart_first);
+        restart_first.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedPreferences settings = getSharedPreferences("GLOBAL_PREFERENCES", MODE_PRIVATE);
+                settings
+                        .edit()
+                        .putBoolean("FIRST_LAUNCH_KEY", true)
+                        .apply();
+
+                finish();
+
+                startActivity(new Intent(MainActivity.this, SplashActivity.class)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
 

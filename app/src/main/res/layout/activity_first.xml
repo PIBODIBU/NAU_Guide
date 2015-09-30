@@ -1,0 +1,53 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#b7beb3"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/vk_sign_in"
+        android:layout_width="90dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="200dp"
+        android:layout_marginLeft="10dp"
+        android:background="@color/main_blue"
+        android:text="VKontakte"
+        android:textColor="#ffffff" />
+
+    <Button
+        android:id="@+id/gg_sign_in"
+        android:layout_width="90dp"
+        android:layout_height="50dp"
+        android:background="#ccb11500"
+        android:text="Google+"
+        android:textColor="#ffffff"
+        android:layout_alignTop="@+id/vk_sign_in"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:id="@+id/fb_sign_in"
+        android:layout_width="90dp"
+        android:layout_height="50dp"
+        android:background="#c0152887"
+        android:text="Facebook"
+        android:textColor="#ffffff"
+        android:layout_alignTop="@+id/gg_sign_in"
+        android:layout_alignRight="@+id/login_skip"
+        android:layout_alignEnd="@+id/login_skip"
+        android:layout_marginRight="10dp" />
+
+    <Button
+        android:id="@+id/login_skip"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:background="#a79f483d"
+        android:text="Skip"
+        android:textColor="#ffffff" />
+
+</RelativeLayout>

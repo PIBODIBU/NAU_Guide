@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -49,16 +50,8 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
     private SearchView searchView;
     private boolean wasInputActive = false;
 
-    //private String ACCOUNT_NAME;
-    //private String ACCOUNT_PHOTO;
-
     BaseNavigationDrawerActivity() {
     }
-
-    /*BaseNavigationDrawerActivity(String ACCOUNT_NAME, String ACCOUNT_PHOTO) {
-        this.ACCOUNT_NAME = ACCOUNT_NAME;
-        this.ACCOUNT_PHOTO = ACCOUNT_PHOTO;
-    }*/
 
     public void getCurrentSelection() {
         switch (BaseNavigationDrawerActivity.this.getClass().getSimpleName()) {
@@ -81,7 +74,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         }
     }
 
-    public void getDrawer(String ACCOUNT_NAME, String ACCOUNT_PHOTO, String ACCOUNT_EMAIL) {
+    public void getDrawer(String ACCOUNT_NAME, String ACCOUNT_PHOTO, String ACCOUNT_EMAIL, boolean SIGNED_KEY) {
 
 // Инициализируем Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -143,11 +136,19 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 //
 
 // Create the AccountHeader
+        ProfileDrawerItem profile_1;
+
+        if (SIGNED_KEY) {
+            profile_1 = new ProfileDrawerItem().withName(ACCOUNT_NAME).withEmail(ACCOUNT_EMAIL).withIcon(ACCOUNT_PHOTO);
+        } else {
+            profile_1 = new ProfileDrawerItem().withName("I am giraffe").withEmail("giraffe@giraffe.com").withIcon(getResources().getDrawable(R.drawable.default_header_icon));
+        }
+
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header_png)
                 .addProfiles(
-                        new ProfileDrawerItem().withName(ACCOUNT_NAME).withEmail(ACCOUNT_EMAIL).withIcon(ACCOUNT_PHOTO)
+                        profile_1
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override

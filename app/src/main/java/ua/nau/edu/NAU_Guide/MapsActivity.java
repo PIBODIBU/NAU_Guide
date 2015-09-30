@@ -40,7 +40,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         getDrawer(
                 settings.getString("VK_INFO_KEY", ""),
                 settings.getString("VK_PHOTO_KEY", ""),
-                settings.getString("VK_EMAIL_KEY", "")
+                settings.getString("VK_EMAIL_KEY", ""),
+                settings.getBoolean("VK_SIGNED_KEY", false)
         );
 
         setUpMapIfNeeded();
@@ -155,7 +156,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         this.titleSlidingLayout = (TextView) findViewById(R.id.titleSlidingLayout);
     }
 
-    //Получение айди маркера
+//Получение айди маркера
     private int getMarkerId(Marker marker) {
         String s = marker.getId();
         s = s.substring(1, s.length());
@@ -163,4 +164,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         i++;
         return i;
     }
+//
+
 }

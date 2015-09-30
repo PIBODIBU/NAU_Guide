@@ -75,6 +75,10 @@
             android:name="com.vk.sdk.VKServiceActivity"
             android:label="ServiceActivity"
             android:theme="@style/VK.Transparent" />
+
+        <activity
+            android:name=".FirstLaunchActivity"
+            android:label="@string/FirstActivity_label" />
     </application>
 
 </manifest>

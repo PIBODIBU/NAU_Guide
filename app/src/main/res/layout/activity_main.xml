@@ -39,24 +39,24 @@
         android:id="@+id/sign_in_button"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/vk_sign_in"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/button_vk_log_in"
-        android:enabled="false"
-        android:layout_alignBottom="@+id/button_vk_log_in" />
+        android:layout_alignTop="@+id/vk_sign_in"
+        android:enabled="false" />
 
     <Button
         android:id="@+id/sign_out_button"
         android:layout_width="130dp"
         android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/sign_in_button"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignStart="@+id/sign_in_button"
+        android:layout_below="@+id/sign_in_button"
         android:background="#ff939393"
         android:enabled="false"
-        android:text="@string/sign_out_button_name"
-        android:layout_below="@+id/sign_in_button"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignLeft="@+id/sign_in_button"
-        android:layout_alignStart="@+id/sign_in_button" />
+        android:text="@string/sign_out_button_name" />
 
     <ListView
         android:id="@+id/circles_list"
@@ -80,25 +80,25 @@
         android:text="Restart" />
 
     <Button
-        android:id="@+id/button_vk_log_in"
+        android:id="@+id/vk_sign_in"
         android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:background="@color/main_blue"
-        android:text="Sign in"
-        android:layout_below="@+id/linearLayout"
+        android:layout_height="50dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="35dp" />
+        android:layout_below="@+id/linearLayout"
+        android:layout_marginTop="35dp"
+        android:background="@color/main_blue"
+        android:text="VK Sign in" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="#010000"
-        android:layout_below="@+id/imageView2"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/imageView2"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#010000" />
 
     <ImageView
         android:id="@+id/imageView2"
@@ -107,5 +107,29 @@
         android:layout_above="@+id/circles_list"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="150dp" />
+
+    <Button
+        android:id="@+id/vk_sign_out"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/sign_out_button"
+        android:text="Sign out"
+        android:layout_alignBottom="@+id/sign_out_button"
+        android:layout_alignRight="@+id/vk_sign_in"
+        android:layout_alignEnd="@+id/vk_sign_in" />
+
+    <Button
+        android:id="@+id/restart_first"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:background="#ff00aa13"
+        android:text="Restart with FirstScreen"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/vk_sign_out"
+        android:layout_alignEnd="@+id/vk_sign_out" />
 
 </RelativeLayout>
