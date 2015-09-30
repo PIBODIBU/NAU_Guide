@@ -28,7 +28,7 @@
 
         <TextView
             android:id="@+id/plus_user"
-            android:layout_width="40dp"
+            android:layout_width="290dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="100dp"
             android:textColor="@color/black"
@@ -102,11 +102,10 @@
 
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/circles_list"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="33dp" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="150dp" />
 
 </RelativeLayout>

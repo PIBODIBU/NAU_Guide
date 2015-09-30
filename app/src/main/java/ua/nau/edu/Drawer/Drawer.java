@@ -1,4 +1,4 @@
-package ua.nau.edu.Drawer;//
+/*package ua.nau.edu.Drawer;//
 // Source code recreated from a .class file by IntelliJ IDEA
 // (powered by Fernflower decompiler)
 //
@@ -706,3 +706,4 @@ public class Drawer {
         }
     }
 }
+*/

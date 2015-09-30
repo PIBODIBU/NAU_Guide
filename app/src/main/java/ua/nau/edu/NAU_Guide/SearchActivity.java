@@ -3,6 +3,7 @@ package ua.nau.edu.NAU_Guide;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.view.KeyEvent;
@@ -15,12 +16,21 @@ import android.widget.Toast;
 
 public class SearchActivity extends BaseNavigationDrawerActivity {
 
+    public SearchActivity() {
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        getDrawer();
+        SharedPreferences settings = getSharedPreferences("VK_PREFERENCES", MainActivity.MODE_PRIVATE);
+
+        getDrawer(
+                settings.getString("VK_INFO_KEY", ""),
+                settings.getString("VK_PHOTO_KEY", "")
+        );
+
         handleIntent(getIntent());
     }
 
@@ -57,7 +67,7 @@ public class SearchActivity extends BaseNavigationDrawerActivity {
 
     @Override
     protected void onResume() {
-        getCurrentSelection();
+        //getCurrentSelection();
         super.onResume();
     }
 

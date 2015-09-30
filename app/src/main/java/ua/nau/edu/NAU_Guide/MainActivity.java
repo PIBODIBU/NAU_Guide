@@ -7,10 +7,12 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
@@ -69,9 +71,11 @@ import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
+import com.vk.sdk.payments.VKIInAppBillingService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -81,6 +85,10 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         ResultCallback<People.LoadPeopleResult>, View.OnClickListener,
         CheckBox.OnCheckedChangeListener, GoogleApiClient.ServerAuthCodeCallbacks {
+
+    public MainActivity() {
+    }
+
     private SearchView searchView;
     private InputMethodManager inputMethodManager = null;
 
@@ -151,10 +159,13 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private ArrayList<String> mCirclesList;
     private ArrayAdapter<String> mCirclesAdapter;
 
-// VKONTAKTE SDK VARIABLES
+    // VKONTAKTE SDK VARIABLES
     private int appId = 5084652;
+    public static final String VK_PREFERENCES = "VK_PREFERENCES";
+    public static final String VK_INFO_KEY = "VK_INFO_KEY";
+    public static final String VK_PHOTO_KEY = "VK_PHOTO_KEY";
+    public static final String VK_EMAIL_KEY = "VK_EMAIL_KEY";
     VKRequest request_info = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_50, photo_100, photo_200"));
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -167,23 +178,31 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                     @Override
                     public void onComplete(VKResponse response) {
 //Do complete stuff
-                        TextView text = (TextView) findViewById(R.id.textView2);
-                        VKApiUserFull user = ((VKList<VKApiUserFull>) response.parsedModel).get(0);
+                        VKApiUserFull users = ((VKList<VKApiUserFull>) response.parsedModel).get(0);
 
-                        text.setText("Name: " + user.first_name + " " + user.last_name + "\n Id: " + user.id);
+/********** < setShared Preferences> **********/
+                        SharedPreferences settings = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = settings.edit();
 
-                        ImageView avatar = (ImageView) findViewById(R.id.imageView2);
-                        new ImageDownloader(avatar).execute(user.photo_200);
+                        editor.putString(VK_INFO_KEY, users.first_name + " " + users.last_name);
+                        editor.putString(VK_PHOTO_KEY, users.photo_200);
+
+                        editor.apply();
+/********** < /setShared Preferences> **********/
+
+                        super.onComplete(response);
                     }
 
                     @Override
                     public void onError(VKError error) {
 //Do error stuff
+                        super.onError(error);
                     }
 
                     @Override
                     public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
 //I don't really believe in progress
+                        super.attemptFailed(request, attemptNumber, totalAttempts);
                     }
                 });
             }
@@ -222,29 +241,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     }
 
 // Image DownLoader
-    class ImageDownloader extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
-
-        public ImageDownloader(ImageView bmImage) {
-            this.bmImage = bmImage;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String url = urls[0];
-            Bitmap mIcon = null;
-            try {
-                InputStream in = new java.net.URL(url).openStream();
-                mIcon = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-            }
-            return mIcon;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
-        }
-    }
+    Bitmap b = null;
 // ****************
 
     VKAccessTokenTracker vkAccessTokenTracker = new VKAccessTokenTracker() {
@@ -264,6 +261,13 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         }
         super.onCreate(savedInstanceState);
 
+/********** < getShared Preferences> **********/
+        SharedPreferences settings = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
+        //TextView signed_in_as = (TextView) findViewById(R.id.textView2);
+        ImageView avatar = (ImageView) findViewById(R.id.imageView2);
+
+/********** </getShared Preferences> **********/
+
 //VK initialize
         vkAccessTokenTracker.startTracking();
         VKSdk.initialize(getApplicationContext(), appId, "");
@@ -274,7 +278,17 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
 
 // Load Navigation Drawer
-        getDrawer();
+        /*BaseNavigationDrawerActivity NavigationDrawer = new BaseNavigationDrawerActivity(
+                settings.getString(VK_INFO_KEY, ""),
+                settings.getString(VK_PHOTO_KEY, ""));*/
+
+        //NavigationDrawer.getDrawer();
+
+        getDrawer(
+                settings.getString(VK_INFO_KEY, ""),
+                settings.getString(VK_PHOTO_KEY, "")
+        );
+//
 
 // VK sing in button
         Button vk_log_in = (Button) findViewById(R.id.button_vk_log_in);
@@ -351,13 +365,13 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
     @Override
     protected void onResume() {
-        getCurrentSelection();
+        //getCurrentSelection();
         super.onResume();
     }
 
     /**
      * Google plus
-     */
+     **/
 
     private GoogleApiClient buildGoogleApiClient() {
         GoogleApiClient.Builder builder = new GoogleApiClient.Builder(this)

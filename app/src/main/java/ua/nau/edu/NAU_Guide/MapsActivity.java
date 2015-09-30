@@ -1,6 +1,7 @@
 package ua.nau.edu.NAU_Guide;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -14,6 +15,9 @@ import ua.nau.edu.University.University;
 
 public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback {
 
+    public MapsActivity(){
+    }
+
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private NAU university;
 
@@ -25,7 +29,12 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         university = new NAU();
         university.init();
 
-        getDrawer();
+        SharedPreferences settings = getSharedPreferences("VK_PREFERENCES", MainActivity.MODE_PRIVATE);
+
+        getDrawer(
+                settings.getString("VK_INFO_KEY", ""),
+                settings.getString("VK_PHOTO_KEY", "")
+        );
 
         setUpMapIfNeeded();
     }

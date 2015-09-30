@@ -4,35 +4,62 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.mikepenz.iconics.typeface.FontAwesome;
+//import com.mikepenz.iconics.typeface.FontAwesome;
 
-import ua.nau.edu.Drawer.*;
-
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.mikepenz.materialdrawer.util.DrawerImageLoader;
+
+import java.io.InputStream;
+import java.net.URL;
 
 
 public class BaseNavigationDrawerActivity extends AppCompatActivity {
-    protected Drawer.Result drawerResult = null;
+    protected Drawer drawerResult = null;
     private InputMethodManager inputMethodManager = null;
     private SearchView searchView;
     private boolean wasInputActive = false;
 
-    public void getCurrentSelection() {
+    //private String ACCOUNT_NAME;
+    //private String ACCOUNT_PHOTO;
+
+    BaseNavigationDrawerActivity() {
+    }
+
+    /*BaseNavigationDrawerActivity(String ACCOUNT_NAME, String ACCOUNT_PHOTO) {
+        this.ACCOUNT_NAME = ACCOUNT_NAME;
+        this.ACCOUNT_PHOTO = ACCOUNT_PHOTO;
+    }*/
+
+    /*public void getCurrentSelection() {
         switch (BaseNavigationDrawerActivity.this.getClass().getSimpleName()) {
             case "MainActivity": {
                 drawerResult.setSelection(0);
@@ -51,15 +78,14 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 break;
             }
         }
-    }
+    }*/
 
-    public void getDrawer() {
-        // Инициализируем Toolbar
+    public void getDrawer(String ACCOUNT_NAME, String ACCOUNT_PHOTO) {
+// Инициализируем Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Инициализируем Navigation Drawer
         final PrimaryDrawerItem home = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_home)
                 .withIcon(FontAwesome.Icon.faw_home)
@@ -90,11 +116,52 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withIcon(FontAwesome.Icon.faw_close)
                 .withIdentifier(7);
 
-        drawerResult = new Drawer()
+        toastShowLong(ACCOUNT_PHOTO);
+
+        /*DrawerImageLoader.init(new DrawerImageLoader.IDrawerImageLoader() {
+            @Override
+            public void set(ImageView imageView, Uri uri, Drawable placeholder) {
+                Picasso.with(imageView.getContext()).load(uri).placeholder(placeholder).into(imageView);
+            }
+
+            @Override
+            public void cancel(ImageView imageView) {
+                Picasso.with(imageView.getContext()).cancelRequest(imageView);
+            }
+
+            @Override
+            public Drawable placeholder(Context context) {
+                return null;
+            }
+
+            @Override
+            public Drawable placeholder(Context ctx, String s) {
+                return null;
+            }
+        });*/
+
+// Create the AccountHeader
+        AccountHeader headerResult = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withHeaderBackground(R.drawable.header_png)
+                .addProfiles(
+                        new ProfileDrawerItem().withName(ACCOUNT_NAME).withEmail("your_email@gmail.com").withIcon(ACCOUNT_PHOTO)
+                )
+                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+                        return false;
+                    }
+                })
+                .build();
+
+// Инициализируем Navigation Drawer
+        drawerResult = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withActionBarDrawerToggle(true)
-                .withHeader(R.layout.drawer_header)
+                        //.withHeader(R.layout.drawer_header)
+                .withAccountHeader(headerResult)
                 .withHeaderDivider(false)
                 .addDrawerItems(
                         home,
@@ -124,11 +191,16 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                         if (wasInputActive)
                             inputMethodManager.showSoftInput(getCurrentFocus(), 0);
                     }
+
+                    @Override
+                    public void onDrawerSlide(View view, float v) {
+
+                    }
                 })
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     // Обработка клика
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         try {
                             String CURRENT_CLASS = BaseNavigationDrawerActivity.this.getClass().getSimpleName();
                             String MAIN_CLASS = "MainActivity";
@@ -178,12 +250,12 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        getCurrentSelection();
+                        //getCurrentSelection();
 
                         /*if (drawerItem instanceof Nameable) {
                             Toast.makeText(MainActivity.this, MainActivity.this.getString(((Nameable) drawerItem).getNameRes()), Toast.LENGTH_SHORT).show();
-                        }*/
-                        /*if (drawerItem instanceof Badgeable) {
+                        }
+                        if (drawerItem instanceof Badgeable) {
                             Badgeable badgeable = (Badgeable) drawerItem;
                             if (badgeable.getBadge() != null) {
                                 // учтите, не делайте так, если ваш бейдж содержит символ "+"
@@ -197,20 +269,21 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                 }
                             }
                         }*/
+                        return false;
                     }
                 })
-                .withOnDrawerItemLongClickListener(new Drawer.OnDrawerItemLongClickListener() {
+                /*.withOnDrawerItemLongClickListener(new Drawer.OnDrawerItemLongClickListener() {
                     @Override
                     // Обработка длинного клика, например, только для SecondaryDrawerItem
                     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
                         if (drawerItem instanceof SecondaryDrawerItem) {
-                            Toast.makeText(BaseNavigationDrawerActivity.this, BaseNavigationDrawerActivity.this.getString(((SecondaryDrawerItem) drawerItem).getNameRes()), Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(BaseNavigationDrawerActivity.this, BaseNavigationDrawerActivity.this.getString(((SecondaryDrawerItem) drawerItem).getNameRes()), Toast.LENGTH_SHORT).show();
                         }
                         return false;
                     }
-                })
+                })*/
                 .build();
-        getCurrentSelection();
+        //getCurrentSelection();
     }
 
     @Override
