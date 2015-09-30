@@ -37,6 +37,7 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
+import com.squareup.picasso.Picasso;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -118,7 +119,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 
         toastShowLong(ACCOUNT_PHOTO);
 
-        /*DrawerImageLoader.init(new DrawerImageLoader.IDrawerImageLoader() {
+        DrawerImageLoader.init(new DrawerImageLoader.IDrawerImageLoader() {
             @Override
             public void set(ImageView imageView, Uri uri, Drawable placeholder) {
                 Picasso.with(imageView.getContext()).load(uri).placeholder(placeholder).into(imageView);
@@ -138,7 +139,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
             public Drawable placeholder(Context ctx, String s) {
                 return null;
             }
-        });*/
+        });
 
 // Create the AccountHeader
         AccountHeader headerResult = new AccountHeaderBuilder()
