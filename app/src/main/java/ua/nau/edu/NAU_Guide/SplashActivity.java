@@ -25,10 +25,6 @@ public class SplashActivity extends Activity {
                     // After 1 seconds redirect to another intent
                     if (settings.getBoolean(FIRST_LAUNCH_KEY, true)) {
                         startActivity(new Intent(getBaseContext(), FirstLaunchActivity.class));
-
-                        SharedPreferences.Editor editor = settings.edit();
-                        editor.putBoolean(FIRST_LAUNCH_KEY, false);
-                        editor.apply();
                     } else {
                         startActivity(new Intent(getBaseContext(), MainActivity.class));
                     }

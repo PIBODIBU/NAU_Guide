@@ -34,6 +34,8 @@ public class FirstLaunchActivity extends Activity {
     public static final String VK_PHOTO_KEY = "VK_PHOTO_KEY";
     public static final String VK_EMAIL_KEY = "VK_EMAIL_KEY";
     private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
+    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
+    private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
     private boolean SIGNED_IN;
     VKRequest request_info = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_50, photo_100, photo_200"));
 //
@@ -51,19 +53,25 @@ public class FirstLaunchActivity extends Activity {
                         VKApiUserFull users = ((VKList<VKApiUserFull>) response.parsedModel).get(0);
                         SIGNED_IN = true;
 
-/********** <setShared Preferences> **********/
-                        SharedPreferences settings = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = settings.edit();
+/** Shared Preferences **/
+                        SharedPreferences settings_vk = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
+                        SharedPreferences.Editor editor_vk = settings_vk.edit();
 
-                        editor.putString(VK_INFO_KEY, users.first_name + " " + users.last_name);
-                        editor.putString(VK_PHOTO_KEY, users.photo_200);
-                        editor.putString(VK_EMAIL_KEY, VKSdk.getAccessToken().email);
+                        editor_vk.putString(VK_INFO_KEY, users.first_name + " " + users.last_name);
+                        editor_vk.putString(VK_PHOTO_KEY, users.photo_200);
+                        editor_vk.putString(VK_EMAIL_KEY, VKSdk.getAccessToken().email);
 
-                        editor.putBoolean(VK_SIGNED_KEY, SIGNED_IN);
+                        editor_vk.putBoolean(VK_SIGNED_KEY, SIGNED_IN);
 
-                        editor.apply();
-/********** </setShared Preferences> **********/
+                        editor_vk.apply();
+/*****/
 
+/** Important! Add this after each success login **/
+                        SharedPreferences settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
+                        settings_global.edit().putBoolean(FIRST_LAUNCH_KEY, false).apply();
+/*****/
+
+                        finish();
                         startActivity(new Intent(FirstLaunchActivity.this, MainActivity.class)
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 
@@ -162,11 +170,24 @@ public class FirstLaunchActivity extends Activity {
         {
             @Override
             public void onClick(View view) {
+/** Important! Add this after each success login **/
+                SharedPreferences settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
+                settings_global.edit().putBoolean(FIRST_LAUNCH_KEY, false).apply();
+/*****/
+
+                finish();
                 startActivity(new Intent(FirstLaunchActivity.this, MainActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
 //
 
+    }
+
+    @Override
+    protected void onStop() {
+
+
+        super.onStop();
     }
 }

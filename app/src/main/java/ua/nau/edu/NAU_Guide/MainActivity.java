@@ -169,7 +169,9 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
     private boolean SIGNED_IN;
     VKRequest request_info = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_50, photo_100, photo_200"));
-//
+    //
+    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
+    private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -185,7 +187,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                         VKApiUserFull users = ((VKList<VKApiUserFull>) response.parsedModel).get(0);
                         SIGNED_IN = true;
 
-/********** <setShared Preferences> **********/
+/** Shared Preferences **/
                         SharedPreferences settings = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
                         SharedPreferences.Editor editor = settings.edit();
 
@@ -196,7 +198,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                         editor.putBoolean(VK_SIGNED_KEY, SIGNED_IN);
 
                         editor.apply();
-/********** </setShared Preferences> **********/
+/*****/
 
                         startActivity(new Intent(MainActivity.this, MainActivity.class)
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
@@ -255,7 +257,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         @Override
         public void onVKAccessTokenChanged(VKAccessToken oldToken, VKAccessToken newToken) {
             if (newToken == null) {
-// VKAccessToken is invalid
+                // VKAccessToken is invalid
                 toastShowLong("Invalid access token");
             }
         }
@@ -268,9 +270,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         }
         super.onCreate(savedInstanceState);
 
-/********** < getShared Preferences> **********/
-        SharedPreferences settings = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
-/********** </getShared Preferences> **********/
 
 //VK initialize
         vkAccessTokenTracker.startTracking();
@@ -280,13 +279,10 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
 // Get system services
         inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+//
 
-// Create object and load Navigation Drawer
-        /*BaseNavigationDrawerActivity NavigationDrawer = new BaseNavigationDrawerActivity(
-                settings.getString(VK_INFO_KEY, ""),
-                settings.getString(VK_PHOTO_KEY, ""));*/
-
-        //NavigationDrawer.getDrawer();
+// Load Navigation Drawer
+        SharedPreferences settings = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
 
         getDrawer(
                 settings.getString(VK_INFO_KEY, ""),
@@ -301,7 +297,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         vk_log_in.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-// VK login execute
+                // VK login execute
                 VKSdk.login(MainActivity.this, VKScope.EMAIL, VKScope.PHOTOS);
             }
         });
@@ -312,22 +308,22 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         vk_log_out.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferences settings = getSharedPreferences(VK_PREFERENCES, BaseNavigationDrawerActivity.MODE_PRIVATE);
-                SharedPreferences.Editor editor = settings.edit();
+                SharedPreferences settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
+                settings_global
+                        .edit()
+                        .putBoolean(FIRST_LAUNCH_KEY, true)
+                        .apply();
 
-                editor.putBoolean(VK_SIGNED_KEY, false);
+                finish();
+                startActivity(new Intent(MainActivity.this, FirstLaunchActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 
-                editor.apply();
-
-                /*startActivity(new Intent(MainActivity.this, MainActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));*/
-
-                getDrawer(
+                /*getDrawer(
                         settings.getString(VK_INFO_KEY, ""),
                         settings.getString(VK_PHOTO_KEY, ""),
                         settings.getString(VK_EMAIL_KEY, ""),
                         settings.getBoolean(VK_SIGNED_KEY, false)
-                );
+                );*/
 
             }
         });
@@ -348,7 +344,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         restart_first.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferences settings = getSharedPreferences("GLOBAL_PREFERENCES", MODE_PRIVATE);
+                SharedPreferences settings = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
                 settings
                         .edit()
                         .putBoolean("FIRST_LAUNCH_KEY", true)
@@ -357,13 +353,14 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                 finish();
 
                 startActivity(new Intent(MainActivity.this, SplashActivity.class)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
 
         /**
          *
          * Google plus
+         *
          **/
 
         if (savedInstanceState != null) {
