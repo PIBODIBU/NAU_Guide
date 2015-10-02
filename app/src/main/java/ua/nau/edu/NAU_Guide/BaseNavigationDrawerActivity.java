@@ -39,12 +39,32 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.squareup.picasso.Picasso;
+import com.vk.sdk.api.VKApi;
+import com.vk.sdk.api.VKApiConst;
+import com.vk.sdk.api.VKParameters;
+import com.vk.sdk.api.VKRequest;
+import com.vk.sdk.api.model.VKApiUserFull;
 
 import java.io.InputStream;
 import java.net.URL;
 
 
 public class BaseNavigationDrawerActivity extends AppCompatActivity {
+    private static final String VK_PREFERENCES = "VK_PREFERENCES";
+    private static final String VK_INFO_KEY = "VK_INFO_KEY";
+    private static final String VK_PHOTO_KEY = "VK_PHOTO_KEY";
+    private static final String VK_EMAIL_KEY = "VK_EMAIL_KEY";
+    private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
+    private static final String VK_ID_KEY = "VK_ID_KEY";
+
+    private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
+    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
+
+    SharedPreferences settings_global = null;
+    SharedPreferences settings_vk = null;
+    SharedPreferences.Editor editor_global;
+    SharedPreferences.Editor editor_vk;
+
     protected Drawer drawerResult = null;
     private InputMethodManager MethodManager = null;
     private SearchView searchView;
@@ -74,7 +94,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         }
     }
 
-    public void getDrawer(String ACCOUNT_NAME, String ACCOUNT_PHOTO, String ACCOUNT_EMAIL, boolean SIGNED_KEY) {
+    public void getDrawer(String ACCOUNT_NAME, String ACCOUNT_PHOTO, String ACCOUNT_EMAIL) {
 
 // Инициализируем Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -138,7 +158,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 // Create the AccountHeader
         ProfileDrawerItem profile_1;
 
-        if (SIGNED_KEY) {
+        if (settings_vk.getBoolean(VK_SIGNED_KEY, false)) {
             profile_1 = new ProfileDrawerItem().withName(ACCOUNT_NAME).withEmail(ACCOUNT_EMAIL).withIcon(ACCOUNT_PHOTO);
         } else {
             profile_1 = new ProfileDrawerItem().withName("I am giraffe").withEmail("giraffe@giraffe.com").withIcon(getResources().getDrawable(R.drawable.default_header_icon));
@@ -340,5 +360,10 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         MethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+
+        settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
+        settings_vk = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
+        editor_global = settings_global.edit();
+        editor_vk = settings_vk.edit();
     }
 }

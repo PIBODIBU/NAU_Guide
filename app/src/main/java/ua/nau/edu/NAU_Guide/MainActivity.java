@@ -10,7 +10,6 @@ import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -67,14 +66,16 @@ import java.util.List;
 import java.util.Set;
 
 public class MainActivity extends BaseNavigationDrawerActivity implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        ResultCallback<People.LoadPeopleResult>, View.OnClickListener,
-        CheckBox.OnCheckedChangeListener, GoogleApiClient.ServerAuthCodeCallbacks {
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        ResultCallback<People.LoadPeopleResult>,
+        View.OnClickListener,
+        CheckBox.OnCheckedChangeListener,
+        GoogleApiClient.ServerAuthCodeCallbacks {
 
     public MainActivity() {
     }
 
-    private SearchView searchView;
     private InputMethodManager inputMethodManager = null;
 
     /**
@@ -130,11 +131,10 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
     private static final int RC_SIGN_IN = 0;
 
-    // Used to store the error code most recently returned by Google Play services
-    // until the user clicks 'sign in'.
     private int mSignInError;
 
-    //views
+/** VIEWS **/
+
     private SignInButton mSignInButoon;
     private TextView plusText;
     private TextView plus_user;
@@ -144,10 +144,17 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private ArrayList<String> mCirclesList;
     private ArrayAdapter<String> mCirclesAdapter;
 
-// VKONTAKTE SDK VARIABLES
+    private Button vk_share;
+    private Button restart;
+    private Button vk_sign_in;
+    private Button vk_sign_out;
+    private Button restart_first;
+
+/*****/
+
+/*** VKONTAKTE SDK VARIABLES ***/
 
     private int appId = 5084652;
-    private String user_id;
 
     private static final String VK_PREFERENCES = "VK_PREFERENCES";
     private static final String VK_INFO_KEY = "VK_INFO_KEY";
@@ -156,20 +163,195 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
     private static final String VK_ID_KEY = "VK_ID_KEY";
 
-    private boolean SIGNED_IN;
     VKApiUserFull users_full = null;
     VKRequest request_info = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_50, photo_100, photo_200"));
     VKRequest request_post;
-//
+/*****/
 
-    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
     private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
+    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
 
     SharedPreferences settings_global = null;
     SharedPreferences settings_vk = null;
-
     SharedPreferences.Editor editor_global;
     SharedPreferences.Editor editor_vk;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        if (getIntent().getBooleanExtra("EXIT", false)) {
+            finish();
+        }
+        super.onCreate(savedInstanceState);
+
+//VK initialize
+        vkAccessTokenTracker.startTracking();
+        VKSdk.initialize(getApplicationContext(), appId, "");
+//
+
+// Setting Content View
+        setContentView(R.layout.activity_main);
+
+// Get and set system services & Buttons & SharedPreferences
+        inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+
+        settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
+        settings_vk = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
+        editor_global = settings_global.edit();
+        editor_vk = settings_vk.edit();
+
+        vk_share = (Button) findViewById(R.id.vk_share);
+        restart = (Button) findViewById(R.id.restart);
+        vk_sign_in = (Button) findViewById(R.id.vk_sign_in);
+        vk_sign_out = (Button) findViewById(R.id.vk_sign_out);
+        restart_first = (Button) findViewById(R.id.restart_first);
+
+        if(!settings_vk.getBoolean(VK_SIGNED_KEY, false)) {
+            vk_sign_out.setEnabled(false);
+            vk_share.setEnabled(false);
+        }
+//
+
+// Load Navigation Drawer
+        getDrawer(
+                settings_vk.getString(VK_INFO_KEY, ""),
+                settings_vk.getString(VK_PHOTO_KEY, ""),
+                settings_vk.getString(VK_EMAIL_KEY, "")
+        );
+//
+
+/** BUTTONS **/
+
+// VK sing in button
+        vk_sign_in.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // VK login execute
+                VKSdk.login(MainActivity.this, VKScope.EMAIL, VKScope.PHOTOS);
+            }
+        });
+//
+
+// VK sign out button
+        vk_sign_out.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                settings_global
+                        .edit()
+                        .putBoolean(FIRST_LAUNCH_KEY, true)
+                        .apply();
+
+
+                settings_vk
+                        .edit()
+                        .putString(VK_PHOTO_KEY, "")
+                        .putString(VK_EMAIL_KEY, "")
+                        .putString(VK_INFO_KEY, "")
+                        .putBoolean(VK_SIGNED_KEY, false)
+                        .apply();
+
+                finish();
+                startActivity(new Intent(MainActivity.this, FirstLaunchActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        });
+//
+
+// Share button
+        request_post = VKApi.wall()
+                .post(VKParameters.from(
+                        VKApiConst.OWNER_ID,
+                        Integer.toString(settings_vk.getInt(VK_ID_KEY, -1)),
+                        VKApiConst.MESSAGE,
+                        "Test: \n" + Uri.parse("https://play.google.com/store") ));
+
+        vk_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                request_post.executeWithListener(new VKRequest.VKRequestListener() {
+                    @Override
+                    public void onComplete(VKResponse response) {
+                        toastShowLong("Отправлено");
+
+                        super.onComplete(response);
+                    }
+
+                    @Override
+                    public void onError(VKError error) {
+                        toastShowLong("Ошибка");
+
+                        super.onError(error);
+                    }
+
+                    @Override
+                    public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
+                        super.attemptFailed(request, attemptNumber, totalAttempts);
+                    }
+                });
+            }
+        });
+//
+
+// Restart button
+        restart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+
+                startActivity(new Intent(MainActivity.this, SplashActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        });
+//
+
+// Restart with FirstLaunchActivity button
+        restart_first.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editor_global
+                        .putBoolean(FIRST_LAUNCH_KEY, true)
+                        .apply();
+
+                editor_vk.
+                        putBoolean(VK_SIGNED_KEY, false)
+                        .apply();
+
+                finish();
+
+                startActivity(new Intent(MainActivity.this, SplashActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        });
+//
+
+/*****/
+
+/** Google+ **/
+
+        if (savedInstanceState != null) {
+            mSignInProgress = savedInstanceState
+                    .getInt(SAVED_PROGRESS, STATE_DEFAULT);
+        }
+
+        mClient = buildGoogleApiClient();
+
+        mSignInButoon = (SignInButton) findViewById(R.id.sign_in_button);
+        mSignInButoon.setOnClickListener(this);
+
+        mSignOutButton = (Button) findViewById(R.id.sign_out_button);
+        mSignOutButton.setOnClickListener(this);
+
+        plusText = (TextView) findViewById(R.id.plus_text);
+        plus_user = (TextView) findViewById(R.id.plus_user);
+        mCirclesListView = (ListView) findViewById(R.id.circles_list);
+
+
+        mCirclesList = new ArrayList<>();
+        mCirclesAdapter = new ArrayAdapter<String>(
+                this, R.layout.circle_member, mCirclesList);
+        mCirclesListView.setAdapter(mCirclesAdapter);
+
+/*****/
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -177,22 +359,21 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
             @Override
             public void onResult(VKAccessToken res) {
 // Пользователь успешно авторизовался
-
                 request_info.executeWithListener(new VKRequest.VKRequestListener() {
                     @Override
                     public void onComplete(VKResponse response) {
 //Do complete stuff
                         users_full = ((VKList<VKApiUserFull>) response.parsedModel).get(0);
-                        SIGNED_IN = true;
 
 /** Shared Preferences **/
                         editor_vk.putString(VK_INFO_KEY, users_full.first_name + " " + users_full.last_name);
                         editor_vk.putString(VK_PHOTO_KEY, users_full.photo_200);
                         editor_vk.putString(VK_EMAIL_KEY, VKSdk.getAccessToken().email);
-
-                        editor_vk.putBoolean(VK_SIGNED_KEY, SIGNED_IN);
-
+                        editor_vk.putBoolean(VK_SIGNED_KEY, true);
                         editor_vk.apply();
+
+                        editor_global.putBoolean(FIRST_LAUNCH_KEY, false);
+                        editor_global.apply();
 /*****/
 
                         startActivity(new Intent(MainActivity.this, MainActivity.class)
@@ -255,175 +436,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
             }
         }
     };
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        if (getIntent().getBooleanExtra("EXIT", false)) {
-            finish();
-        }
-        super.onCreate(savedInstanceState);
-
-        settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
-        settings_vk = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
-        editor_global = settings_global.edit();
-        editor_vk = settings_vk.edit();
-
-//VK initialize
-        vkAccessTokenTracker.startTracking();
-        VKSdk.initialize(getApplicationContext(), appId, "");
-//
-        setContentView(R.layout.activity_main);
-
-// Get system services
-        inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-//
-
-// Load Navigation Drawer
-        getDrawer(
-                settings_vk.getString(VK_INFO_KEY, ""),
-                settings_vk.getString(VK_PHOTO_KEY, ""),
-                settings_vk.getString(VK_EMAIL_KEY, ""),
-                settings_vk.getBoolean(VK_SIGNED_KEY, false)
-        );
-//
-
-// VK sing in button
-        Button vk_log_in = (Button) findViewById(R.id.vk_sign_in);
-        vk_log_in.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // VK login execute
-                VKSdk.login(MainActivity.this, VKScope.EMAIL, VKScope.PHOTOS);
-            }
-        });
-//
-
-// VK sign out button
-        Button vk_log_out = (Button) findViewById(R.id.vk_sign_out);
-
-        if(!settings_vk.getBoolean(VK_SIGNED_KEY, false)) {
-            vk_log_out.setEnabled(false);
-        }
-        vk_log_out.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                settings_global
-                        .edit()
-                        .putBoolean(FIRST_LAUNCH_KEY, true)
-                        .apply();
-
-
-                settings_vk
-                        .edit()
-                        .putString(VK_PHOTO_KEY, "")
-                        .putString(VK_EMAIL_KEY, "")
-                        .putString(VK_INFO_KEY, "")
-                        .putBoolean(VK_SIGNED_KEY, false)
-                        .apply();
-
-                finish();
-                startActivity(new Intent(MainActivity.this, FirstLaunchActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-            }
-        });
-//
-
-// Restart button
-        Button restart = (Button) findViewById(R.id.restart);
-        restart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-
-                startActivity(new Intent(MainActivity.this, SplashActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-            }
-        });
-//
-
-// Restart with FirstLaunchActivity button
-        Button restart_first = (Button) findViewById(R.id.restart_first);
-        restart_first.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                settings_global
-                        .edit()
-                        .putBoolean("FIRST_LAUNCH_KEY", true)
-                        .apply();
-
-                finish();
-
-                startActivity(new Intent(MainActivity.this, SplashActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-            }
-        });
-//
-
-// Share button
-        request_post = VKApi.wall()
-                .post(VKParameters.from(
-                        VKApiConst.OWNER_ID,
-                        Integer.toString(settings_vk.getInt(VK_ID_KEY, -1)),
-                        VKApiConst.MESSAGE,
-                        "Test: \n" + Uri.parse("https://play.google.com/store") ));
-
-        Button vk_share = (Button) findViewById(R.id.vk_share);
-        vk_share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                request_post.executeWithListener(new VKRequest.VKRequestListener() {
-                    @Override
-                    public void onComplete(VKResponse response) {
-                        toastShowLong("Отправлено");
-
-                        super.onComplete(response);
-                    }
-
-                    @Override
-                    public void onError(VKError error) {
-                        toastShowLong("Ошибка");
-
-                        super.onError(error);
-                    }
-
-                    @Override
-                    public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
-                        super.attemptFailed(request, attemptNumber, totalAttempts);
-                    }
-                });
-            }
-        });
-//
-
-        /**
-         *
-         * Google plus
-         *
-         **/
-
-        if (savedInstanceState != null) {
-            mSignInProgress = savedInstanceState
-                    .getInt(SAVED_PROGRESS, STATE_DEFAULT);
-        }
-
-        mClient = buildGoogleApiClient();
-
-        mSignInButoon = (SignInButton) findViewById(R.id.sign_in_button);
-        mSignInButoon.setOnClickListener(this);
-
-        mSignOutButton = (Button) findViewById(R.id.sign_out_button);
-        mSignOutButton.setOnClickListener(this);
-
-        plusText = (TextView) findViewById(R.id.plus_text);
-        plus_user = (TextView) findViewById(R.id.plus_user);
-        mCirclesListView = (ListView) findViewById(R.id.circles_list);
-
-
-        mCirclesList = new ArrayList<>();
-        mCirclesAdapter = new ArrayAdapter<String>(
-                this, R.layout.circle_member, mCirclesList);
-        mCirclesListView.setAdapter(mCirclesAdapter);
-    }
 
     public void toastShowLong(String TEXT) {
         Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();

@@ -173,11 +173,6 @@ public class FirstLaunchActivity extends Activity {
         {
             @Override
             public void onClick(View view) {
-/** Important! Add this after each success login **/
-                SharedPreferences settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
-                settings_global.edit().putBoolean(FIRST_LAUNCH_KEY, false).apply();
-/*****/
-
                 finish();
                 startActivity(new Intent(FirstLaunchActivity.this, MainActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));

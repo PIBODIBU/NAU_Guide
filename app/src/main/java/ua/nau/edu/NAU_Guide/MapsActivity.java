@@ -40,13 +40,12 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         university = new NAU();
         university.init();
 
-        SharedPreferences settings = getSharedPreferences(VK_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences settings_vk = getSharedPreferences(VK_PREFERENCES, MODE_PRIVATE);
 
         getDrawer(
-                settings.getString(VK_INFO_KEY, ""),
-                settings.getString(VK_PHOTO_KEY, ""),
-                settings.getString(VK_EMAIL_KEY, ""),
-                settings.getBoolean(VK_SIGNED_KEY, false)
+                settings_vk.getString(VK_INFO_KEY, ""),
+                settings_vk.getString(VK_PHOTO_KEY, ""),
+                settings_vk.getString(VK_EMAIL_KEY, "")
         );
 
         setUpMapIfNeeded();
