@@ -4,16 +4,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
@@ -22,7 +18,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,19 +59,8 @@ import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
-import com.vk.sdk.VKAccessToken;
-import com.vk.sdk.VKCallback;
-import com.vk.sdk.VKSdk;
-import com.vk.sdk.api.VKApi;
-import com.vk.sdk.api.VKApiConst;
-import com.vk.sdk.api.VKError;
-import com.vk.sdk.api.VKParameters;
-import com.vk.sdk.api.VKRequest;
-import com.vk.sdk.payments.VKIInAppBillingService;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -160,18 +144,32 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private ArrayList<String> mCirclesList;
     private ArrayAdapter<String> mCirclesAdapter;
 
-    // VKONTAKTE SDK VARIABLES
+// VKONTAKTE SDK VARIABLES
+
     private int appId = 5084652;
-    public static final String VK_PREFERENCES = "VK_PREFERENCES";
-    public static final String VK_INFO_KEY = "VK_INFO_KEY";
-    public static final String VK_PHOTO_KEY = "VK_PHOTO_KEY";
-    public static final String VK_EMAIL_KEY = "VK_EMAIL_KEY";
+    private String user_id;
+
+    private static final String VK_PREFERENCES = "VK_PREFERENCES";
+    private static final String VK_INFO_KEY = "VK_INFO_KEY";
+    private static final String VK_PHOTO_KEY = "VK_PHOTO_KEY";
+    private static final String VK_EMAIL_KEY = "VK_EMAIL_KEY";
     private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
+    private static final String VK_ID_KEY = "VK_ID_KEY";
+
     private boolean SIGNED_IN;
+    VKApiUserFull users_full = null;
     VKRequest request_info = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_50, photo_100, photo_200"));
-    //
+    VKRequest request_post;
+//
+
     private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
     private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
+
+    SharedPreferences settings_global = null;
+    SharedPreferences settings_vk = null;
+
+    SharedPreferences.Editor editor_global;
+    SharedPreferences.Editor editor_vk;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -184,20 +182,17 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                     @Override
                     public void onComplete(VKResponse response) {
 //Do complete stuff
-                        VKApiUserFull users = ((VKList<VKApiUserFull>) response.parsedModel).get(0);
+                        users_full = ((VKList<VKApiUserFull>) response.parsedModel).get(0);
                         SIGNED_IN = true;
 
 /** Shared Preferences **/
-                        SharedPreferences settings = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = settings.edit();
+                        editor_vk.putString(VK_INFO_KEY, users_full.first_name + " " + users_full.last_name);
+                        editor_vk.putString(VK_PHOTO_KEY, users_full.photo_200);
+                        editor_vk.putString(VK_EMAIL_KEY, VKSdk.getAccessToken().email);
 
-                        editor.putString(VK_INFO_KEY, users.first_name + " " + users.last_name);
-                        editor.putString(VK_PHOTO_KEY, users.photo_200);
-                        editor.putString(VK_EMAIL_KEY, VKSdk.getAccessToken().email);
+                        editor_vk.putBoolean(VK_SIGNED_KEY, SIGNED_IN);
 
-                        editor.putBoolean(VK_SIGNED_KEY, SIGNED_IN);
-
-                        editor.apply();
+                        editor_vk.apply();
 /*****/
 
                         startActivity(new Intent(MainActivity.this, MainActivity.class)
@@ -223,8 +218,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
             @Override
             public void onError(VKError error) {
 // Произошла ошибка авторизации (например, пользователь запретил авторизацию)
-                TextView text = (TextView) findViewById(R.id.textView2);
-                text.setText("SOMETHING WRONG, BRO");
             }
         })) {
             super.onActivityResult(requestCode, resultCode, data);
@@ -270,6 +263,10 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         }
         super.onCreate(savedInstanceState);
 
+        settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
+        settings_vk = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
+        editor_global = settings_global.edit();
+        editor_vk = settings_vk.edit();
 
 //VK initialize
         vkAccessTokenTracker.startTracking();
@@ -282,13 +279,11 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 //
 
 // Load Navigation Drawer
-        SharedPreferences settings = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
-
         getDrawer(
-                settings.getString(VK_INFO_KEY, ""),
-                settings.getString(VK_PHOTO_KEY, ""),
-                settings.getString(VK_EMAIL_KEY, ""),
-                settings.getBoolean(VK_SIGNED_KEY, false)
+                settings_vk.getString(VK_INFO_KEY, ""),
+                settings_vk.getString(VK_PHOTO_KEY, ""),
+                settings_vk.getString(VK_EMAIL_KEY, ""),
+                settings_vk.getBoolean(VK_SIGNED_KEY, false)
         );
 //
 
@@ -305,31 +300,36 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
 // VK sign out button
         Button vk_log_out = (Button) findViewById(R.id.vk_sign_out);
+
+        if(!settings_vk.getBoolean(VK_SIGNED_KEY, false)) {
+            vk_log_out.setEnabled(false);
+        }
         vk_log_out.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferences settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
                 settings_global
                         .edit()
                         .putBoolean(FIRST_LAUNCH_KEY, true)
                         .apply();
 
+
+                settings_vk
+                        .edit()
+                        .putString(VK_PHOTO_KEY, "")
+                        .putString(VK_EMAIL_KEY, "")
+                        .putString(VK_INFO_KEY, "")
+                        .putBoolean(VK_SIGNED_KEY, false)
+                        .apply();
+
                 finish();
                 startActivity(new Intent(MainActivity.this, FirstLaunchActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-
-                /*getDrawer(
-                        settings.getString(VK_INFO_KEY, ""),
-                        settings.getString(VK_PHOTO_KEY, ""),
-                        settings.getString(VK_EMAIL_KEY, ""),
-                        settings.getBoolean(VK_SIGNED_KEY, false)
-                );*/
-
             }
         });
 //
 
-        Button restart = (Button) findViewById(R.id.button_restart);
+// Restart button
+        Button restart = (Button) findViewById(R.id.restart);
         restart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -339,13 +339,14 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
+//
 
+// Restart with FirstLaunchActivity button
         Button restart_first = (Button) findViewById(R.id.restart_first);
         restart_first.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferences settings = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
-                settings
+                settings_global
                         .edit()
                         .putBoolean("FIRST_LAUNCH_KEY", true)
                         .apply();
@@ -356,6 +357,43 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
+//
+
+// Share button
+        request_post = VKApi.wall()
+                .post(VKParameters.from(
+                        VKApiConst.OWNER_ID,
+                        Integer.toString(settings_vk.getInt(VK_ID_KEY, -1)),
+                        VKApiConst.MESSAGE,
+                        "Test: \n" + Uri.parse("https://play.google.com/store") ));
+
+        Button vk_share = (Button) findViewById(R.id.vk_share);
+        vk_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                request_post.executeWithListener(new VKRequest.VKRequestListener() {
+                    @Override
+                    public void onComplete(VKResponse response) {
+                        toastShowLong("Отправлено");
+
+                        super.onComplete(response);
+                    }
+
+                    @Override
+                    public void onError(VKError error) {
+                        toastShowLong("Ошибка");
+
+                        super.onError(error);
+                    }
+
+                    @Override
+                    public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
+                        super.attemptFailed(request, attemptNumber, totalAttempts);
+                    }
+                });
+            }
+        });
+//
 
         /**
          *
@@ -385,8 +423,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         mCirclesAdapter = new ArrayAdapter<String>(
                 this, R.layout.circle_member, mCirclesList);
         mCirclesListView.setAdapter(mCirclesAdapter);
-
-
     }
 
     public void toastShowLong(String TEXT) {

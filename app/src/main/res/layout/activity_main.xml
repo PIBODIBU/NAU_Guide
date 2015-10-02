@@ -38,7 +38,7 @@
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_button"
         android:layout_width="120dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_alignBottom="@+id/vk_sign_in"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
@@ -48,29 +48,30 @@
     <Button
         android:id="@+id/sign_out_button"
         android:layout_width="130dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_alignLeft="@+id/sign_in_button"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignStart="@+id/sign_in_button"
         android:layout_below="@+id/sign_in_button"
-        android:background="#ff939393"
+        android:background="@drawable/common_signin_btn_text_pressed_dark"
         android:enabled="false"
-        android:text="@string/sign_out_button_name" />
+        android:text="@string/sign_out_button_name"
+        android:layout_marginTop="10dp" />
 
     <ListView
         android:id="@+id/circles_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/button_restart"
-        android:layout_alignRight="@+id/button_restart"
-        android:layout_alignTop="@+id/button_restart"
+        android:layout_alignEnd="@+id/restart"
+        android:layout_alignRight="@+id/restart"
+        android:layout_alignTop="@+id/restart"
         android:orientation="vertical"
         android:padding="0dip"
         android:visibility="invisible" />
 
     <Button
-        android:id="@+id/button_restart"
+        android:id="@+id/restart"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_alignEnd="@+id/sign_out_button"
@@ -90,46 +91,38 @@
         android:background="@color/main_blue"
         android:text="VK Sign in" />
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/imageView2"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="#010000" />
-
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/circles_list"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="150dp" />
-
     <Button
         android:id="@+id/vk_sign_out"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/sign_out_button"
+        android:layout_alignEnd="@+id/vk_sign_in"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignTop="@+id/sign_out_button"
-        android:text="Sign out"
-        android:layout_alignBottom="@+id/sign_out_button"
         android:layout_alignRight="@+id/vk_sign_in"
-        android:layout_alignEnd="@+id/vk_sign_in" />
+        android:layout_alignTop="@+id/sign_out_button"
+        android:text="VK Sign out"
+        android:background="@color/main_blue" />
 
     <Button
         android:id="@+id/restart_first"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:background="#ff00aa13"
-        android:text="Restart with FirstScreen"
+        android:layout_alignEnd="@+id/vk_sign_out"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignRight="@+id/vk_sign_out"
-        android:layout_alignEnd="@+id/vk_sign_out" />
+        android:background="#ff00aa13"
+        android:text="Restart with FirstScreen" />
+
+    <Button
+        android:id="@+id/vk_share"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:layout_above="@+id/circles_list"
+        android:layout_centerHorizontal="true"
+        android:background="@color/main_blue"
+        android:text="SHARE" />
 
 </RelativeLayout>

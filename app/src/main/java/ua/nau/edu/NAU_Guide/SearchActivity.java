@@ -15,6 +15,11 @@ import android.widget.Toast;
 
 
 public class SearchActivity extends BaseNavigationDrawerActivity {
+    private static final String VK_PREFERENCES = "VK_PREFERENCES";
+    private static final String VK_INFO_KEY = "VK_INFO_KEY";
+    private static final String VK_PHOTO_KEY = "VK_PHOTO_KEY";
+    private static final String VK_EMAIL_KEY = "VK_EMAIL_KEY";
+    private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
 
     public SearchActivity() {
     }
@@ -24,13 +29,13 @@ public class SearchActivity extends BaseNavigationDrawerActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        SharedPreferences settings = getSharedPreferences("VK_PREFERENCES", MainActivity.MODE_PRIVATE);
+        SharedPreferences settings = getSharedPreferences(VK_PREFERENCES, MODE_PRIVATE);
 
         getDrawer(
-                settings.getString("VK_INFO_KEY", ""),
-                settings.getString("VK_PHOTO_KEY", ""),
-                settings.getString("VK_EMAIL_KEY", ""),
-                settings.getBoolean("VK_SIGNED_KEY", false)
+                settings.getString(VK_INFO_KEY, ""),
+                settings.getString(VK_PHOTO_KEY, ""),
+                settings.getString(VK_EMAIL_KEY, ""),
+                settings.getBoolean(VK_SIGNED_KEY, false)
         );
 
         handleIntent(getIntent());

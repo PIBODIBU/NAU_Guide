@@ -39,7 +39,6 @@
 
             <intent-filter>
                 <action android:name="com.tutorial.CLEARSCREEN" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

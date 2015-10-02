@@ -17,6 +17,11 @@ import ua.nau.edu.University.NAU;
 import ua.nau.edu.University.University;
 
 public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+    private static final String VK_PREFERENCES = "VK_PREFERENCES";
+    private static final String VK_INFO_KEY = "VK_INFO_KEY";
+    private static final String VK_PHOTO_KEY = "VK_PHOTO_KEY";
+    private static final String VK_EMAIL_KEY = "VK_EMAIL_KEY";
+    private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
 
     public MapsActivity() {
     }
@@ -35,13 +40,13 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         university = new NAU();
         university.init();
 
-        SharedPreferences settings = getSharedPreferences("VK_PREFERENCES", MainActivity.MODE_PRIVATE);
+        SharedPreferences settings = getSharedPreferences(VK_PREFERENCES, MODE_PRIVATE);
 
         getDrawer(
-                settings.getString("VK_INFO_KEY", ""),
-                settings.getString("VK_PHOTO_KEY", ""),
-                settings.getString("VK_EMAIL_KEY", ""),
-                settings.getBoolean("VK_SIGNED_KEY", false)
+                settings.getString(VK_INFO_KEY, ""),
+                settings.getString(VK_PHOTO_KEY, ""),
+                settings.getString(VK_EMAIL_KEY, ""),
+                settings.getBoolean(VK_SIGNED_KEY, false)
         );
 
         setUpMapIfNeeded();
@@ -112,6 +117,16 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                 //Получаем идентефикатор маркера
                 int id = getMarkerId(marker);
 
+                switch (id) {
+                    case 1: {
+                        toastShowLong(Integer.toString(id));
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+
                 //Отображение названия объекта
                 titleSlidingLayout.setText(marker.getTitle());
 
@@ -156,7 +171,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         this.titleSlidingLayout = (TextView) findViewById(R.id.titleSlidingLayout);
     }
 
-//Получение айди маркера
+    //Получение айди маркера
     private int getMarkerId(Marker marker) {
         String s = marker.getId();
         s = s.substring(1, s.length());

@@ -27,18 +27,21 @@ import com.vk.sdk.api.model.VKList;
  * Created by root on 9/30/15.
  */
 public class FirstLaunchActivity extends Activity {
-    // VKONTAKTE SDK VARIABLES
+// VKONTAKTE SDK VARIABLES
     private int appId = 5084652;
+
     public static final String VK_PREFERENCES = "VK_PREFERENCES";
     public static final String VK_INFO_KEY = "VK_INFO_KEY";
+    public static final String VK_ID_KEY = "VK_ID_KEY";
     public static final String VK_PHOTO_KEY = "VK_PHOTO_KEY";
     public static final String VK_EMAIL_KEY = "VK_EMAIL_KEY";
     private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
     private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
-    private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
-    private boolean SIGNED_IN;
+
     VKRequest request_info = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_50, photo_100, photo_200"));
 //
+
+    private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -51,7 +54,6 @@ public class FirstLaunchActivity extends Activity {
                     public void onComplete(VKResponse response) {
                         //Do complete stuff
                         VKApiUserFull users = ((VKList<VKApiUserFull>) response.parsedModel).get(0);
-                        SIGNED_IN = true;
 
 /** Shared Preferences **/
                         SharedPreferences settings_vk = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
@@ -60,8 +62,9 @@ public class FirstLaunchActivity extends Activity {
                         editor_vk.putString(VK_INFO_KEY, users.first_name + " " + users.last_name);
                         editor_vk.putString(VK_PHOTO_KEY, users.photo_200);
                         editor_vk.putString(VK_EMAIL_KEY, VKSdk.getAccessToken().email);
+                        editor_vk.putInt(VK_ID_KEY, users.id);
 
-                        editor_vk.putBoolean(VK_SIGNED_KEY, SIGNED_IN);
+                        editor_vk.putBoolean(VK_SIGNED_KEY, true);
 
                         editor_vk.apply();
 /*****/
@@ -139,7 +142,7 @@ public class FirstLaunchActivity extends Activity {
             @Override
             public void onClick(View view) {
                 // VK login execute
-                VKSdk.login(FirstLaunchActivity.this, VKScope.EMAIL, VKScope.PHOTOS);
+                VKSdk.login(FirstLaunchActivity.this, VKScope.EMAIL, VKScope.PHOTOS, VKScope.WALL);
             }
         });
 //
