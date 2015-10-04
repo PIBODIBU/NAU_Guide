@@ -54,10 +54,10 @@
         android:layout_alignParentRight="true"
         android:layout_alignStart="@+id/sign_in_button"
         android:layout_below="@+id/sign_in_button"
+        android:layout_marginTop="10dp"
         android:background="@drawable/common_signin_btn_text_pressed_dark"
         android:enabled="false"
-        android:text="@string/sign_out_button_name"
-        android:layout_marginTop="10dp" />
+        android:text="@string/sign_out_button_name" />
 
     <ListView
         android:id="@+id/circles_list"
@@ -101,8 +101,8 @@
         android:layout_alignParentStart="true"
         android:layout_alignRight="@+id/vk_sign_in"
         android:layout_alignTop="@+id/sign_out_button"
-        android:text="VK Sign out"
-        android:background="@color/main_blue" />
+        android:background="@color/main_blue"
+        android:text="VK Sign out" />
 
     <Button
         android:id="@+id/restart_first"
