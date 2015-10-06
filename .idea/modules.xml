@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/NAU_Guide .iml" filepath="$PROJECT_DIR$/NAU_Guide .iml" />
+      <module fileurl="file://$PROJECT_DIR$/NAU_Guide2.iml" filepath="$PROJECT_DIR$/NAU_Guide2.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/vksdk_library/vksdk_library.iml" filepath="$PROJECT_DIR$/vksdk_library/vksdk_library.iml" />
     </modules>
