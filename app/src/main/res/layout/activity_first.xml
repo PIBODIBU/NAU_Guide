@@ -40,10 +40,10 @@
 
     <Button
         android:id="@+id/login_skip"
-        android:layout_width="105dp"
-        android:layout_height="30dp"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
         android:background="@color/main_blue"
-        android:gravity="center|fill_horizontal"
+        android:gravity="center"
         android:text="Пропустить"
         android:textAlignment="gravity"
         android:textColor="#ffffff"
@@ -62,6 +62,6 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_marginRight="10dp"
-        android:layout_marginBottom="9dp" />
+        android:layout_marginBottom="14dp" />
 
 </RelativeLayout>

@@ -1,36 +1,64 @@
 package ua.nau.edu.NAU_Guide;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.*;
-import com.google.android.gms.maps.model.*;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-import java.util.HashMap;
-
 import ua.nau.edu.University.NAU;
-import ua.nau.edu.University.University;
 
 public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+
+    private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
+    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
+
+    SharedPreferences settings_global = null;
+    SharedPreferences settings_vk = null;
+    SharedPreferences.Editor editor_global;
+    SharedPreferences.Editor editor_vk;
+
+    /***
+     * VKONTAKTE SDK VARIABLES
+     ***/
+
+    private int appId = 5084652;
+
     private static final String VK_PREFERENCES = "VK_PREFERENCES";
     private static final String VK_INFO_KEY = "VK_INFO_KEY";
     private static final String VK_PHOTO_KEY = "VK_PHOTO_KEY";
     private static final String VK_EMAIL_KEY = "VK_EMAIL_KEY";
     private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
+    private static final String VK_ID_KEY = "VK_ID_KEY";
+
+    /*****/
 
     public MapsActivity() {
     }
+
+/*** VIEWS ***/
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private NAU university;
 
     private SlidingUpPanelLayout slidingUpPanelLayout;
     private TextView titleSlidingLayout;
+
+    Button go;
+
+/*****/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +68,14 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         university = new NAU();
         university.init();
 
-        SharedPreferences settings_vk = getSharedPreferences(VK_PREFERENCES, MODE_PRIVATE);
+// Get and set system services & Buttons & SharedPreferences & Requests
+        settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
+        settings_vk = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
+        editor_global = settings_global.edit();
+        editor_vk = settings_vk.edit();
+
+        go = (Button) findViewById(R.id.button_go);
+//
 
         getDrawer(
                 settings_vk.getString(VK_INFO_KEY, ""),
@@ -55,6 +90,13 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         Toast toast = Toast.makeText(getApplicationContext(),
                 "Пора покормить кота!", Toast.LENGTH_SHORT);
         toast.show();
+
+        go.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MapsActivity.this, FloorActivity.class));
+            }
+        });
     }
 
     @Override
@@ -92,7 +134,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
         //Стартовое положение камеры
         LatLng nau = new LatLng(50.437476, 30.428322);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(nau, 17));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(nau, 15));
 
         //Добавление маркеров на карту из класса НАУ
         for (Integer i : university.getCorps().keySet()) {
@@ -114,23 +156,13 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
             @Override
             public boolean onMarkerClick(Marker marker) {
                 //Получаем идентефикатор маркера
-                int id = getMarkerId(marker);
-
-                switch (id) {
-                    case 1: {
-                        toastShowLong(Integer.toString(id));
-                        break;
-                    }
-                    default: {
-                        break;
-                    }
-                }
+                Toast.makeText(getApplicationContext(), Integer.toString(getMarkerId(marker)), Toast.LENGTH_SHORT).show();
 
                 //Отображение названия объекта
                 titleSlidingLayout.setText(marker.getTitle());
 
                 //Отображаем слайдер
-                slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+                //slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
                 return false;
             }
         });
@@ -156,16 +188,18 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         this.slidingUpPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
 
         //Высота слайдера в закрытом режиме
-        this.slidingUpPanelLayout.setPanelHeight(0);
+        this.slidingUpPanelLayout.setPanelHeight(75);
         //Фактор тени слайдера
         this.slidingUpPanelLayout.setShadowHeight(100);
         //пока не понятно что это
-        this.slidingUpPanelLayout.setClipPanel(false);
+        this.slidingUpPanelLayout.setClipPanel(true);
         //пока не понятно что это
-        this.slidingUpPanelLayout.setAnchorPoint(100.0f);
+        this.slidingUpPanelLayout.setAnchorPoint(1000.0f);
         //Увеличение нижнего отступа карты-елемента при открытии слайдера
-        this.slidingUpPanelLayout.setParalaxOffset(0);
+        this.slidingUpPanelLayout.setParalaxOffset(100);
 
+        // TEST
+        //this.slidingUpPanelLayout.hed
 
         this.titleSlidingLayout = (TextView) findViewById(R.id.titleSlidingLayout);
     }

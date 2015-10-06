@@ -31,4 +31,8 @@
     <string name="sport">Спорткомплекс</string>
     <string name="bistro">Бистро</string>
 
+    <string name="VK_bad_token">Неправильный access token</string>
+    <string name="VK_sign_error">Ошибка авторизации</string>
+    <string name="VK_sent_success">Отправлено</string>
+    <string name="VK_sent_error">Ошибка при отправке</string>
 </resources>

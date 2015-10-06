@@ -27,21 +27,106 @@ import com.vk.sdk.api.model.VKList;
  * Created by root on 9/30/15.
  */
 public class FirstLaunchActivity extends Activity {
-// VKONTAKTE SDK VARIABLES
+    /*** VIEWS ***/
+
+    Button vk_log_in;
+    Button gg_log_in;
+    Button fb_log_in;
+    Button login_skip;
+
+    /*****/
+
+    /*** VKONTAKTE SDK VARIABLES ***/
+
     private int appId = 5084652;
 
-    public static final String VK_PREFERENCES = "VK_PREFERENCES";
-    public static final String VK_INFO_KEY = "VK_INFO_KEY";
-    public static final String VK_ID_KEY = "VK_ID_KEY";
-    public static final String VK_PHOTO_KEY = "VK_PHOTO_KEY";
-    public static final String VK_EMAIL_KEY = "VK_EMAIL_KEY";
+    private static final String VK_PREFERENCES = "VK_PREFERENCES";
+    private static final String VK_INFO_KEY = "VK_INFO_KEY";
+    private static final String VK_PHOTO_KEY = "VK_PHOTO_KEY";
+    private static final String VK_EMAIL_KEY = "VK_EMAIL_KEY";
     private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
-    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
+    private static final String VK_ID_KEY = "VK_ID_KEY";
 
+    VKApiUserFull users_full = null;
     VKRequest request_info = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_50, photo_100, photo_200"));
-//
+
+    /*****/
 
     private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
+    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
+
+    SharedPreferences settings_global = null;
+    SharedPreferences settings_vk = null;
+    SharedPreferences.Editor editor_global;
+    SharedPreferences.Editor editor_vk;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+//VK initialize
+        vkAccessTokenTracker.startTracking();
+        VKSdk.initialize(getApplicationContext(), appId, "");
+//
+
+// Setting Content View
+        setContentView(R.layout.activity_first);
+
+// Get and set system services & Buttons & SharedPreferences
+        settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
+        settings_vk = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
+        editor_global = settings_global.edit();
+        editor_vk = settings_vk.edit();
+
+        vk_log_in = (Button) findViewById(R.id.vk_sign_in);
+        gg_log_in = (Button) findViewById(R.id.gg_sign_in);
+        fb_log_in = (Button) findViewById(R.id.fb_sign_in);
+        login_skip = (Button) findViewById(R.id.login_skip);
+//
+
+/*** BUTTONS ***/
+
+// VK sing in button
+        vk_log_in.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // VK login execute
+                VKSdk.login(FirstLaunchActivity.this, VKScope.EMAIL, VKScope.PHOTOS, VKScope.WALL);
+            }
+        });
+//
+
+// Google+ sign in button
+        gg_log_in.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toastShowLong("Google+ sign in");
+            }
+        });
+//
+
+// Facebook sign in button
+        fb_log_in.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toastShowLong("Facebook sign in");
+            }
+        });
+//
+
+// Skip button
+        login_skip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+                startActivity(new Intent(FirstLaunchActivity.this, MainActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        });
+//
+
+/*****/
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -53,25 +138,21 @@ public class FirstLaunchActivity extends Activity {
                     @Override
                     public void onComplete(VKResponse response) {
                         //Do complete stuff
-                        VKApiUserFull users = ((VKList<VKApiUserFull>) response.parsedModel).get(0);
+                        users_full = ((VKList<VKApiUserFull>) response.parsedModel).get(0);
 
-/** Shared Preferences **/
-                        SharedPreferences settings_vk = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
-                        SharedPreferences.Editor editor_vk = settings_vk.edit();
-
-                        editor_vk.putString(VK_INFO_KEY, users.first_name + " " + users.last_name);
-                        editor_vk.putString(VK_PHOTO_KEY, users.photo_200);
+/*** Shared Preferences ***/
+                        editor_vk.putString(VK_INFO_KEY, users_full.first_name + " " + users_full.last_name);
+                        editor_vk.putString(VK_PHOTO_KEY, users_full.photo_200);
                         editor_vk.putString(VK_EMAIL_KEY, VKSdk.getAccessToken().email);
-                        editor_vk.putInt(VK_ID_KEY, users.id);
+                        editor_vk.putInt(VK_ID_KEY, users_full.id);
 
                         editor_vk.putBoolean(VK_SIGNED_KEY, true);
 
                         editor_vk.apply();
 /*****/
 
-/** Important! Add this after each success login **/
-                        SharedPreferences settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
-                        settings_global.edit().putBoolean(FIRST_LAUNCH_KEY, false).apply();
+/*** Important! Add this after each success login ***/
+                        editor_global.putBoolean(FIRST_LAUNCH_KEY, false).apply();
 /*****/
 
                         finish();
@@ -98,7 +179,7 @@ public class FirstLaunchActivity extends Activity {
             @Override
             public void onError(VKError error) {
                 // Произошла ошибка авторизации (например, пользователь запретил авторизацию)
-                toastShowLong("Ошибка авторизации");
+                toastShowLong(getString(R.string.VK_sign_error));
             }
         })) {
             super.onActivityResult(requestCode, resultCode, data);
@@ -112,7 +193,7 @@ public class FirstLaunchActivity extends Activity {
         public void onVKAccessTokenChanged(VKAccessToken oldToken, VKAccessToken newToken) {
             if (newToken == null) {
                 // VKAccessToken is invalid
-                toastShowLong("Invalid access token");
+                toastShowLong(getString(R.string.VK_bad_token));
             }
         }
     };
@@ -126,65 +207,7 @@ public class FirstLaunchActivity extends Activity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-//VK initialize
-        vkAccessTokenTracker.startTracking();
-        VKSdk.initialize(getApplicationContext(), appId, "");
-//
-
-        setContentView(R.layout.activity_first);
-
-// VK sing in button
-        Button vk_log_in = (Button) findViewById(R.id.vk_sign_in);
-        vk_log_in.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // VK login execute
-                VKSdk.login(FirstLaunchActivity.this, VKScope.EMAIL, VKScope.PHOTOS, VKScope.WALL);
-            }
-        });
-//
-
-// Google+ sign in button
-        Button gg_log_in = (Button) findViewById(R.id.gg_sign_in);
-        gg_log_in.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toastShowLong("Google+ sign in");
-            }
-        });
-//
-
-// Facebook sign in button
-        Button fb_log_in = (Button) findViewById(R.id.fb_sign_in);
-        fb_log_in.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toastShowLong("Facebook sign in");
-            }
-        });
-//
-
-// Skip button
-        Button login_skip = (Button) findViewById(R.id.login_skip);
-        login_skip.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view) {
-                finish();
-                startActivity(new Intent(FirstLaunchActivity.this, MainActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-            }
-        });
-//
-
-    }
-
-    @Override
     protected void onStop() {
-
 
         super.onStop();
     }

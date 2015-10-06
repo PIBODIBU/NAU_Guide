@@ -133,7 +133,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
     private int mSignInError;
 
-/** VIEWS **/
+/*** VIEWS ***/
 
     private SignInButton mSignInButoon;
     private TextView plusText;
@@ -152,6 +152,14 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
 /*****/
 
+    private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
+    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
+
+    SharedPreferences settings_global = null;
+    SharedPreferences settings_vk = null;
+    SharedPreferences.Editor editor_global;
+    SharedPreferences.Editor editor_vk;
+
 /*** VKONTAKTE SDK VARIABLES ***/
 
     private int appId = 5084652;
@@ -163,18 +171,11 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
     private static final String VK_ID_KEY = "VK_ID_KEY";
 
-    VKApiUserFull users_full = null;
-    VKRequest request_info = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_50, photo_100, photo_200"));
-    VKRequest request_post;
 /*****/
 
-    private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
-    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
-
-    SharedPreferences settings_global = null;
-    SharedPreferences settings_vk = null;
-    SharedPreferences.Editor editor_global;
-    SharedPreferences.Editor editor_vk;
+    VKApiUserFull users_full = null;
+    VKRequest request_info = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_50, photo_100, photo_200"));
+    VKRequest request_share;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,7 +192,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 // Setting Content View
         setContentView(R.layout.activity_main);
 
-// Get and set system services & Buttons & SharedPreferences
+// Get and set system services & Buttons & SharedPreferences & Requests
         inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
 
         settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
@@ -209,6 +210,12 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
             vk_sign_out.setEnabled(false);
             vk_share.setEnabled(false);
         }
+
+        request_share = VKApi.wall().post(VKParameters.from(
+                VKApiConst.OWNER_ID,
+                Integer.toString(settings_vk.getInt(VK_ID_KEY, -1)),
+                VKApiConst.MESSAGE,
+                "Hi, guys! \n I use this shit. Check it out! \n" + Uri.parse("https://play.google.com/my_fucking_link") ));
 //
 
 // Load Navigation Drawer
@@ -219,14 +226,14 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         );
 //
 
-/** BUTTONS **/
+/*** BUTTONS ***/
 
 // VK sing in button
         vk_sign_in.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // VK login execute
-                VKSdk.login(MainActivity.this, VKScope.EMAIL, VKScope.PHOTOS);
+                VKSdk.login(MainActivity.this, VKScope.EMAIL, VKScope.PHOTOS, VKScope.WALL);
             }
         });
 //
@@ -257,27 +264,20 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 //
 
 // Share button
-        request_post = VKApi.wall()
-                .post(VKParameters.from(
-                        VKApiConst.OWNER_ID,
-                        Integer.toString(settings_vk.getInt(VK_ID_KEY, -1)),
-                        VKApiConst.MESSAGE,
-                        "Test: \n" + Uri.parse("https://play.google.com/store") ));
-
         vk_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                request_post.executeWithListener(new VKRequest.VKRequestListener() {
+                request_share.executeWithListener(new VKRequest.VKRequestListener() {
                     @Override
                     public void onComplete(VKResponse response) {
-                        toastShowLong("Отправлено");
+                        toastShowLong(getString(R.string.VK_sent_success));
 
                         super.onComplete(response);
                     }
 
                     @Override
                     public void onError(VKError error) {
-                        toastShowLong("Ошибка");
+                        toastShowLong(getString(R.string.VK_sent_error));
 
                         super.onError(error);
                     }
@@ -372,12 +372,14 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                         editor_vk.putBoolean(VK_SIGNED_KEY, true);
                         editor_vk.apply();
 
+/*****/
+                        startActivity(new Intent(MainActivity.this, MainActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+
+ /*** Important! Add this after each success login ***/
                         editor_global.putBoolean(FIRST_LAUNCH_KEY, false);
                         editor_global.apply();
 /*****/
-
-                        startActivity(new Intent(MainActivity.this, MainActivity.class)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 
                         super.onComplete(response);
                     }
@@ -399,6 +401,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
             @Override
             public void onError(VKError error) {
 // Произошла ошибка авторизации (например, пользователь запретил авторизацию)
+                toastShowLong(getString(R.string.VK_sign_error));
             }
         })) {
             super.onActivityResult(requestCode, resultCode, data);
@@ -432,7 +435,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         public void onVKAccessTokenChanged(VKAccessToken oldToken, VKAccessToken newToken) {
             if (newToken == null) {
                 // VKAccessToken is invalid
-                toastShowLong("Invalid access token");
+                toastShowLong(getString(R.string.VK_bad_token));
             }
         }
     };
