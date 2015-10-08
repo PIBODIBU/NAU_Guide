@@ -3,6 +3,7 @@ package ua.nau.edu.NAU_Guide;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -48,7 +49,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     public MapsActivity() {
     }
 
-/*** VIEWS ***/
+    /***
+     * VIEWS
+     ***/
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private NAU university;
@@ -56,9 +59,11 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     private SlidingUpPanelLayout slidingUpPanelLayout;
     private TextView titleSlidingLayout;
 
-    Button go;
+    public Button button_photo;
+    public Button button_scheme;
+    public Button button_info;
 
-/*****/
+    /*****/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +78,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         settings_vk = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
         editor_global = settings_global.edit();
         editor_vk = settings_vk.edit();
-
-        go = (Button) findViewById(R.id.button_go);
 //
 
         getDrawer(
@@ -91,7 +94,35 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                 "Пора покормить кота!", Toast.LENGTH_SHORT);
         toast.show();
 
-        go.setOnClickListener(new View.OnClickListener() {
+        /*TextView text = (TextView) findViewById(R.id.titleSlidingLayout);
+
+        text.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toastShowShort("text clicked");
+                if (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED)
+                    slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+            }
+        });*/
+
+        button_photo = (Button) findViewById(R.id.button_photo);
+        button_photo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MapsActivity.this, FloorActivity.class));
+            }
+        });
+
+        button_scheme = (Button) findViewById(R.id.button_scheme);
+        button_scheme.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MapsActivity.this, FloorActivity.class));
+            }
+        });
+
+        button_info = (Button) findViewById(R.id.button_info);
+        button_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(MapsActivity.this, FloorActivity.class));
@@ -105,7 +136,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
         setUpMapIfNeeded();
     }
-
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
@@ -121,8 +151,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     }
 
     private void addMarker_custom(Integer i, int icon, String title) {
-
-
         mMap.addMarker(new MarkerOptions()
                 .position(university.getCorps().get(i))
                 .title(title))
@@ -131,7 +159,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     }
 
     private void setUpMap() {
-
         //Стартовое положение камеры
         LatLng nau = new LatLng(50.437476, 30.428322);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(nau, 15));
@@ -158,12 +185,26 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                 //Получаем идентефикатор маркера
                 Toast.makeText(getApplicationContext(), Integer.toString(getMarkerId(marker)), Toast.LENGTH_SHORT).show();
 
+                //Отображаем маленькую панель в 30dp+15dp
+                slidingUpPanelLayout.setPanelHeight(45);
+
                 //Отображение названия объекта
                 titleSlidingLayout.setText(marker.getTitle());
 
                 //Отображаем слайдер
                 //slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
                 return false;
+            }
+        });
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                if (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+                    slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                } else if (slidingUpPanelLayout.getPanelHeight() != 0) {
+                    slidingUpPanelLayout.setPanelHeight(0);
+                }
             }
         });
     }
@@ -188,9 +229,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         this.slidingUpPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
 
         //Высота слайдера в закрытом режиме
-        this.slidingUpPanelLayout.setPanelHeight(75);
+        this.slidingUpPanelLayout.setPanelHeight(0);
         //Фактор тени слайдера
-        this.slidingUpPanelLayout.setShadowHeight(100);
+        this.slidingUpPanelLayout.setShadowHeight(0);
         //пока не понятно что это
         this.slidingUpPanelLayout.setClipPanel(true);
         //пока не понятно что это

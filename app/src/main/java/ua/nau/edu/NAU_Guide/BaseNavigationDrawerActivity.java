@@ -131,6 +131,11 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withIcon(FontAwesome.Icon.faw_close)
                 .withIdentifier(7);
 
+        final PrimaryDrawerItem chat = new PrimaryDrawerItem()
+                .withName("Чат")
+                .withIcon(FontAwesome.Icon.faw_wechat)
+                .withIdentifier(8);
+
 // Image Downloader for Drawer
         DrawerImageLoader.init(new DrawerImageLoader.IDrawerImageLoader() {
             @Override
@@ -194,7 +199,9 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                         settings,
                         search,
                         new DividerDrawerItem(),
-                        exit
+                        exit,
+                        new DividerDrawerItem(),
+                        chat
                 )
                 .withOnDrawerListener(new Drawer.OnDrawerListener() {
                     @Override
