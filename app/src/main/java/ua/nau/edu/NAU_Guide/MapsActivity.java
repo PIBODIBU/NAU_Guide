@@ -209,51 +209,67 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                         break;
                     }
                     case 1: {
-
+                        title_inst = "ЮИ";
                         break;
                     }
                     case 2: {
-
+                        title_inst = "ИЕМ";
                         break;
                     }
                     case 3: {
-
+                        title_inst = "ИАП";
                         break;
                     }
                     case 4: {
-
+                        title_inst = "";
                         break;
                     }
                     case 5: {
-
+                        title_inst = "ИАН";
                         break;
                     }
                     case 6: {
-                        title_inst = " ИКИТ";
+                        title_inst = "ИКИТ";
                         break;
                     }
                     case 7: {
-
+                        title_inst = "ИМО";
                         break;
                     }
                     case 8: {
-
+                        title_inst = "ГМИ";
                         break;
                     }
                     case 9: {
-
+                        title_inst = "НДИ-Дизайн";
                         break;
                     }
                     case 10: {
-
+                        title_inst = "";
                         break;
                     }
                     case 11: {
-
+                        title_inst = "ИИДС";
                         break;
                     }
                     case 12: {
-
+                        title_inst = "";
+                        break;
+                    }
+                    case 13: {
+                        title_inst = "ЦКИ";
+                        break;
+                    }
+                    case 14: {
+                        title_inst = "Бистро";
+                        break;
+                    }
+                    case 15: {
+                        title_inst = "Мед.центр";
+                        break;
+                    }
+                    case 16: {
+                        title_inst = "Спорткомплекс";
                         break;
                     }
                     default: {

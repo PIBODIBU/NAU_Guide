@@ -2,7 +2,6 @@ package ua.nau.edu.NAU_Guide;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -46,7 +45,21 @@ public class InfoActivity extends BaseNavigationDrawerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_info);
+        switch (getIntent().getIntExtra("Corp", -1)) {
+            case 5: {
+                setContentView(R.layout.activity_info_5);
+                break;
+            }
+            case 6: {
+                setContentView(R.layout.activity_info_6);
+                break;
+            }
+            default: {
+                setContentView(R.layout.activity_info_default);
+                break;
+            }
+        }
+
 
 // Get and set system services & Buttons & SharedPreferences & Requests
         settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
@@ -60,10 +73,6 @@ public class InfoActivity extends BaseNavigationDrawerActivity {
                 settings_vk.getString(VK_PHOTO_KEY, ""),
                 settings_vk.getString(VK_EMAIL_KEY, "")
         );
-
-        int i = getIntent().getIntExtra("Corp", -1);
-
-        toastShowShort(Integer.toString(i));
     }
 
     public void toastShowLong(String TEXT) {
