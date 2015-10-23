@@ -3,11 +3,10 @@ package ua.nau.edu.NAU_Guide;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,8 +22,10 @@ import ua.nau.edu.University.NAU;
 
 public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
+    private int GLOBAL_MARKER_ID = -1;
+    private Marker activeMarker = null;
     private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
-    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
+    private static final String GLOBAL_SIGNED_KEY = "GLOBAL_SIGNED_KEY";
 
     SharedPreferences settings_global = null;
     SharedPreferences settings_vk = null;
@@ -63,6 +64,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     public Button button_scheme;
     public Button button_info;
 
+
     /*****/
 
     @Override
@@ -78,6 +80,10 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         settings_vk = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
         editor_global = settings_global.edit();
         editor_vk = settings_vk.edit();
+
+        button_photo = (Button) findViewById(R.id.button_photo);
+        button_scheme = (Button) findViewById(R.id.button_scheme);
+        button_info = (Button) findViewById(R.id.button_info);
 //
 
         getDrawer(
@@ -90,10 +96,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
         initSlidingPanel();
 
-        Toast toast = Toast.makeText(getApplicationContext(),
-                "Пора покормить кота!", Toast.LENGTH_SHORT);
-        toast.show();
-
         /*TextView text = (TextView) findViewById(R.id.titleSlidingLayout);
 
         text.setOnClickListener(new View.OnClickListener() {
@@ -105,27 +107,25 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
             }
         });*/
 
-        button_photo = (Button) findViewById(R.id.button_photo);
         button_photo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MapsActivity.this, FloorActivity.class));
+                startActivity(new Intent(MapsActivity.this, InfoActivity.class));
             }
         });
 
-        button_scheme = (Button) findViewById(R.id.button_scheme);
         button_scheme.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MapsActivity.this, FloorActivity.class));
+                startActivity(new Intent(MapsActivity.this, InfoActivity.class));
             }
         });
 
-        button_info = (Button) findViewById(R.id.button_info);
         button_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MapsActivity.this, FloorActivity.class));
+                startActivity(new Intent(MapsActivity.this, InfoActivity.class)
+                        .putExtra("Corp", GLOBAL_MARKER_ID));
             }
         });
     }
@@ -158,6 +158,21 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                 );
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        try {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                if (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+                    slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                } else
+                    super.onBackPressed();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
     private void setUpMap() {
         //Стартовое положение камеры
         LatLng nau = new LatLng(50.437476, 30.428322);
@@ -182,17 +197,76 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                //Получаем идентефикатор маркера
-                Toast.makeText(getApplicationContext(), Integer.toString(getMarkerId(marker)), Toast.LENGTH_SHORT).show();
-
                 //Отображаем маленькую панель в 30dp+15dp
                 slidingUpPanelLayout.setPanelHeight(45);
 
                 //Отображение названия объекта
-                titleSlidingLayout.setText(marker.getTitle());
+                String title_inst = "";
 
-                //Отображаем слайдер
-                //slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+                switch (getMarkerId(marker)) {
+                    case 0: {
+
+                        break;
+                    }
+                    case 1: {
+
+                        break;
+                    }
+                    case 2: {
+
+                        break;
+                    }
+                    case 3: {
+
+                        break;
+                    }
+                    case 4: {
+
+                        break;
+                    }
+                    case 5: {
+
+                        break;
+                    }
+                    case 6: {
+                        title_inst = " ИКИТ";
+                        break;
+                    }
+                    case 7: {
+
+                        break;
+                    }
+                    case 8: {
+
+                        break;
+                    }
+                    case 9: {
+
+                        break;
+                    }
+                    case 10: {
+
+                        break;
+                    }
+                    case 11: {
+
+                        break;
+                    }
+                    case 12: {
+
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+
+                titleSlidingLayout.setText(title_inst);
+
+                //Записываем id текущего маркера в глобальную переменную
+                GLOBAL_MARKER_ID = getMarkerId(marker);
+
+                activeMarker = marker;
                 return false;
             }
         });
@@ -202,11 +276,12 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
             public void onMapClick(LatLng latLng) {
                 if (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
                     slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                } else if (slidingUpPanelLayout.getPanelHeight() != 0) {
+                    activeMarker.showInfoWindow();
+                } else
                     slidingUpPanelLayout.setPanelHeight(0);
-                }
             }
         });
+
     }
 
     @Override
@@ -233,14 +308,11 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         //Фактор тени слайдера
         this.slidingUpPanelLayout.setShadowHeight(0);
         //пока не понятно что это
-        this.slidingUpPanelLayout.setClipPanel(true);
+        this.slidingUpPanelLayout.setClipPanel(false);
         //пока не понятно что это
-        this.slidingUpPanelLayout.setAnchorPoint(1000.0f);
+        this.slidingUpPanelLayout.setAnchorPoint(0.0f);
         //Увеличение нижнего отступа карты-елемента при открытии слайдера
-        this.slidingUpPanelLayout.setParalaxOffset(100);
-
-        // TEST
-        //this.slidingUpPanelLayout.hed
+        this.slidingUpPanelLayout.setParalaxOffset(0);
 
         this.titleSlidingLayout = (TextView) findViewById(R.id.titleSlidingLayout);
     }

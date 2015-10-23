@@ -5,14 +5,13 @@
     android:layout_height="match_parent"
     android:gravity="bottom"
     sothree:umanoOverlay="true"
-    sothree:umanoPanelHeight="68dp"
-    sothree:umanoShadowHeight="4dp">
+    sothree:umanoShadowHeight="0dp"
+    sothree:umanoFadeColor="@android:color/transparent">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center">
-
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -35,7 +34,6 @@
             android:layout_height="wrap_content"
             android:background="@color/main_blue"
             android:minHeight="?attr/actionBarSize" />
-
 
     </RelativeLayout>
 
@@ -78,6 +76,11 @@
             android:id="@+id/button_scheme"
             android:layout_width="80dp"
             android:layout_height="32dp"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentTop="false"
+            android:layout_alignWithParentIfMissing="false"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="42dp"
             android:background="@drawable/slider_button"
@@ -92,7 +95,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginTop="42dp"
             android:background="@drawable/slider_button"
-            android:text="Iнфо"
+            android:text="Инфо"
             android:textAlignment="center" />
 
         <View

@@ -81,7 +81,7 @@
             android:label="@string/FirstActivity_label" />
 
         <activity
-            android:name=".FloorActivity"
+            android:name=".InfoActivity"
             android:label="@string/FloorActivity_label" />
     </application>
 

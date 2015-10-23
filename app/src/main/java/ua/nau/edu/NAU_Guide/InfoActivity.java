@@ -1,22 +1,14 @@
 package ua.nau.edu.NAU_Guide;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.gms.maps.GoogleMap;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-
-import ua.nau.edu.University.NAU;
 
 /**
  * Created by root on 10/5/15.
  */
-public class FloorActivity extends BaseNavigationDrawerActivity {
+public class InfoActivity extends BaseNavigationDrawerActivity {
 
     private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
     private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
@@ -41,7 +33,7 @@ public class FloorActivity extends BaseNavigationDrawerActivity {
 
     /*****/
 
-    public FloorActivity() {
+    public InfoActivity() {
     }
 
     /***
@@ -54,7 +46,7 @@ public class FloorActivity extends BaseNavigationDrawerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_floor);
+        setContentView(R.layout.activity_info);
 
 // Get and set system services & Buttons & SharedPreferences & Requests
         settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
@@ -68,6 +60,17 @@ public class FloorActivity extends BaseNavigationDrawerActivity {
                 settings_vk.getString(VK_PHOTO_KEY, ""),
                 settings_vk.getString(VK_EMAIL_KEY, "")
         );
+
+        int i = getIntent().getIntExtra("Corp", -1);
+
+        toastShowShort(Integer.toString(i));
     }
 
+    public void toastShowLong(String TEXT) {
+        Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
+    }
+
+    public void toastShowShort(String TEXT) {
+        Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_SHORT).show();
+    }
 }
