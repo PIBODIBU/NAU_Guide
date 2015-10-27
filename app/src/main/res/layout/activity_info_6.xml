@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    tools:context=".FloorActivity">
+    tools:context=".FloorActivity"
+    android:id="@+id/activity_info_6" >
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -17,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="250dp"
         android:src="@drawable/info_adress" />
 
     <ImageView
@@ -28,7 +29,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:src="@drawable/info_phone" />
+        android:src="@drawable/info_phone"
+        android:layout_marginTop="5dp" />
 
     <ImageView
         android:id="@+id/imageView5"
@@ -38,7 +40,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:src="@drawable/info_web" />
+        android:src="@drawable/info_web"
+        android:layout_marginTop="5dp" />
 
     <TextView
         android:id="@+id/textView2"
@@ -92,5 +95,31 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="#000000"
         android:textSize="13sp" />
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:id="@+id/imageView6"
+        android:layout_below="@+id/toolbar"
+        android:src="@drawable/gerb_6"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="6-й корпус \n ИКИТ"
+        android:id="@+id/textView5"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:layout_alignTop="@+id/imageView6"
+        android:layout_toRightOf="@+id/imageView6"
+        android:layout_alignBottom="@+id/imageView6"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="8dp" />
 
 </RelativeLayout>

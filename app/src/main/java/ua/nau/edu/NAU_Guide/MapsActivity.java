@@ -24,6 +24,7 @@ import ua.nau.edu.University.NAU;
 public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private int GLOBAL_MARKER_ID = -1;
+    private String GLOBAL_MARKER_LABEL = "";
     private Marker activeMarker = null;
     private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
     private static final String GLOBAL_SIGNED_KEY = "GLOBAL_SIGNED_KEY";
@@ -82,7 +83,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         editor_global = settings_global.edit();
         editor_vk = settings_vk.edit();
 
-        button_photo = (Button) findViewById(R.id.button_photo);
+        button_photo = (Button) findViewById(R.id.button_gallery);
         button_scheme = (Button) findViewById(R.id.button_scheme);
         button_info = (Button) findViewById(R.id.button_info);
 //
@@ -126,7 +127,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(MapsActivity.this, InfoActivity.class)
-                        .putExtra("Corp", GLOBAL_MARKER_ID));
+                        .putExtra("Corp_id", GLOBAL_MARKER_ID)
+                        .putExtra("Corp_label", GLOBAL_MARKER_LABEL));
             }
         });
     }
@@ -255,6 +257,42 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                     addMarker_custom(i, R.drawable.mark_sport, getString(R.string.sport));
                     break;
                 }
+                case 17: {
+                    addMarker_custom(i, R.drawable.mark_host, i - 16 + getString(R.string.host));
+                    break;
+                }
+                /*case 18: {
+                    addMarker_custom(i, R.drawable.mark_host, i - 16 +getString(R.string.sport));
+                    break;
+                }*/
+                case 19: {
+                    addMarker_custom(i, R.drawable.mark_host, i - 16 + getString(R.string.host));
+                    break;
+                }
+                case 20: {
+                    addMarker_custom(i, R.drawable.mark_host, i - 16 + getString(R.string.host));
+                    break;
+                }
+                case 21: {
+                    addMarker_custom(i, R.drawable.mark_host, i - 16 + getString(R.string.host));
+                    break;
+                }
+                case 22: {
+                    addMarker_custom(i, R.drawable.mark_host, i - 16 + getString(R.string.host));
+                    break;
+                }
+                case 23: {
+                    addMarker_custom(i, R.drawable.mark_host, i - 16 + getString(R.string.host));
+                    break;
+                }
+                case 24: {
+                    addMarker_custom(i, R.drawable.mark_host, i - 16 + getString(R.string.host));
+                    break;
+                }
+                case 25: {
+                    addMarker_custom(i, R.drawable.mark_host, i - 16 + getString(R.string.host));
+                    break;
+                }
                 default: {
                     break;
                 }
@@ -349,6 +387,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
                 //Записываем id текущего маркера в глобальную переменную
                 GLOBAL_MARKER_ID = getMarkerId(marker);
+
+                //Записываем label текущего маркера в глобальную переменную
+                GLOBAL_MARKER_LABEL = title_inst;
 
                 activeMarker = marker;
                 return false;

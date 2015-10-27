@@ -40,6 +40,19 @@ public class NAU extends University {
         // SPORT
         Corps.put(16, new LatLng(50.436868, 30.422972));
 
+        // HOSTEL
+        Corps.put(17, new LatLng(50.440152, 30.435087)); // 1
+        //Corps.put(18, new LatLng(, )); // 2
+        Corps.put(19, new LatLng(50.439593, 30.434185)); // 3
+        Corps.put(20, new LatLng(50.438905, 30.434146)); // 4
+        Corps.put(21, new LatLng(50.441425, 30.433795)); // 5
+        Corps.put(22, new LatLng(50.439317, 30.435665)); // 6
+        Corps.put(23, new LatLng(50.437694, 30.438223)); // 7
+        Corps.put(24, new LatLng(50.438350, 30.438223)); // 8
+        Corps.put(25, new LatLng(50.437886, 30.439007)); // 9
+        //Corps.put(25, new LatLng(50.437886, 30.439007)); // 10
+        Corps.put(25, new LatLng(50.437879, 30.440026)); // 11
+
         this.setCorps(Corps);
     }
 }

@@ -50,7 +50,6 @@
             android:layout_marginRight="10dp"
             android:background="@color/main_blue"
             android:gravity="center_vertical|center_horizontal"
-            android:text="The Fucking Sliding Up Panel"
             android:textAlignment="gravity"
             android:textColor="#ffffff"
             android:textSize="16sp" />
@@ -62,14 +61,14 @@
             android:background="#ffffff" />
 
         <Button
-            android:id="@+id/button_photo"
+            android:id="@+id/button_gallery"
             android:layout_width="80dp"
             android:layout_height="32dp"
             android:layout_alignParentStart="true"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="42dp"
             android:background="@drawable/slider_button"
-            android:text="Галерея"
+            android:text="@string/slide_gallery"
             android:textAlignment="center" />
 
         <Button
@@ -84,7 +83,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="42dp"
             android:background="@drawable/slider_button"
-            android:text="Схема"
+            android:text="@string/slide_scheme"
             android:textAlignment="center" />
 
         <Button
@@ -95,7 +94,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginTop="42dp"
             android:background="@drawable/slider_button"
-            android:text="Инфо"
+            android:text="@string/slide_info"
             android:textAlignment="center" />
 
         <View

@@ -5,7 +5,7 @@
     <string name="SearchActivity_label">Поиск</string>
     <string name="SplashActivity_label">NAU Guide</string>
     <string name="SettingsActivity_label">Настройки</string>
-    <string name="FloorActivity_label">Floor</string>
+    <string name="FloorActivity_label">Инфо</string>
     <string name="MapsActivity_label">Карта</string>
     <string name="FirstActivity_label">FirstActivity</string>
 
@@ -30,9 +30,14 @@
     <string name="med">Медцентр</string>
     <string name="sport">Спорткомплекс</string>
     <string name="bistro">Бистро</string>
+    <string name="host">-е общ.</string>
 
     <string name="VK_bad_token">Неправильный access token</string>
     <string name="VK_sign_error">Ошибка авторизации</string>
     <string name="VK_sent_success">Отправлено</string>
     <string name="VK_sent_error">Ошибка при отправке</string>
+
+    <string name="slide_gallery">Галерея</string>
+    <string name="slide_scheme">Схема</string>
+    <string name="slide_info">Инфо</string>
 </resources>
