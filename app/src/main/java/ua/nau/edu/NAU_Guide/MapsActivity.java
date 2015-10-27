@@ -13,6 +13,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -176,20 +177,85 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     private void setUpMap() {
         //Стартовое положение камеры
         LatLng nau = new LatLng(50.437476, 30.428322);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(nau, 15));
+        CameraPosition cameraPosition_start = new CameraPosition.Builder()
+                .target(nau)      // Sets the center of the map to Mountain View
+                .zoom(15)                   // Sets the zoom
+                .bearing(160)                // Sets the orientation of the camera to east
+                //.tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                .build();                   // Creates a CameraPosition from the builder
+
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition_start));
 
         //Добавление маркеров на карту из класса НАУ
         for (Integer i : university.getCorps().keySet()) {
-            if (i == 1 || i == 2 || i == 3 || i == 4 || i == 5 || i == 6 || i == 7 || i == 8 || i == 9 || i == 10 || i == 11 || i == 12) {
-                addMarker_custom(i, R.drawable.mark_corp, i + getString(R.string.corp));
-            } else if (i == 13) { // CKI
-                addMarker_custom(i, R.drawable.mark_cki, getString(R.string.cki));
-            } else if (i == 14) { // BISTRO
-                addMarker_custom(i, R.drawable.mark_bistro, getString(R.string.bistro));
-            } else if (i == 15) { // MED CENTER
-                addMarker_custom(i, R.drawable.mark_med, getString(R.string.med));
-            } else if (i == 16) { // SPORT
-                addMarker_custom(i, R.drawable.mark_sport, getString(R.string.sport));
+            switch (i) {
+                case 1: {
+                    addMarker_custom(i, R.drawable.corp_1, i + getString(R.string.corp));
+                    break;
+                }
+                case 2: {
+                    addMarker_custom(i, R.drawable.corp_2, i + getString(R.string.corp));
+                    break;
+                }
+                case 3: {
+                    addMarker_custom(i, R.drawable.corp_3, i + getString(R.string.corp));
+                    break;
+                }
+                case 4: {
+                    addMarker_custom(i, R.drawable.corp_4, i + getString(R.string.corp));
+                    break;
+                }
+                case 5: {
+                    addMarker_custom(i, R.drawable.corp_5, i + getString(R.string.corp));
+                    break;
+                }
+                case 6: {
+                    addMarker_custom(i, R.drawable.corp_6, i + getString(R.string.corp));
+                    break;
+                }
+                case 7: {
+                    addMarker_custom(i, R.drawable.corp_7, i + getString(R.string.corp));
+                    break;
+                }
+                case 8: {
+                    addMarker_custom(i, R.drawable.corp_8, i + getString(R.string.corp));
+                    break;
+                }
+                case 9: {
+                    addMarker_custom(i, R.drawable.corp_9, i + getString(R.string.corp));
+                    break;
+                }
+                case 10: {
+                    addMarker_custom(i, R.drawable.corp_10, i + getString(R.string.corp));
+                    break;
+                }
+                case 11: {
+                    addMarker_custom(i, R.drawable.corp_11, i + getString(R.string.corp));
+                    break;
+                }
+                case 12: {
+                    addMarker_custom(i, R.drawable.corp_12, i + getString(R.string.corp));
+                    break;
+                }
+                case 13: {
+                    addMarker_custom(i, R.drawable.mark_cki, getString(R.string.cki));
+                    break;
+                }
+                case 14: {
+                    addMarker_custom(i, R.drawable.mark_bistro, getString(R.string.bistro));
+                    break;
+                }
+                case 15: {
+                    addMarker_custom(i, R.drawable.mark_med, getString(R.string.med));
+                    break;
+                }
+                case 16: {
+                    addMarker_custom(i, R.drawable.mark_sport, getString(R.string.sport));
+                    break;
+                }
+                default: {
+                    break;
+                }
             }
         }
 
