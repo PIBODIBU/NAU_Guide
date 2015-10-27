@@ -186,6 +186,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition_start));
 
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+
         //Добавление маркеров на карту из класса НАУ
         for (Integer i : university.getCorps().keySet()) {
             switch (i) {
