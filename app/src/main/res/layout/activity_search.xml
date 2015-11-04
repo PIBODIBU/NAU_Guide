@@ -4,15 +4,22 @@
     android:layout_height="match_parent"
     tools:context=".SearchActivity">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+    <ImageView
+        android:id="@+id/shadow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/main_blue"
-        android:elevation="4dp"
-        android:minHeight="?attr/actionBarSize"
-        android:paddingTop="@dimen/tool_bar_top_padding"
-        android:transitionName="actionBar" />
+        android:layout_alignBottom="@+id/toolbar"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="-8dp"
+        android:layout_marginLeft="-8dp"
+        android:layout_marginRight="-8dp"
+        android:background="@android:drawable/dialog_holo_light_frame"
+        android:foreground="?android:windowContentOverlay" />
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/tool_bar" />
 
     <TextView
         android:id="@+id/textView"

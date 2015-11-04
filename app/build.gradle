@@ -32,7 +32,7 @@ dependencies {
     compile "com.android.support:appcompat-v7:23.0.1"
     compile 'com.android.support:recyclerview-v7:23.0.1'
     compile 'com.android.support:support-annotations:23.0.1'
-    compile 'com.google.android.gms:play-services:7.5.0'
+    compile 'com.google.android.gms:play-services:8.1.0'
 
     compile 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
 

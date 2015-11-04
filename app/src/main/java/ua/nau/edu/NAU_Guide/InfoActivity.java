@@ -1,13 +1,18 @@
 package ua.nau.edu.NAU_Guide;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
+import android.view.Menu;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-/**
- * Created by root on 10/5/15.
- */
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+
 public class InfoActivity extends BaseNavigationDrawerActivity {
 
     private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
@@ -89,7 +94,7 @@ public class InfoActivity extends BaseNavigationDrawerActivity {
 
                 break;
             }
-            case 8 : {
+            case 8: {
                 setContentView(R.layout.activity_info_8);
                 setLabel();
 
@@ -128,7 +133,6 @@ public class InfoActivity extends BaseNavigationDrawerActivity {
             }
         }
 
-
 // Get and set system services & Buttons & SharedPreferences & Requests
         settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
         settings_vk = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
@@ -141,6 +145,53 @@ public class InfoActivity extends BaseNavigationDrawerActivity {
                 settings_vk.getString(VK_PHOTO_KEY, ""),
                 settings_vk.getString(VK_EMAIL_KEY, "")
         );
+
+        // Multiple ScrollView/Text scrollViews
+        final TextView text = (TextView) findViewById(R.id.textView5);
+        final TextView text_head = (TextView) findViewById(R.id.textView10);
+        ScrollView scroll_main = (ScrollView) findViewById(R.id.scroll_main);
+        text.setMovementMethod(new ScrollingMovementMethod());
+
+        final int i = text.getHeight();
+        toastShowLong(Integer.toString(i));
+        text.setHeight(0);
+
+        text_head.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (text.getHeight() == 0)
+                    text.setHeight(200);
+                else
+                    text.setHeight(0);
+
+                return false;
+            }
+        });
+
+        scroll_main.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                text.getParent().requestDisallowInterceptTouchEvent(false);
+
+                return false;
+            }
+        });
+
+        text.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                text.getParent().requestDisallowInterceptTouchEvent(true);
+
+                return false;
+            }
+        });
+        // **********************************
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return true;
     }
 
     public void toastShowLong(String TEXT) {
@@ -151,7 +202,7 @@ public class InfoActivity extends BaseNavigationDrawerActivity {
         Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_SHORT).show();
     }
 
-    public void setLabel () {
+    public void setLabel() {
         this.setTitle(Integer.toString(getIntent().getIntExtra("Corp_id", -1)) +
                 getString(R.string.corp) +
                 ", " +

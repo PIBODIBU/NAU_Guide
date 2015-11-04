@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom"
+    sothree:umanoFadeColor="@android:color/transparent"
     sothree:umanoOverlay="true"
-    sothree:umanoShadowHeight="0dp"
-    sothree:umanoFadeColor="@android:color/transparent">
+    sothree:umanoShadowHeight="0dp">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -27,13 +27,22 @@
                 tools:context="ua.nau.edu.NAU_Guide.MapsActivity" />
         </RelativeLayout>
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-
+        <ImageView
+            android:id="@+id/shadow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/main_blue"
-            android:minHeight="?attr/actionBarSize" />
+            android:layout_alignBottom="@+id/toolbar"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="-8dp"
+            android:layout_marginLeft="-8dp"
+            android:layout_marginRight="-8dp"
+            android:background="@android:drawable/dialog_holo_light_frame"
+            android:foreground="?android:windowContentOverlay" />
+
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/tool_bar" />
 
     </RelativeLayout>
 
@@ -61,46 +70,27 @@
             android:background="#ffffff" />
 
         <Button
-            android:id="@+id/button_gallery"
-            android:layout_width="80dp"
-            android:layout_height="32dp"
-            android:layout_alignParentStart="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="42dp"
-            android:background="@drawable/slider_button"
-            android:text="@string/slide_gallery"
-            android:textAlignment="center" />
-
-        <Button
             android:id="@+id/button_scheme"
-            android:layout_width="80dp"
-            android:layout_height="32dp"
-            android:layout_alignParentEnd="false"
-            android:layout_alignParentLeft="false"
-            android:layout_alignParentRight="false"
-            android:layout_alignParentTop="false"
-            android:layout_alignWithParentIfMissing="false"
-            android:layout_centerHorizontal="true"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
             android:layout_marginTop="42dp"
-            android:background="@drawable/slider_button"
-            android:text="@string/slide_scheme"
-            android:textAlignment="center" />
+            android:background="@drawable/button_slider"
+            android:text="@string/slide_scheme" />
 
         <Button
             android:id="@+id/button_info"
-            android:layout_width="80dp"
-            android:layout_height="32dp"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
             android:layout_alignParentEnd="true"
-            android:layout_marginRight="10dp"
             android:layout_marginTop="42dp"
-            android:background="@drawable/slider_button"
-            android:text="@string/slide_info"
-            android:textAlignment="center" />
+            android:background="@drawable/button_slider"
+            android:text="@string/slide_info" />
 
         <View
             android:layout_width="fill_parent"
             android:layout_height="10dp"
-            android:layout_marginTop="74dp"
+            android:layout_marginTop="82dp"
             android:background="@color/main_blue" />
 
     </RelativeLayout>

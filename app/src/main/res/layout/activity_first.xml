@@ -3,44 +3,44 @@
     tools:context=".FirstLaunchActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/first_bg"
+    android:background="@drawable/bg_firstlaunch"
     android:orientation="vertical">
 
     <Button
         android:id="@+id/vk_sign_in"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_alignParentBottom="true"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/button_vk"
+        android:textColor="#ffffff"
+        android:layout_marginBottom="110dp"
+        android:layout_above="@+id/login_skip"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="150dp"
-        android:layout_marginLeft="20dp"
-        android:background="@drawable/vk_button"
-        android:textColor="#ffffff" />
+        android:layout_marginLeft="20dp" />
 
     <Button
         android:id="@+id/gg_sign_in"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_alignTop="@+id/vk_sign_in"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/gg_button"
+        android:background="@drawable/button_gg"
         android:textColor="#ffffff" />
 
     <Button
         android:id="@+id/fb_sign_in"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/button_fb"
+        android:textColor="#ffffff"
         android:layout_alignTop="@+id/gg_sign_in"
-        android:layout_marginRight="20dp"
-        android:background="@drawable/fb_button"
-        android:textColor="#ffffff" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="20dp" />
 
     <Button
         android:id="@+id/login_skip"
-        android:layout_width="100dp"
+        android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:background="@color/main_blue"
         android:gravity="center"
@@ -57,7 +57,7 @@
         android:layout_width="9dp"
         android:layout_height="12dp"
         android:id="@+id/imageView2"
-        android:background="@drawable/skip_button"
+        android:background="@drawable/button_skip"
         android:layout_alignBottom="@+id/login_skip"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"

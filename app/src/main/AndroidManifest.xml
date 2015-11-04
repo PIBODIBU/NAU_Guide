@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ua.nau.edu.NAU_Guide"
-    android:installLocation="preferExternal" >
+    android:installLocation="preferExternal">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -69,7 +69,11 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/MapsActivity_label" />
+            android:label="@string/MapsActivity_label">
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".SearchActivity" />
+        </activity>
 
         <activity
             android:name="com.vk.sdk.VKServiceActivity"

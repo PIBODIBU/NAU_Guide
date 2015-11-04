@@ -37,7 +37,6 @@ public class SplashActivity extends Activity {
         editor_global = settings_global.edit();
         editor_vk = settings_vk.edit();
 //
-        if (settings_vk.getBoolean(VK_SIGNED_KEY, false));
 
         Thread background = new Thread() {
             public void run() {

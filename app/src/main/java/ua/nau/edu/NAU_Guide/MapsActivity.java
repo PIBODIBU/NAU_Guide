@@ -83,7 +83,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         editor_global = settings_global.edit();
         editor_vk = settings_vk.edit();
 
-        button_photo = (Button) findViewById(R.id.button_gallery);
         button_scheme = (Button) findViewById(R.id.button_scheme);
         button_info = (Button) findViewById(R.id.button_info);
 //
@@ -97,24 +96,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         setUpMapIfNeeded();
 
         initSlidingPanel();
-
-        /*TextView text = (TextView) findViewById(R.id.titleSlidingLayout);
-
-        text.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toastShowShort("text clicked");
-                if (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED)
-                    slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
-            }
-        });*/
-
-        button_photo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MapsActivity.this, InfoActivity.class));
-            }
-        });
 
         button_scheme.setOnClickListener(new View.OnClickListener() {
             @Override

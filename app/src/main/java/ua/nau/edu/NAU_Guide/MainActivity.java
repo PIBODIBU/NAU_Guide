@@ -204,7 +204,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         restart = (Button) findViewById(R.id.restart);
         vk_sign_in = (Button) findViewById(R.id.vk_sign_in);
         vk_sign_out = (Button) findViewById(R.id.vk_sign_out);
-        restart_first = (Button) findViewById(R.id.restart_first);
 
         if(!settings_vk.getBoolean(VK_SIGNED_KEY, false)) {
             vk_sign_out.setEnabled(false);
@@ -303,26 +302,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         });
 //
 
-// Restart with FirstLaunchActivity button
-        restart_first.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                editor_global
-                        .putBoolean(FIRST_LAUNCH_KEY, true)
-                        .apply();
-
-                editor_vk.
-                        putBoolean(VK_SIGNED_KEY, false)
-                        .apply();
-
-                finish();
-
-                startActivity(new Intent(MainActivity.this, SplashActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-            }
-        });
-//
-
 /*****/
 
 /** Google+ **/
@@ -371,7 +350,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                         editor_vk.putString(VK_EMAIL_KEY, VKSdk.getAccessToken().email);
                         editor_vk.putBoolean(VK_SIGNED_KEY, true);
                         editor_vk.apply();
-
 /*****/
                         startActivity(new Intent(MainActivity.this, MainActivity.class)
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));

@@ -37,7 +37,20 @@
     <string name="VK_sent_success">Отправлено</string>
     <string name="VK_sent_error">Ошибка при отправке</string>
 
-    <string name="slide_gallery">Галерея</string>
     <string name="slide_scheme">Схема</string>
     <string name="slide_info">Инфо</string>
+
+    <string name="activity_info_6_vectors">
+        <b>0501 Інформатика та обчислювальна техніка\n</b>
+            \t6.050101 Компютерні науки
+            \n\t6.050102 Компютерна інженерія
+            \n\t6.050103 Програмна інженерія
+
+        <b>\n\n1701 Інформаційна безпека</b>
+            \n\t6.170101 Безпека інформаційних і комунікаційних систем
+            \n\t6.170103 Управління інформаційною безпекою
+
+        <b>\n\n0515 Видавничо-поліграфічна справа</b>
+            \n\t6.051201 Видавничо-поліграфічна справа
+    </string>
 </resources>

@@ -4,8 +4,9 @@
     <color name="material_drawer_selected_text">@color/main_blue</color>
     <color name="material_drawer_primary_text">@color/grey</color>
     <color name="grey">#ff737373</color>
+    <color name="grey_light">#E0E0E0</color>
     <color name="white">#ffffff</color>
-    <color name="main_blue">#2196F3</color>
+    <color name="main_blue">#0288d1</color>
     <color name="black">#000000</color>
     <color name="tsyan">#18E3FF</color>
 

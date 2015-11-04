@@ -5,28 +5,21 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-//import com.mikepenz.iconics.typeface.FontAwesome;
-
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -34,19 +27,10 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.squareup.picasso.Picasso;
-import com.vk.sdk.api.VKApi;
-import com.vk.sdk.api.VKApiConst;
-import com.vk.sdk.api.VKParameters;
-import com.vk.sdk.api.VKRequest;
-import com.vk.sdk.api.model.VKApiUserFull;
-
-import java.io.InputStream;
-import java.net.URL;
 
 
 public class BaseNavigationDrawerActivity extends AppCompatActivity {
@@ -103,38 +87,40 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 
         final PrimaryDrawerItem home = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_home)
-                .withIcon(FontAwesome.Icon.faw_home)
+                .withIcon(GoogleMaterial.Icon.gmd_home)
                 .withIdentifier(0);
 
         final PrimaryDrawerItem map = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_map)
-                .withIcon(FontAwesome.Icon.faw_map_marker)
+                .withIcon(GoogleMaterial.Icon.gmd_map)
                 .withIdentifier(1);
 
         final PrimaryDrawerItem download = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_download)
-                .withIcon(FontAwesome.Icon.faw_download)
+                .withIcon(GoogleMaterial.Icon.gmd_file_download)
                 .withIdentifier(2);
+
+        final PrimaryDrawerItem chat = new PrimaryDrawerItem()
+                .withName("Чат")
+                .withIcon(GoogleMaterial.Icon.gmd_chat)
+                .withIdentifier(8)
+                .withEnabled(false);
 
         final PrimaryDrawerItem settings = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_settings)
-                .withIcon(FontAwesome.Icon.faw_cog)
-                .withIdentifier(4);
+                .withIcon(GoogleMaterial.Icon.gmd_settings)
+                .withIdentifier(4)
+                .withEnabled(false);
 
         final PrimaryDrawerItem search = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_search)
-                .withIcon(FontAwesome.Icon.faw_search)
+                .withIcon(GoogleMaterial.Icon.gmd_search)
                 .withIdentifier(5);
 
         final PrimaryDrawerItem exit = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_exit)
-                .withIcon(FontAwesome.Icon.faw_close)
+                .withIcon(GoogleMaterial.Icon.gmd_close)
                 .withIdentifier(7);
-
-        final PrimaryDrawerItem chat = new PrimaryDrawerItem()
-                .withName("Чат")
-                .withIcon(FontAwesome.Icon.faw_wechat)
-                .withIdentifier(8);
 
 // Image Downloader for Drawer
         DrawerImageLoader.init(new DrawerImageLoader.IDrawerImageLoader() {
@@ -166,7 +152,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         if (settings_vk.getBoolean(VK_SIGNED_KEY, false)) {
             profile_1 = new ProfileDrawerItem().withName(ACCOUNT_NAME).withEmail(ACCOUNT_EMAIL).withIcon(ACCOUNT_PHOTO);
         } else {
-            profile_1 = new ProfileDrawerItem().withName("I am giraffe").withEmail("giraffe@giraffe.com").withIcon(getResources().getDrawable(R.drawable.default_header_icon));
+            profile_1 = new ProfileDrawerItem().withIcon(R.drawable.ic_account_circle_white_48dp);
         }
 
         AccountHeader headerResult = new AccountHeaderBuilder()
@@ -181,6 +167,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                         return false;
                     }
                 })
+                .withSelectionListEnabled(false)
                 .build();
 
 // Инициализируем Navigation Drawer
@@ -188,20 +175,20 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withActionBarDrawerToggle(true)
-                        //.withHeader(R.layout.drawer_header)
+                .withActionBarDrawerToggleAnimated(true)
                 .withAccountHeader(headerResult)
                 .withHeaderDivider(false)
+                .withDrawerWidthDp(250)
                 .addDrawerItems(
                         home,
                         map,
                         download,
+                        chat,
                         new DividerDrawerItem(),
                         settings,
                         search,
                         new DividerDrawerItem(),
-                        exit,
-                        new DividerDrawerItem(),
-                        chat
+                        exit
                 )
                 .withOnDrawerListener(new Drawer.OnDrawerListener() {
                     @Override

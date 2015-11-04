@@ -1,129 +1,162 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_activity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+    <ImageView
+        android:id="@+id/shadow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/main_blue"
-        android:minHeight="?attr/actionBarSize" />
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/plus_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="100dp"
-            android:text="@string/plus_signed_id"
-            android:textColor="@color/black"
-            android:textSize="15dp" />
-
-        <TextView
-            android:id="@+id/plus_user"
-            android:layout_width="290dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
-            android:textColor="@color/black"
-            android:textSize="15dp" />
-    </LinearLayout>
-
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/sign_in_button"
-        android:layout_width="120dp"
-        android:layout_height="50dp"
-        android:layout_alignBottom="@+id/vk_sign_in"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/vk_sign_in"
-        android:enabled="false"
-        android:background="#B71C1C" />
-
-    <Button
-        android:id="@+id/sign_out_button"
-        android:layout_width="130dp"
-        android:layout_height="50dp"
-        android:layout_alignLeft="@+id/sign_in_button"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignStart="@+id/sign_in_button"
-        android:layout_below="@+id/sign_in_button"
-        android:layout_marginTop="10dp"
-        android:background="#B71C1C"
-        android:enabled="false"
-        android:text="@string/sign_out_button_name" />
-
-    <ListView
-        android:id="@+id/circles_list"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/restart"
-        android:layout_alignRight="@+id/restart"
-        android:layout_alignTop="@+id/restart"
-        android:orientation="vertical"
-        android:padding="0dip"
-        android:visibility="invisible" />
-
-    <Button
-        android:id="@+id/restart"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/sign_out_button"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/sign_out_button"
-        android:background="#4CAF50"
-        android:text="Restart" />
-
-    <Button
-        android:id="@+id/vk_sign_in"
-        android:layout_width="120dp"
-        android:layout_height="50dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/linearLayout"
-        android:layout_marginTop="35dp"
-        android:background="@color/main_blue"
-        android:text="VK Sign in" />
-
-    <Button
-        android:id="@+id/vk_sign_out"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/sign_out_button"
-        android:layout_alignEnd="@+id/vk_sign_in"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/vk_sign_in"
-        android:layout_alignTop="@+id/sign_out_button"
-        android:background="@color/main_blue"
-        android:text="VK Sign out" />
-
-    <Button
-        android:id="@+id/restart_first"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/vk_sign_out"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/vk_sign_out"
-        android:background="#4CAF50"
-        android:text="Restart with FirstScreen" />
-
-    <Button
-        android:id="@+id/vk_share"
-        android:layout_width="120dp"
-        android:layout_height="50dp"
-        android:layout_above="@+id/circles_list"
+        android:layout_alignBottom="@+id/toolbar"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:background="@color/main_blue"
-        android:text="SHARE" />
+        android:layout_marginLeft="-8dp"
+        android:layout_marginRight="-8dp"
+        android:background="@android:drawable/dialog_holo_light_frame"
+        android:foreground="?android:windowContentOverlay"
+        android:layout_marginBottom="-8dp" />
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/tool_bar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/shadow">
+
+        <RelativeLayout
+            android:id="@+id/main_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/dialog_holo_light_frame"
+            android:paddingBottom="16dp">
+
+            <com.google.android.gms.common.SignInButton
+                android:id="@+id/sign_in_button"
+                android:layout_width="120dp"
+                android:layout_height="50dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+                android:background="#B71C1C"
+                android:enabled="false" />
+
+            <Button
+                android:id="@+id/sign_out_button"
+                android:layout_width="130dp"
+                android:layout_height="50dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignStart="@+id/sign_in_button"
+                android:layout_below="@+id/sign_in_button"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+                android:background="#B71C1C"
+                android:enabled="false"
+                android:text="@string/sign_out_button_name" />
+
+            <ListView
+                android:id="@+id/circles_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignTop="@+id/restart"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="100dp"
+                android:orientation="vertical"
+                android:padding="0dip"
+                android:visibility="invisible" />
+
+            <Button
+                android:id="@+id/restart"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="false"
+                android:layout_alignParentLeft="false"
+                android:layout_alignParentStart="false"
+                android:layout_alignParentTop="false"
+                android:layout_alignWithParentIfMissing="false"
+                android:layout_below="@+id/vk_share"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="16dp"
+                android:background="#4CAF50"
+                android:text="Restart"
+                android:textColor="#ffffff" />
+
+            <Button
+                android:id="@+id/vk_sign_in"
+                android:layout_width="120dp"
+                android:layout_height="50dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/main_blue"
+                android:text="VK Sign in"
+                android:textColor="#ffffff" />
+
+            <Button
+                android:id="@+id/vk_sign_out"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@+id/vk_sign_in"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/vk_sign_in"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/main_blue"
+                android:text="VK Sign out"
+                android:textColor="#ffffff" />
+
+            <Button
+                android:id="@+id/vk_share"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignStart="@+id/plus_text"
+                android:layout_below="@+id/vk_sign_out"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/main_blue"
+                android:text="SHARE"
+                android:textColor="#ffffff" />
+
+            <TextView
+                android:id="@+id/plus_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/sign_out_button"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/sign_out_button"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/grey_light"
+                android:text="@string/plus_signed_id"
+                android:textColor="@color/black"
+                android:textSize="15dp" />
+
+            <TextView
+                android:id="@+id/plus_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/vk_share"
+                android:layout_alignLeft="@+id/sign_out_button"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/plus_text"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/grey_light"
+                android:textColor="@color/black"
+                android:textSize="15dp" />
+
+        </RelativeLayout>
+    </ScrollView>
 
 </RelativeLayout>
