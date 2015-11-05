@@ -35,14 +35,9 @@ import com.squareup.picasso.Picasso;
 
 public class BaseNavigationDrawerActivity extends AppCompatActivity {
     private static final String VK_PREFERENCES = "VK_PREFERENCES";
-    private static final String VK_INFO_KEY = "VK_INFO_KEY";
-    private static final String VK_PHOTO_KEY = "VK_PHOTO_KEY";
-    private static final String VK_EMAIL_KEY = "VK_EMAIL_KEY";
     private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
-    private static final String VK_ID_KEY = "VK_ID_KEY";
 
     private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
-    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
 
     SharedPreferences settings_global = null;
     SharedPreferences settings_vk = null;
@@ -60,15 +55,15 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
     public void getCurrentSelection() {
         switch (BaseNavigationDrawerActivity.this.getClass().getSimpleName()) {
             case "MainActivity": {
-                drawerResult.setSelection(0);
+                drawerResult.setSelection(Activities.MainActivity.ordinal());
                 break;
             }
             case "MapsActivity": {
-                drawerResult.setSelection(1);
+                drawerResult.setSelection(Activities.MapsActivity.ordinal());
                 break;
             }
             case "SearchActivity": {
-                drawerResult.setSelection(5);
+                drawerResult.setSelection(Activities.SearchActivity.ordinal());
                 break;
             }
             default: {
@@ -88,39 +83,39 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         final PrimaryDrawerItem home = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_home)
                 .withIcon(GoogleMaterial.Icon.gmd_home)
-                .withIdentifier(0);
+                .withIdentifier(Activities.MainActivity.ordinal());
 
         final PrimaryDrawerItem map = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_map)
                 .withIcon(GoogleMaterial.Icon.gmd_map)
-                .withIdentifier(1);
+                .withIdentifier(Activities.MapsActivity.ordinal());
 
         final PrimaryDrawerItem download = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_download)
                 .withIcon(GoogleMaterial.Icon.gmd_file_download)
-                .withIdentifier(2);
+                .withIdentifier(Activities.DownloadActivity.ordinal());
 
         final PrimaryDrawerItem chat = new PrimaryDrawerItem()
                 .withName("Чат")
                 .withIcon(GoogleMaterial.Icon.gmd_chat)
-                .withIdentifier(8)
+                .withIdentifier(Activities.ChatActivity.ordinal())
                 .withEnabled(false);
 
         final PrimaryDrawerItem settings = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_settings)
                 .withIcon(GoogleMaterial.Icon.gmd_settings)
-                .withIdentifier(4)
+                .withIdentifier(Activities.SettingsActivity.ordinal())
                 .withEnabled(false);
 
         final PrimaryDrawerItem search = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_search)
                 .withIcon(GoogleMaterial.Icon.gmd_search)
-                .withIdentifier(5);
+                .withIdentifier(Activities.SearchActivity.ordinal());
 
         final PrimaryDrawerItem exit = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_exit)
                 .withIcon(GoogleMaterial.Icon.gmd_close)
-                .withIdentifier(7);
+                .withIdentifier(Activities.Exit.ordinal());
 
 // Image Downloader for Drawer
         DrawerImageLoader.init(new DrawerImageLoader.IDrawerImageLoader() {
@@ -224,8 +219,10 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                             String SEARCH_CLASS = "SearchActivity";
                             String MAP_CLASS = "MapsActivity";
 
-                            switch (drawerItem.getIdentifier()) {
-                                case 0: {
+                            Activities activities = Activities.values()[drawerItem.getIdentifier()];
+
+                            switch (activities) {
+                                case MainActivity: {
                                     if (CURRENT_CLASS.equals(MAIN_CLASS)) {
                                         break;
                                     } else {
@@ -234,7 +231,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                     }
                                     break;
                                 }
-                                case 1: {
+                                case MapsActivity: {
                                     if (CURRENT_CLASS.equals(MAP_CLASS)) {
                                         break;
                                     } else {
@@ -242,11 +239,11 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                         break;
                                     }
                                 }
-                                case 4: {
+                                case SettingsActivity: {
                                     startActivity(new Intent(BaseNavigationDrawerActivity.this, SettingsActivity.class));
                                     break;
                                 }
-                                case 5: {
+                                case SearchActivity: {
                                     if (CURRENT_CLASS.equals(SEARCH_CLASS)) {
                                         break;
                                     } else {
@@ -254,7 +251,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                     }
                                     break;
                                 }
-                                case 7: {
+                                case Exit: {
                                     startActivity(new Intent(getApplicationContext(), MainActivity.class)
                                             .putExtra("EXIT", true)
                                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
