@@ -203,8 +203,5 @@ public class FileAdapter {
                 e.printStackTrace();
             }
         }
-
-
-
 }
 

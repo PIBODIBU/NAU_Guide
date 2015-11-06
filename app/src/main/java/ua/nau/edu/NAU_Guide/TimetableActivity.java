@@ -3,6 +3,9 @@ package ua.nau.edu.NAU_Guide;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import ua.nau.edu.Systems.FileAdapter;
@@ -31,6 +34,7 @@ public class TimetableActivity extends BaseNavigationDrawerActivity {
     private static final String VK_ID_KEY = "VK_ID_KEY";
 
 
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +54,11 @@ public class TimetableActivity extends BaseNavigationDrawerActivity {
                 settings_vk.getString(VK_EMAIL_KEY, "")
         );
 
+        listView =(ListView) findViewById(R.id.list_view);
         FileAdapter connector = new FileAdapter();
-
-        Context context = getApplicationContext();
-        CharSequence text = connector.listGroup.toString();
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
+        String[] groupes = new String[connector.listGroup.size()];
+        connector.listGroup.toArray(groupes);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,R.layout.list_item,groupes);
+        listView.setAdapter(adapter);
     }
 }
