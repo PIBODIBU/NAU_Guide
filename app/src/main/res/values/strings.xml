@@ -53,4 +53,9 @@
         <b>\n\n0515 Видавничо-поліграфічна справа</b>
             \n\t6.051201 Видавничо-поліграфічна справа
     </string>
+    <string name="title_activity_timetable">TimetableActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="input_group">Введите свою группу</string>
+    <string name="timetable">Расписание</string>
 </resources>

@@ -66,6 +66,10 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 drawerResult.setSelection(Activities.SearchActivity.ordinal());
                 break;
             }
+            case "TimetableActivity": {
+                drawerResult.setSelection(Activities.TimetableActivity.ordinal());
+                break;
+            }
             default: {
                 drawerResult.setSelection(-1);
                 break;
@@ -106,6 +110,11 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withIcon(GoogleMaterial.Icon.gmd_settings)
                 .withIdentifier(Activities.SettingsActivity.ordinal())
                 .withEnabled(false);
+
+        final PrimaryDrawerItem timetable = new PrimaryDrawerItem()
+                .withName(R.string.timetable)
+                .withIcon(R.mipmap.ic_timetable_navi)
+                .withIdentifier(Activities.TimetableActivity.ordinal());
 
         final PrimaryDrawerItem search = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_search)
@@ -177,6 +186,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .addDrawerItems(
                         home,
                         map,
+                        timetable,
                         download,
                         chat,
                         new DividerDrawerItem(),
@@ -218,6 +228,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                             String MAIN_CLASS = "MainActivity";
                             String SEARCH_CLASS = "SearchActivity";
                             String MAP_CLASS = "MapsActivity";
+                            String TIMETABLE_CLASS = "TimetableActivity";
 
                             Activities activities = Activities.values()[drawerItem.getIdentifier()];
 
@@ -236,6 +247,14 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                         break;
                                     } else {
                                         startActivity(new Intent(BaseNavigationDrawerActivity.this, MapsActivity.class));
+                                        break;
+                                    }
+                                }
+                                case TimetableActivity: {
+                                    if(CURRENT_CLASS.equals(TIMETABLE_CLASS)){
+                                        break;
+                                    } else {
+                                        startActivity(new Intent(BaseNavigationDrawerActivity.this, TimetableActivity.class));
                                         break;
                                     }
                                 }
