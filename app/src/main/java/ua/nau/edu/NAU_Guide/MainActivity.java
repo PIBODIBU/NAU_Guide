@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gc.materialdesign.views.CustomView;
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKAccessTokenTracker;
 import com.vk.sdk.VKCallback;
@@ -144,11 +145,10 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private ArrayList<String> mCirclesList;
     private ArrayAdapter<String> mCirclesAdapter;
 
-    private Button vk_share;
-    private Button restart;
-    private Button vk_sign_in;
-    private Button vk_sign_out;
-    private Button restart_first;
+    private CustomView vk_share;
+    private CustomView restart;
+    private CustomView vk_sign_in;
+    private CustomView vk_sign_out;
 
 /*****/
 
@@ -200,10 +200,10 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         editor_global = settings_global.edit();
         editor_vk = settings_vk.edit();
 
-        vk_share = (Button) findViewById(R.id.vk_share);
-        restart = (Button) findViewById(R.id.restart);
-        vk_sign_in = (Button) findViewById(R.id.vk_sign_in);
-        vk_sign_out = (Button) findViewById(R.id.vk_sign_out);
+        vk_share = (CustomView) findViewById(R.id.vk_share);
+        restart = (CustomView) findViewById(R.id.restart);
+        vk_sign_in = (CustomView) findViewById(R.id.vk_sign_in);
+        vk_sign_out = (CustomView) findViewById(R.id.vk_sign_out);
 
         if(!settings_vk.getBoolean(VK_SIGNED_KEY, false)) {
             vk_sign_out.setEnabled(false);

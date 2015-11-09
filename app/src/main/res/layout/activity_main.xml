@@ -1,8 +1,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:materialdesign="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_activity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/grey_light"
     tools:context=".MainActivity">
 
     <ImageView
@@ -12,26 +14,28 @@
         android:layout_alignBottom="@+id/toolbar"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
+        android:layout_marginBottom="-8dp"
         android:layout_marginLeft="-8dp"
         android:layout_marginRight="-8dp"
         android:background="@android:drawable/dialog_holo_light_frame"
-        android:foreground="?android:windowContentOverlay"
-        android:layout_marginBottom="-8dp" />
+        android:foreground="?android:windowContentOverlay" />
 
     <include
         android:id="@+id/toolbar"
         layout="@layout/tool_bar" />
 
-    <ScrollView
+    <com.gc.materialdesign.views.ScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/shadow">
+        android:layout_below="@+id/shadow"
+        android:layout_marginTop="8dp">
 
         <RelativeLayout
             android:id="@+id/main_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:drawable/dialog_holo_light_frame"
+            android:background="@color/white"
             android:paddingBottom="16dp">
 
             <com.google.android.gms.common.SignInButton
@@ -47,7 +51,7 @@
 
             <Button
                 android:id="@+id/sign_out_button"
-                android:layout_width="130dp"
+                android:layout_width="120dp"
                 android:layout_height="50dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
@@ -62,67 +66,62 @@
             <ListView
                 android:id="@+id/circles_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentRight="false"
+                android:layout_alignParentStart="true"
                 android:layout_alignTop="@+id/restart"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginTop="100dp"
+                android:layout_marginTop="500dp"
                 android:orientation="vertical"
                 android:padding="0dip"
                 android:visibility="invisible" />
 
-            <Button
+            <com.gc.materialdesign.views.ButtonRectangle
                 android:id="@+id/restart"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="false"
-                android:layout_alignParentLeft="false"
-                android:layout_alignParentStart="false"
-                android:layout_alignParentTop="false"
-                android:layout_alignWithParentIfMissing="false"
+                android:layout_width="120dp"
+                android:layout_height="50dp"
                 android:layout_below="@+id/vk_share"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="16dp"
-                android:background="#4CAF50"
+                android:background="@color/green"
                 android:text="Restart"
                 android:textColor="#ffffff" />
 
-            <Button
+            <com.gc.materialdesign.views.ButtonRectangle
                 android:id="@+id/vk_sign_in"
                 android:layout_width="120dp"
                 android:layout_height="50dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
                 android:background="@color/main_blue"
+
                 android:text="VK Sign in"
                 android:textColor="#ffffff" />
 
-            <Button
+            <com.gc.materialdesign.views.ButtonRectangle
                 android:id="@+id/vk_sign_out"
                 android:layout_width="120dp"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_alignEnd="@+id/vk_sign_in"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
+                android:layout_alignRight="@+id/vk_sign_in"
                 android:layout_below="@+id/vk_sign_in"
-                android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
                 android:background="@color/main_blue"
                 android:text="VK Sign out"
                 android:textColor="#ffffff" />
 
-            <Button
+            <com.gc.materialdesign.views.ButtonRectangle
                 android:id="@+id/vk_share"
                 android:layout_width="120dp"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignStart="@+id/plus_text"
                 android:layout_below="@+id/vk_sign_out"
-                android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
                 android:background="@color/main_blue"
                 android:text="SHARE"
@@ -157,6 +156,17 @@
                 android:textSize="15dp" />
 
         </RelativeLayout>
-    </ScrollView>
+    </com.gc.materialdesign.views.ScrollView>
+
+    <com.gc.materialdesign.views.ButtonFloat
+        android:id="@+id/buttonFloat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="24dp"
+        android:background="@color/main_blue"
+        materialdesign:animate="true"
+        materialdesign:iconDrawable="@drawable/ic_web_white_24dp" />
 
 </RelativeLayout>
