@@ -1,16 +1,12 @@
 package ua.nau.edu.NAU_Guide;
 
 import android.app.Activity;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gc.materialdesign.views.CustomView;
@@ -69,7 +65,7 @@ public class FirstLaunchActivity extends Activity {
     /*****/
 
     private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
-    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
+    private static final String GLOBAL_SIGNED_IN = "GLOBAL_SIGNED_IN";
 
     SharedPreferences settings_global = null;
     SharedPreferences settings_vk = null;
@@ -167,15 +163,14 @@ public class FirstLaunchActivity extends Activity {
                         editor_vk.putBoolean(VK_SIGNED_KEY, true);
 
                         editor_vk.apply();
-/*****/
-
 /*** Important! Add this after each success login ***/
-                        editor_global.putBoolean(FIRST_LAUNCH_KEY, false).apply();
+                        editor_global.putBoolean(GLOBAL_SIGNED_IN, true).apply();
 /*****/
 
                         finish();
                         startActivity(new Intent(FirstLaunchActivity.this, MainActivity.class)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                .putExtra("JustSigned", true));
 
                         super.onComplete(response);
                     }

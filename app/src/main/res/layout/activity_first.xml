@@ -4,45 +4,52 @@
     android:layout_height="match_parent"
     android:background="@color/grey_bg"
     android:orientation="vertical"
-    tools:context=".FirstLaunchActivity" >
+    tools:context=".FirstLaunchActivity">
 
     <View
         android:id="@+id/head"
         android:layout_width="match_parent"
-        android:layout_height="330dp"
+        android:layout_height="320dp"
         android:background="@drawable/bg_firstlaunch" />
+
+    <include
+        android:id="@+id/shadow"
+        layout="@layout/toolbar_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_below="@+id/head" />
 
     <com.gc.materialdesign.views.CustomView
         android:id="@+id/vk_sign_in"
         android:layout_width="70dp"
         android:layout_height="70dp"
+        android:layout_alignBottom="@+id/gg_sign_in"
+        android:layout_alignParentBottom="false"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:background="@drawable/button_vk"
-        android:layout_alignParentBottom="false"
-        android:layout_alignBottom="@+id/gg_sign_in"
-        android:layout_marginLeft="8dp" />
+        android:layout_marginLeft="8dp"
+        android:background="@drawable/button_vk" />
 
     <com.gc.materialdesign.views.CustomView
         android:id="@+id/gg_sign_in"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/button_gg"
+        android:layout_alignBottom="@+id/fb_sign_in"
         android:layout_alignParentBottom="false"
-        android:layout_alignBottom="@+id/fb_sign_in" />
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/button_gg" />
 
     <com.gc.materialdesign.views.CustomView
         android:id="@+id/fb_sign_in"
         android:layout_width="70dp"
         android:layout_height="70dp"
+        android:layout_above="@+id/login_skip"
+        android:layout_alignParentBottom="false"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:background="@drawable/button_fb"
-        android:layout_alignParentBottom="false"
-        android:layout_above="@+id/login_skip"
         android:layout_marginBottom="16dp"
-        android:layout_marginRight="8dp" />
+        android:layout_marginRight="8dp"
+        android:background="@drawable/button_fb" />
 
     <com.gc.materialdesign.views.ButtonFlat
         android:id="@+id/login_skip"
@@ -51,11 +58,11 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="20dp"
         android:background="@color/colorAppPrimary"
         android:text="Пропустить"
         android:textAlignment="gravity"
-        android:textColor="#ffffff"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="10dp" />
+        android:textColor="#ffffff" />
 
 </RelativeLayout>

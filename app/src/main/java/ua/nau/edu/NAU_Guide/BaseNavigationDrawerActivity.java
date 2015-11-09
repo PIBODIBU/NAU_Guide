@@ -35,6 +35,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
     private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
 
     private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
+    private static final String GLOBAL_SIGNED_IN = "GLOBAL_SIGNED_IN";
 
     private SharedPreferences settings_global = null;
     private SharedPreferences settings_vk = null;
@@ -142,8 +143,10 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
                     public boolean onProfileChanged(View view, IProfile iProfile, boolean b) {
-                        startActivity(new Intent(BaseNavigationDrawerActivity.this, FirstLaunchActivity.class)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                        if(!settings_global.getBoolean(GLOBAL_SIGNED_IN, false)) {
+                            startActivity(new Intent(BaseNavigationDrawerActivity.this, FirstLaunchActivity.class)
+                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                        }
                         return false;
                     }
                 })

@@ -10,6 +10,7 @@ import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -21,6 +22,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.views.CustomView;
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKAccessTokenTracker;
@@ -134,7 +138,9 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
     private int mSignInError;
 
-/*** VIEWS ***/
+    /***
+     * VIEWS
+     ***/
 
     private SignInButton mSignInButoon;
     private TextView plusText;
@@ -150,17 +156,19 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private CustomView vk_sign_in;
     private CustomView vk_sign_out;
 
-/*****/
+    /*****/
 
     private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
-    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
+    private static final String GLOBAL_SIGNED_IN = "GLOBAL_SIGNED_IN";
 
     SharedPreferences settings_global = null;
     SharedPreferences settings_vk = null;
     SharedPreferences.Editor editor_global;
     SharedPreferences.Editor editor_vk;
 
-/*** VKONTAKTE SDK VARIABLES ***/
+    /***
+     * VKONTAKTE SDK VARIABLES
+     ***/
 
     private int appId = 5084652;
 
@@ -171,7 +179,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
     private static final String VK_ID_KEY = "VK_ID_KEY";
 
-/*****/
+    /*****/
 
     VKApiUserFull users_full = null;
     VKRequest request_info = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_50, photo_100, photo_200"));
@@ -192,6 +200,10 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 // Setting Content View
         setContentView(R.layout.activity_main);
 
+        if (getIntent().getBooleanExtra("JustSigned", false)) {
+            initDialog_share();
+        }
+
 // Get and set system services & Buttons & SharedPreferences & Requests
         inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
 
@@ -205,7 +217,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         vk_sign_in = (CustomView) findViewById(R.id.vk_sign_in);
         vk_sign_out = (CustomView) findViewById(R.id.vk_sign_out);
 
-        if(!settings_vk.getBoolean(VK_SIGNED_KEY, false)) {
+        if (!settings_vk.getBoolean(VK_SIGNED_KEY, false)) {
             vk_sign_out.setEnabled(false);
             vk_share.setEnabled(false);
         }
@@ -214,7 +226,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                 VKApiConst.OWNER_ID,
                 Integer.toString(settings_vk.getInt(VK_ID_KEY, -1)),
                 VKApiConst.MESSAGE,
-                "Hi, guys! \n I use this shit. Check it out! \n" + Uri.parse("https://play.google.com/my_fucking_link") ));
+                "Test String"));
 //
 
 // Load Navigation Drawer
@@ -243,7 +255,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
             public void onClick(View view) {
                 settings_global
                         .edit()
-                        .putBoolean(FIRST_LAUNCH_KEY, true)
+                        .putBoolean(GLOBAL_SIGNED_IN, false)
                         .apply();
 
 
@@ -332,6 +344,60 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 /*****/
     }
 
+    private void initDialog_share() {
+        MaterialDialog dialog = new MaterialDialog.Builder(this)
+                .title("Вы вошли!")
+                .content("Вы успешно авторизовались! Спасибо, что используете наше приложение. Расскажите о нем своим друзьям!")
+                .positiveText("Рассказать")
+                .negativeText("Отмена")
+
+                .cancelable(false)
+
+                .backgroundColor(getResources().getColor(R.color.white))
+                .dividerColor(getResources().getColor(R.color.colorAppPrimary))
+                .positiveColor(getResources().getColor(R.color.colorAppPrimary))
+                .negativeColor(getResources().getColor(R.color.black))
+                .contentColor(getResources().getColor(R.color.black))
+                .titleColor(getResources().getColor(R.color.colorAppPrimary))
+
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        request_share.executeWithListener(new VKRequest.VKRequestListener() {
+                            @Override
+                            public void onComplete(VKResponse response) {
+                                toastShowLong(getString(R.string.VK_sent_success));
+                                super.onComplete(response);
+                            }
+
+                            @Override
+                            public void onError(VKError error) {
+                                toastShowLong(getString(R.string.VK_sent_error));
+                                super.onError(error);
+                            }
+
+                            @Override
+                            public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
+                                super.attemptFailed(request, attemptNumber, totalAttempts);
+                            }
+                        });
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                })
+                .onNeutral(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+
+                    }
+                })
+                .show();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (!VKSdk.onActivityResult(requestCode, resultCode, data, new VKCallback<VKAccessToken>() {
@@ -354,8 +420,8 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                         startActivity(new Intent(MainActivity.this, MainActivity.class)
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 
- /*** Important! Add this after each success login ***/
-                        editor_global.putBoolean(FIRST_LAUNCH_KEY, false);
+/*** Important! Add this after each success login ***/
+                        editor_global.putBoolean(GLOBAL_SIGNED_IN, true);
                         editor_global.apply();
 /*****/
 

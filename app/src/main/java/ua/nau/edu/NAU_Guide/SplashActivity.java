@@ -17,7 +17,7 @@ public class SplashActivity extends Activity {
 /*****/
 
 /*** GLOBAL VARIABLES ***/
-    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
+    private static final String GLOBAL_SIGNED_IN = "GLOBAL_SIGNED_IN";
     private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
 
     SharedPreferences settings_global = null;
@@ -45,10 +45,10 @@ public class SplashActivity extends Activity {
                     sleep(1000);
 
                     // After 1 seconds redirect to another intent
-                    if (settings_global.getBoolean(FIRST_LAUNCH_KEY, true)) {
-                        startActivity(new Intent(getBaseContext(), FirstLaunchActivity.class));
-                    } else {
+                    if (settings_global.getBoolean(GLOBAL_SIGNED_IN, false)) {
                         startActivity(new Intent(getBaseContext(), MainActivity.class));
+                    } else {
+                        startActivity(new Intent(getBaseContext(), FirstLaunchActivity.class));
                     }
 
                     //Remove activity

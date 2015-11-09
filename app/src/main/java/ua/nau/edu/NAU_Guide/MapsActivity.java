@@ -437,7 +437,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         fab_1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                toastShowLong("1st fab");
+                startActivity(new Intent(MapsActivity.this, InfoActivity.class)
+                        .putExtra("Corp_id", GLOBAL_MARKER_ID)
+                        .putExtra("Corp_label", GLOBAL_MARKER_LABEL));
             }
         });
 
