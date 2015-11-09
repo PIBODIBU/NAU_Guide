@@ -58,4 +58,5 @@
     <string name="hello_world">Hello world!</string>
     <string name="input_group">Введите свою группу</string>
     <string name="timetable">Расписание</string>
+
 </resources>

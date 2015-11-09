@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -62,10 +64,10 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     private SlidingUpPanelLayout slidingUpPanelLayout;
     private TextView titleSlidingLayout;
 
-    public Button button_photo;
-    public Button button_scheme;
-    public Button button_info;
+    private Button button_scheme;
+    private Button button_info;
 
+    private FloatingActionMenu fab_menu;
 
     /*****/
 
@@ -97,6 +99,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
         initSlidingPanel();
 
+        initFloatingActionMenu();
+
         button_scheme.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -112,6 +116,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                         .putExtra("Corp_label", GLOBAL_MARKER_LABEL));
             }
         });
+
     }
 
     @Override
@@ -164,7 +169,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                 .target(nau)      // Sets the center of the map to Mountain View
                 .zoom(15)                   // Sets the zoom
                 .bearing(160)                // Sets the orientation of the camera to east
-                //.tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                        //.tilt(30)                   // Sets the tilt of the camera to 30 degrees
                 .build();                   // Creates a CameraPosition from the builder
 
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition_start));
@@ -380,7 +385,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                if (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+               if (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
                     slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                     activeMarker.showInfoWindow();
                 } else
@@ -421,6 +426,27 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         this.slidingUpPanelLayout.setParalaxOffset(0);
 
         this.titleSlidingLayout = (TextView) findViewById(R.id.titleSlidingLayout);
+    }
+
+    private void initFloatingActionMenu() {
+        fab_menu = (FloatingActionMenu) findViewById(R.id.fab_menu);
+
+        FloatingActionButton fab_1 = (FloatingActionButton) findViewById(R.id.fab_1);
+        FloatingActionButton fab_2 = (FloatingActionButton) findViewById(R.id.fab_2);
+
+        fab_1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toastShowLong("1st fab");
+            }
+        });
+
+        fab_2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toastShowLong("2nd fab");
+            }
+        });
     }
 
     //Получение айди маркера

@@ -5,9 +5,8 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -16,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -29,9 +27,8 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
-import com.mikepenz.materialdrawer.util.DrawerImageLoader;
-import com.squareup.picasso.Picasso;
 
+import java.io.File;
 
 public class BaseNavigationDrawerActivity extends AppCompatActivity {
     private static final String VK_PREFERENCES = "VK_PREFERENCES";
@@ -39,10 +36,10 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 
     private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
 
-    SharedPreferences settings_global = null;
-    SharedPreferences settings_vk = null;
-    SharedPreferences.Editor editor_global;
-    SharedPreferences.Editor editor_vk;
+    private SharedPreferences settings_global = null;
+    private SharedPreferences settings_vk = null;
+    private SharedPreferences.Editor editor_global;
+    private SharedPreferences.Editor editor_vk;
 
     protected Drawer drawerResult = null;
     private InputMethodManager MethodManager = null;
@@ -113,7 +110,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 
         final PrimaryDrawerItem timetable = new PrimaryDrawerItem()
                 .withName(R.string.timetable)
-                .withIcon(R.mipmap.ic_timetable_navi)
+                .withIcon(GoogleMaterial.Icon.gmd_event_note)
                 .withIdentifier(Activities.TimetableActivity.ordinal());
 
         final PrimaryDrawerItem search = new PrimaryDrawerItem()
@@ -126,51 +123,31 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withIcon(GoogleMaterial.Icon.gmd_close)
                 .withIdentifier(Activities.Exit.ordinal());
 
-// Image Downloader for Drawer
-        DrawerImageLoader.init(new DrawerImageLoader.IDrawerImageLoader() {
-            @Override
-            public void set(ImageView imageView, Uri uri, Drawable placeholder) {
-                Picasso.with(imageView.getContext()).load(uri).placeholder(placeholder).into(imageView);
-            }
-
-            @Override
-            public void cancel(ImageView imageView) {
-                Picasso.with(imageView.getContext()).cancelRequest(imageView);
-            }
-
-            @Override
-            public Drawable placeholder(Context context) {
-                return null;
-            }
-
-            @Override
-            public Drawable placeholder(Context ctx, String s) {
-                return null;
-            }
-        });
-//
-
-// Create the AccountHeader
-        ProfileDrawerItem profile_1;
+// Create the AccountHeader;
+        ProfileDrawerItem profileMain;
+        String profilePhotoLocation = getFilesDir().getPath() + "/profilePhoto_200.jpg";
 
         if (settings_vk.getBoolean(VK_SIGNED_KEY, false)) {
-            profile_1 = new ProfileDrawerItem().withName(ACCOUNT_NAME).withEmail(ACCOUNT_EMAIL).withIcon(ACCOUNT_PHOTO);
+            profileMain = new ProfileDrawerItem().withName(ACCOUNT_NAME).withEmail(ACCOUNT_EMAIL).withIcon(profilePhotoLocation);
         } else {
-            profile_1 = new ProfileDrawerItem().withIcon(R.drawable.ic_account_circle_white_48dp);
+            profileMain = new ProfileDrawerItem().withIcon(R.drawable.ic_account_circle_white_48dp);
         }
 
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header_png)
                 .addProfiles(
-                        profile_1
+                        profileMain
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
-                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+                    public boolean onProfileChanged(View view, IProfile iProfile, boolean b) {
+                        startActivity(new Intent(BaseNavigationDrawerActivity.this, FirstLaunchActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                         return false;
                     }
                 })
+                .withProfileImagesClickable(true)
                 .withSelectionListEnabled(false)
                 .build();
 
@@ -251,7 +228,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                     }
                                 }
                                 case TimetableActivity: {
-                                    if(CURRENT_CLASS.equals(TIMETABLE_CLASS)){
+                                    if (CURRENT_CLASS.equals(TIMETABLE_CLASS)) {
                                         break;
                                     } else {
                                         startActivity(new Intent(BaseNavigationDrawerActivity.this, TimetableActivity.class));

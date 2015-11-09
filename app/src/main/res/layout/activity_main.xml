@@ -7,29 +7,15 @@
     android:background="@color/grey_light"
     tools:context=".MainActivity">
 
-    <ImageView
-        android:id="@+id/shadow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/toolbar"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="-8dp"
-        android:layout_marginLeft="-8dp"
-        android:layout_marginRight="-8dp"
-        android:background="@android:drawable/dialog_holo_light_frame"
-        android:foreground="?android:windowContentOverlay" />
-
     <include
         android:id="@+id/toolbar"
-        layout="@layout/tool_bar" />
+        layout="@layout/toolbar" />
 
     <com.gc.materialdesign.views.ScrollView
         android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/shadow"
-        android:layout_marginTop="8dp">
+        android:layout_below="@+id/toolbar">
 
         <RelativeLayout
             android:id="@+id/main_layout"
@@ -96,8 +82,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_marginTop="8dp"
-                android:background="@color/main_blue"
-
+                android:background="@color/colorAppPrimary"
                 android:text="VK Sign in"
                 android:textColor="#ffffff" />
 
@@ -111,7 +96,7 @@
                 android:layout_alignRight="@+id/vk_sign_in"
                 android:layout_below="@+id/vk_sign_in"
                 android:layout_marginTop="8dp"
-                android:background="@color/main_blue"
+                android:background="@color/colorAppPrimary"
                 android:text="VK Sign out"
                 android:textColor="#ffffff" />
 
@@ -123,7 +108,7 @@
                 android:layout_alignStart="@+id/plus_text"
                 android:layout_below="@+id/vk_sign_out"
                 android:layout_marginTop="8dp"
-                android:background="@color/main_blue"
+                android:background="@color/colorAppPrimary"
                 android:text="SHARE"
                 android:textColor="#ffffff" />
 
@@ -165,8 +150,12 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_marginRight="24dp"
-        android:background="@color/main_blue"
+        android:background="@color/colorAppPrimary"
         materialdesign:animate="true"
         materialdesign:iconDrawable="@drawable/ic_web_white_24dp" />
+
+    <include
+        android:id="@+id/shadow"
+        layout="@layout/toolbar_shadow"/>
 
 </RelativeLayout>

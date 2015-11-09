@@ -1,14 +1,21 @@
 package ua.nau.edu.NAU_Guide;
 
 import android.app.Activity;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gc.materialdesign.views.CustomView;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKAccessTokenTracker;
 import com.vk.sdk.VKCallback;
@@ -23,20 +30,27 @@ import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiUserFull;
 import com.vk.sdk.api.model.VKList;
 
+import java.io.File;
+import java.io.FileOutputStream;
+
 /**
  * Created by root on 9/30/15.
  */
 public class FirstLaunchActivity extends Activity {
-    /*** VIEWS ***/
+    /***
+     * VIEWS
+     ***/
 
-    Button vk_log_in;
-    Button gg_log_in;
-    Button fb_log_in;
-    Button login_skip;
+    CustomView vk_log_in;
+    CustomView gg_log_in;
+    CustomView fb_log_in;
+    CustomView login_skip;
 
     /*****/
 
-    /*** VKONTAKTE SDK VARIABLES ***/
+    /***
+     * VKONTAKTE SDK VARIABLES
+     ***/
 
     private int appId = 5084652;
 
@@ -49,6 +63,8 @@ public class FirstLaunchActivity extends Activity {
 
     VKApiUserFull users_full = null;
     VKRequest request_info = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_50, photo_100, photo_200"));
+
+    private String profilePhotoLocation;
 
     /*****/
 
@@ -78,10 +94,10 @@ public class FirstLaunchActivity extends Activity {
         editor_global = settings_global.edit();
         editor_vk = settings_vk.edit();
 
-        vk_log_in = (Button) findViewById(R.id.vk_sign_in);
-        gg_log_in = (Button) findViewById(R.id.gg_sign_in);
-        fb_log_in = (Button) findViewById(R.id.fb_sign_in);
-        login_skip = (Button) findViewById(R.id.login_skip);
+        vk_log_in = (CustomView) findViewById(R.id.vk_sign_in);
+        gg_log_in = (CustomView) findViewById(R.id.gg_sign_in);
+        fb_log_in = (CustomView) findViewById(R.id.fb_sign_in);
+        login_skip = (CustomView) findViewById(R.id.login_skip);
 //
 
 /*** BUTTONS ***/
@@ -139,6 +155,8 @@ public class FirstLaunchActivity extends Activity {
                     public void onComplete(VKResponse response) {
                         //Do complete stuff
                         users_full = ((VKList<VKApiUserFull>) response.parsedModel).get(0);
+
+                        loadAvatar(users_full.photo_200);
 
 /*** Shared Preferences ***/
                         editor_vk.putString(VK_INFO_KEY, users_full.first_name + " " + users_full.last_name);
@@ -211,4 +229,43 @@ public class FirstLaunchActivity extends Activity {
 
         super.onStop();
     }
+
+    private void loadAvatar(String Uri) {
+        profilePhotoLocation = getFilesDir().getPath() + "/profilePhoto_200.jpg";
+
+        Target target = new Target() {
+            @Override
+            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        File file = new File(profilePhotoLocation);
+                        try {
+                            file.createNewFile();
+                            FileOutputStream ostream = new FileOutputStream(file);
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, ostream);
+                            ostream.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+                if (placeHolderDrawable != null) {
+                }
+            }
+        };
+
+        Picasso.with(getApplicationContext())
+                .load(Uri)
+                .into(target);
+    }
+
 }

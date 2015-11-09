@@ -18,7 +18,7 @@
 
     <include
         android:id="@+id/toolbar"
-        layout="@layout/tool_bar" />
+        layout="@layout/toolbar" />
 
     <ScrollView
         android:id="@+id/scroll_main"
@@ -60,7 +60,7 @@
                     android:layout_toRightOf="@+id/imageView6"
                     android:gravity="center"
                     android:text="Институт Компьютерных Информационных Технологий"
-                    android:textColor="@color/main_blue"
+                    android:textColor="@color/colorAppPrimary"
                     android:textIsSelectable="false"
                     android:textSize="15sp" />
 
@@ -87,7 +87,7 @@
                     android:text="просп. Космонавта Комарова, 1, корп. 6"
                     android:textAlignment="gravity"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textColor="@color/main_blue"
+                    android:textColor="@color/colorAppPrimary"
                     android:textSize="15sp" />
 
                 <TextView
@@ -102,7 +102,7 @@
                     android:text="(044) 444 - 44 - 44"
                     android:textAlignment="gravity"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textColor="@color/main_blue"
+                    android:textColor="@color/colorAppPrimary"
                     android:textSize="15sp" />
 
                 <TextView
@@ -117,7 +117,7 @@
                     android:text="http://icit.nau.edu.ua"
                     android:textAlignment="gravity"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textColor="@color/main_blue"
+                    android:textColor="@color/colorAppPrimary"
                     android:textSize="15sp" />
 
                 <ImageView
@@ -129,7 +129,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_marginLeft="8dp"
                     android:layout_marginTop="8dp"
-                    android:background="@color/main_blue"
+                    android:background="@color/colorAppPrimary"
                     android:src="@drawable/ic_place_white_24dp" />
 
                 <ImageView
@@ -139,7 +139,7 @@
                     android:layout_alignLeft="@+id/image_address"
                     android:layout_alignStart="@+id/image_address"
                     android:layout_alignTop="@+id/textView3"
-                    android:background="@color/main_blue"
+                    android:background="@color/colorAppPrimary"
                     android:src="@drawable/ic_local_phone_white_24dp" />
 
                 <ImageView
@@ -149,7 +149,7 @@
                     android:layout_alignEnd="@+id/imageView10"
                     android:layout_alignRight="@+id/imageView10"
                     android:layout_alignTop="@+id/textView4"
-                    android:background="@color/main_blue"
+                    android:background="@color/colorAppPrimary"
                     android:src="@drawable/ic_web_white_24dp" />
 
             </RelativeLayout>
@@ -179,7 +179,7 @@
                     android:text="@string/activity_info_6_vectors"
                     android:textAlignment="gravity"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textColor="@color/main_blue"
+                    android:textColor="@color/colorAppPrimary"
                     android:textSize="15sp" />
 
                 <TextView
@@ -191,7 +191,7 @@
                     android:layout_marginTop="8dp"
                     android:text="Напрями пiдготовки"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textColor="@color/main_blue"
+                    android:textColor="@color/colorAppPrimary"
                     android:textSize="16dp" />
 
             </RelativeLayout>

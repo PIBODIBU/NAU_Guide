@@ -4,12 +4,17 @@
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColorSecondary">@color/white</item>
         <item name="android:textColorHint">@color/white</item>
+
+        <item name="colorPrimary">@color/colorAppPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorPrimaryLight</item>
     </style>
 
     <style name="AppTheme.ToolBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:textColorSecondary">@color/white</item>
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColorHint">@color/grey_light</item>
+        <item name="colorAccent">@color/colorAppPrimary</item>
     </style>
 
     <style name="DarkText">
