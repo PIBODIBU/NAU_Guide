@@ -5,7 +5,8 @@
     <string name="SearchActivity_label">Поиск</string>
     <string name="SplashActivity_label">NAU Guide</string>
     <string name="SettingsActivity_label">Настройки</string>
-    <string name="FloorActivity_label">Инфо</string>
+    <string name="InfoActivity_label">Инфо</string>
+    <string name="FloorActivity_label">План</string>
     <string name="MapsActivity_label">Карта</string>
     <string name="FirstActivity_label">FirstActivity</string>
 

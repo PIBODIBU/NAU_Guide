@@ -104,7 +104,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         button_scheme.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MapsActivity.this, InfoActivity.class));
+                startActivity(new Intent(MapsActivity.this, FloorActivity.class));
             }
         });
 
@@ -446,7 +446,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         fab_2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                toastShowLong("2nd fab");
+                startActivity(new Intent(MapsActivity.this, FloorActivity.class));
             }
         });
     }
