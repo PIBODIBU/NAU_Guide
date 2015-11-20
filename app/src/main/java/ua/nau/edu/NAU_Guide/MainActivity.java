@@ -163,6 +163,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private static final String VK_SIGNED_KEY = EnumSharedPreferencesVK.VK_SIGNED_KEY.toString();
     private static final String VK_ID_KEY = EnumSharedPreferencesVK.VK_ID_KEY.toString();
     private static final String PROFILE_PHOTO_LOCATION_KEY = EnumSharedPreferences.PROFILE_PHOTO_LOCATION_KEY.toString();
+    private static final String EXIT_KEY = EnumSharedPreferences.EXIT.toString();
 
     private SharedPreferences settings = null;
     private SharedPreferences settingsVK = null;
@@ -171,17 +172,13 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (getIntent().getBooleanExtra("EXIT", false)) {
+        if (getIntent().getBooleanExtra(EXIT_KEY, false)) {
             finish();
         }
         super.onCreate(savedInstanceState);
 
 // Setting Content View
         setContentView(R.layout.activity_main);
-
-        if (getIntent().getBooleanExtra(JUST_SIGNED_KEY, false)) {
-            initDialog_share();
-        }
 
 // Get and set system services & Buttons & SharedPreferences & Requests
         inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
@@ -208,15 +205,18 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                 settingsVK.getString(VK_INFO_KEY, ""),
                 settingsVK.getString(VK_EMAIL_KEY, "")
         );
-//
+
+        if (getIntent().getBooleanExtra(JUST_SIGNED_KEY, false)) {
+            initDialog_share();
+        }
 
 /*** BUTTONS ***/
 // VK sign out button
         vk_sign_out.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                File avatar = new File(settings.getString(PROFILE_PHOTO_LOCATION_KEY, ""));
-                avatar.delete();
+                /*File avatar = new File(settings.getString(PROFILE_PHOTO_LOCATION_KEY, ""));
+                avatar.delete();*/
 
                 settings
                         .edit()
@@ -233,9 +233,10 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                         .apply();
 
 
-                finish();
                 startActivity(new Intent(MainActivity.this, FirstLaunchActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+
+                finish();
             }
         });
 //
@@ -244,7 +245,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         restart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                restart.animate();
                 finish();
 
                 startActivity(new Intent(MainActivity.this, SplashActivity.class)
@@ -320,12 +320,20 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                                 super.attemptFailed(request, attemptNumber, totalAttempts);
                             }
                         });
+
+                        finish();
+                        startActivity(new Intent(MainActivity.this, MainActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     }
                 })
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         dialog.dismiss();
+
+                        finish();
+                        startActivity(new Intent(MainActivity.this, MainActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     }
                 })
                 .onNeutral(new MaterialDialog.SingleButtonCallback() {

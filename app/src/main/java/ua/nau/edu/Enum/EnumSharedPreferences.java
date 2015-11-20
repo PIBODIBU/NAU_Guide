@@ -10,5 +10,6 @@ public enum EnumSharedPreferences {
     JUST_SIGNED_KEY,
     CORP_ID_KEY,
     CORP_LABEL_KEY,
+    EXIT,
 
 }

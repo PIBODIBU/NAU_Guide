@@ -4,14 +4,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.gc.materialdesign.views.CustomView;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vk.sdk.VKAccessToken;
@@ -30,6 +30,10 @@ import com.vk.sdk.api.model.VKList;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
@@ -56,20 +60,23 @@ public class FirstLaunchActivity extends Activity {
     private static final String VK_ID_KEY = EnumSharedPreferencesVK.VK_ID_KEY.toString();
     private static final String PROFILE_PHOTO_LOCATION_KEY = EnumSharedPreferences.PROFILE_PHOTO_LOCATION_KEY.toString();
     private static String PROFILE_PHOTO_LOCATION;
+    private String FilePath;
+    private String FileName;
 
     private SharedPreferences settings = null;
     private SharedPreferences settingsVK = null;
-
+    private Target loadtarget;
     private int VK_APP_ID;
 
     private VKApiUserFull users_full = null;
-    private VKRequest request_info = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_50, photo_100, photo_200"));
+    private VKRequest request_info = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_200"));
 
     /*****/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 //VK initialize
         VK_APP_ID = getResources().getInteger(R.integer.VK_APP_ID);
         vkAccessTokenTracker.startTracking();
@@ -139,8 +146,9 @@ public class FirstLaunchActivity extends Activity {
                         //Do complete stuff
                         users_full = ((VKList<VKApiUserFull>) response.parsedModel).get(0);
 
-                        PROFILE_PHOTO_LOCATION = getFilesDir().getPath() + "/profilePhoto_200.jpg";
-                        loadAvatar(users_full.photo_200, PROFILE_PHOTO_LOCATION);
+                        FilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/NAU Guide";
+                        FileName = "profilePhoto_200.png";
+                        PROFILE_PHOTO_LOCATION = FilePath + "/" + FileName;
 
 /*** Shared Preferences ***/
                         settingsVK
@@ -158,11 +166,13 @@ public class FirstLaunchActivity extends Activity {
                                 .putString(PROFILE_PHOTO_LOCATION_KEY, PROFILE_PHOTO_LOCATION)
                                 .apply();
 
-                        finish();
+                        loadAvatar(users_full.photo_200, FilePath, FileName);
+
                         startActivity(new Intent(FirstLaunchActivity.this, MainActivity.class)
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                 .putExtra(JUST_SIGNED_KEY, true));
 
+                        finish();
                         super.onComplete(response);
                     }
 
@@ -216,42 +226,38 @@ public class FirstLaunchActivity extends Activity {
         super.onStop();
     }
 
-    private void loadAvatar(String Uri, final String Location) {
-        Target target = new Target() {
+    public void loadAvatar(String Uri, final String FilePath, final String FileName) {
+        if (loadtarget == null) loadtarget = new Target() {
             @Override
-            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        File file = new File(Location);
-                        try {
-                            file.createNewFile();
-                            FileOutputStream ostream = new FileOutputStream(file);
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, ostream);
-                            ostream.close();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).start();
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                // do something with the Bitmap
+                try {
+                    File dir = new File(FilePath);
+                    if (!dir.exists())
+                        dir.mkdirs();
+
+                    File file = new File(dir, FileName);
+                    FileOutputStream fOut = new FileOutputStream(file);
+
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                    fOut.flush();
+                    fOut.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
+
             }
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
-                if (placeHolderDrawable != null) {
-                }
-                //TODO Dialog
             }
         };
 
-        Picasso
-                .with(getApplicationContext())
-                .load(Uri)
-                .into(target);
+        Picasso.with(this).load(Uri).into(loadtarget);
     }
 
 }

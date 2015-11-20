@@ -5,7 +5,10 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -28,6 +31,10 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
+import java.io.File;
+import java.io.FileOutputStream;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
@@ -40,9 +47,12 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 
     private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
     private static final String SIGNED_IN_KEY = EnumSharedPreferences.SIGNED_IN_KEY.toString();
+    private static final String JUST_SIGNED_KEY = EnumSharedPreferences.JUST_SIGNED_KEY.toString();
     private static final String VK_PREFERENCES = EnumSharedPreferencesVK.VK_PREFERENCES.toString();
     private static final String VK_SIGNED_KEY = EnumSharedPreferencesVK.VK_SIGNED_KEY.toString();
+    private static final String VK_PHOTO_KEY = EnumSharedPreferencesVK.VK_PHOTO_KEY.toString();
     private static final String PROFILE_PHOTO_LOCATION_KEY = EnumSharedPreferences.PROFILE_PHOTO_LOCATION_KEY.toString();
+    private static final String EXIT_KEY = EnumSharedPreferences.EXIT.toString();
     private static String profilePhotoLocation;
 
     private SharedPreferences sharedPrefs = null;
@@ -129,7 +139,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         ProfileDrawerItem profileMain;
         profilePhotoLocation = sharedPrefs.getString(PROFILE_PHOTO_LOCATION_KEY, "");
 
-        if (sharedPrefsVK.getBoolean(VK_SIGNED_KEY, false) && !profilePhotoLocation .equals("")) {
+        if (sharedPrefsVK.getBoolean(VK_SIGNED_KEY, false)) {
             profileMain = new ProfileDrawerItem().withName(ACCOUNT_NAME).withEmail(ACCOUNT_EMAIL).withIcon(profilePhotoLocation);
         } else {
             profileMain = new ProfileDrawerItem().withIcon(R.drawable.ic_account_circle_white_48dp);
@@ -252,7 +262,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                 }
                                 case Exit: {
                                     startActivity(new Intent(getApplicationContext(), MainActivity.class)
-                                            .putExtra("EXIT", true)
+                                            .putExtra(EXIT_KEY, true)
                                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                     break;
                                 }
