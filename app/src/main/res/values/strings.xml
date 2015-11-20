@@ -21,6 +21,7 @@
     <string name="drawer_item_settings">Настройки</string>
     <string name="drawer_item_search">Поиск</string>
     <string name="drawer_item_exit">Выход</string>
+    <string name="drawer_item_chat">Чат</string>
 
     <string name="plus_signed_id">Вы ввошли как: </string>
     <string name="close_app">Закрыть</string>
@@ -37,6 +38,7 @@
     <string name="VK_sign_error">Ошибка авторизации</string>
     <string name="VK_sent_success">Отправлено</string>
     <string name="VK_sent_error">Ошибка при отправке</string>
+    <string name="VK_share_text">Test String</string>
 
     <string name="slide_scheme">Схема</string>
     <string name="slide_info">Инфо</string>
@@ -59,5 +61,4 @@
     <string name="hello_world">Hello world!</string>
     <string name="input_group">Введите свою группу</string>
     <string name="timetable">Расписание</string>
-
 </resources>

@@ -1,4 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     xmlns:materialdesign="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_activity"
@@ -56,7 +58,6 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="false"
                 android:layout_alignParentStart="true"
-                android:layout_alignTop="@+id/restart"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="500dp"
@@ -65,51 +66,14 @@
                 android:visibility="invisible" />
 
             <com.gc.materialdesign.views.ButtonRectangle
-                android:id="@+id/restart"
-                android:layout_width="120dp"
-                android:layout_height="50dp"
-                android:layout_below="@+id/vk_share"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="16dp"
-                android:background="@color/green"
-                android:text="Restart"
-                android:textColor="#ffffff" />
-
-            <com.gc.materialdesign.views.ButtonRectangle
-                android:id="@+id/vk_sign_in"
-                android:layout_width="120dp"
-                android:layout_height="50dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginTop="8dp"
-                android:background="@color/colorAppPrimary"
-                android:text="VK Sign in"
-                android:textColor="#ffffff" />
-
-            <com.gc.materialdesign.views.ButtonRectangle
                 android:id="@+id/vk_sign_out"
                 android:layout_width="120dp"
                 android:layout_height="50dp"
-                android:layout_alignEnd="@+id/vk_sign_in"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_alignRight="@+id/vk_sign_in"
-                android:layout_below="@+id/vk_sign_in"
                 android:layout_marginTop="8dp"
                 android:background="@color/colorAppPrimary"
                 android:text="VK Sign out"
-                android:textColor="#ffffff" />
-
-            <com.gc.materialdesign.views.ButtonRectangle
-                android:id="@+id/vk_share"
-                android:layout_width="120dp"
-                android:layout_height="50dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignStart="@+id/plus_text"
-                android:layout_below="@+id/vk_sign_out"
-                android:layout_marginTop="8dp"
-                android:background="@color/colorAppPrimary"
-                android:text="SHARE"
                 android:textColor="#ffffff" />
 
             <TextView
@@ -130,7 +94,6 @@
                 android:id="@+id/plus_user"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/vk_share"
                 android:layout_alignLeft="@+id/sign_out_button"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/plus_text"
@@ -143,19 +106,22 @@
         </RelativeLayout>
     </com.gc.materialdesign.views.ScrollView>
 
-    <com.gc.materialdesign.views.ButtonFloat
-        android:id="@+id/buttonFloat"
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/restart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="24dp"
-        android:background="@color/colorAppPrimary"
-        materialdesign:animate="true"
-        materialdesign:iconDrawable="@drawable/ic_web_white_24dp" />
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:src="@drawable/ic_autorenew_white_24dp"
+        fab:fab_colorNormal="@color/colorAppPrimary"
+        fab:fab_colorPressed="@color/colorAppPressed"
+        fab:fab_colorRipple="@color/colorAppRipped"
+        fab:fab_label="Restart" />
 
     <include
         android:id="@+id/shadow"
-        layout="@layout/toolbar_shadow"/>
+        layout="@layout/toolbar_shadow" />
 
 </RelativeLayout>

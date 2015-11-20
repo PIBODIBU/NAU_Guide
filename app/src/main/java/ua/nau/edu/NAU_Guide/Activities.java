@@ -12,5 +12,5 @@ public enum Activities {
     TimetableActivity,
     SearchActivity,
     DownloadActivity,
-    Exit;
+    Exit
 }

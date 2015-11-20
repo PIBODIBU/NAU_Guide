@@ -28,7 +28,7 @@ public class NAU extends University {
         Corps.put(11, new LatLng(50.438901, 30.430643));
         Corps.put(12, new LatLng(50.438676, 30.429303));
 
-        // CKI
+        // CKM
         Corps.put(13, new LatLng(50.438798, 30.427380));
 
         // BISTRO
@@ -50,8 +50,8 @@ public class NAU extends University {
         Corps.put(23, new LatLng(50.437694, 30.438223)); // 7
         Corps.put(24, new LatLng(50.438350, 30.438223)); // 8
         Corps.put(25, new LatLng(50.437886, 30.439007)); // 9
-        //Corps.put(25, new LatLng(50.437886, 30.439007)); // 10
-        Corps.put(25, new LatLng(50.437879, 30.440026)); // 11
+        Corps.put(26, new LatLng(50.437886, 30.439007)); // 10
+        Corps.put(27, new LatLng(50.437879, 30.440026)); // 11
 
         this.setCorps(Corps);
     }

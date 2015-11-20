@@ -13,13 +13,14 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import ua.nau.edu.Enum.EnumSharedPreferences;
+import ua.nau.edu.Enum.EnumSharedPreferencesVK;
+
 
 public class SearchActivity extends BaseNavigationDrawerActivity {
-    private static final String VK_PREFERENCES = "VK_PREFERENCES";
-    private static final String VK_INFO_KEY = "VK_INFO_KEY";
-    private static final String VK_PHOTO_KEY = "VK_PHOTO_KEY";
-    private static final String VK_EMAIL_KEY = "VK_EMAIL_KEY";
-    private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
+    private static final String VK_PREFERENCES = EnumSharedPreferencesVK.VK_PREFERENCES.toString();
+    private static final String VK_INFO_KEY = EnumSharedPreferencesVK.VK_INFO_KEY.toString();
+    private static final String VK_EMAIL_KEY = EnumSharedPreferencesVK.VK_EMAIL_KEY.toString();
 
     public SearchActivity() {
     }
@@ -33,7 +34,6 @@ public class SearchActivity extends BaseNavigationDrawerActivity {
 
         getDrawer(
                 settings_vk.getString(VK_INFO_KEY, ""),
-                settings_vk.getString(VK_PHOTO_KEY, ""),
                 settings_vk.getString(VK_EMAIL_KEY, "")
         );
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="ua.nau.edu.NAU_Guide"
     android:installLocation="preferExternal">
 
@@ -19,6 +20,8 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
+
+        <uses-sdk tools:node="replace" />
 
         <activity
             android:name=".SplashActivity"
@@ -58,9 +61,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/SettingsActivity_label" />
 
         <meta-data
             android:name="com.google.android.gms.version"

@@ -1,129 +1,83 @@
-<com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
-    xmlns:sothree="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/sliding_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="bottom"
-    sothree:umanoFadeColor="@android:color/transparent"
-    sothree:umanoOverlay="true"
-    sothree:umanoShadowHeight="0dp">
-
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:id="@+id/map"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                class="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:context="ua.nau.edu.NAU_Guide.MapsActivity" />
-        </RelativeLayout>
-
-        <include
-            android:id="@+id/toolbar"
-            layout="@layout/toolbar" />
-
-        <include
-            android:id="@+id/shadow"
-            layout="@layout/toolbar_shadow"/>
-
-        <com.github.clans.fab.FloatingActionMenu
-            android:id="@+id/fab_menu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="8dp"
-            android:layout_marginRight="8dp"
-            fab:menu_colorNormal="@color/colorAppPrimary"
-            fab:menu_colorPressed="@color/colorAppPressed"
-            fab:menu_colorRipple="@color/colorAppRipped"
-            fab:menu_icon="@drawable/ic_more_horiz_white_24dp"
-            fab:menu_labels_position="left"
-            fab:menu_openDirection="up">
-
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/fab_1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginRight="8dp"
-                android:src="@drawable/ic_info_outline_white_24dp"
-                fab:fab_colorNormal="@color/colorAppPrimary"
-                fab:fab_colorPressed="@color/colorAppPressed"
-                fab:fab_colorRipple="@color/colorAppRipped" />
-
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/fab_2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginRight="8dp"
-                android:src="@drawable/ic_my_location_white_24dp"
-                fab:fab_colorNormal="@color/colorAppPrimary"
-                fab:fab_colorPressed="@color/colorAppPressed"
-                fab:fab_colorRipple="@color/colorAppRipped" />
-
-        </com.github.clans.fab.FloatingActionMenu>
-
-    </RelativeLayout>
+    android:gravity="center">
 
     <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorAppPrimary">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/titleSlidingLayout"
-            android:layout_width="fill_parent"
-            android:layout_height="30dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@color/colorAppPrimary"
-            android:gravity="center_vertical|center_horizontal"
-            android:textAlignment="gravity"
-            android:textColor="#ffffff"
-            android:textSize="16sp" />
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="2dp"
-            android:layout_marginTop="30dp"
-            android:background="#ffffff" />
-
-        <Button
-            android:id="@+id/button_scheme"
-            android:layout_width="150dp"
-            android:layout_height="40dp"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="42dp"
-            android:background="@drawable/button_slider"
-            android:text="@string/slide_scheme" />
-
-        <Button
-            android:id="@+id/button_info"
-            android:layout_width="150dp"
-            android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="42dp"
-            android:background="@drawable/button_slider"
-            android:text="@string/slide_info" />
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="10dp"
-            android:layout_marginTop="82dp"
-            android:background="@color/colorAppPrimary" />
-
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            class="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:context="ua.nau.edu.NAU_Guide.MapsActivity" />
     </RelativeLayout>
 
-</com.sothree.slidinguppanel.SlidingUpPanelLayout>
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+
+    <include
+        android:id="@+id/shadow"
+        layout="@layout/toolbar_shadow" />
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/fab_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
+        fab:menu_colorNormal="@color/colorAppPrimary"
+        fab:menu_colorPressed="@color/colorAppPressed"
+        fab:menu_colorRipple="@color/colorAppRipped"
+        fab:menu_icon="@drawable/ic_add_white_24dp"
+        fab:menu_labels_position="left"
+        fab:menu_openDirection="up">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_help"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="8dp"
+            android:src="@drawable/ic_info_outline_white_24dp"
+            fab:fab_colorNormal="@color/colorAppPrimary"
+            fab:fab_colorPressed="@color/colorAppPressed"
+            fab:fab_colorRipple="@color/colorAppRipped"
+            fab:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="8dp"
+            android:src="@drawable/ic_info_outline_white_24dp"
+            fab:fab_colorNormal="@color/colorAppPrimary"
+            fab:fab_colorPressed="@color/colorAppPressed"
+            fab:fab_colorRipple="@color/colorAppRipped"
+            fab:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="8dp"
+            android:src="@drawable/ic_my_location_white_24dp"
+            fab:fab_colorNormal="@color/colorAppPrimary"
+            fab:fab_colorPressed="@color/colorAppPressed"
+            fab:fab_colorRipple="@color/colorAppRipped"
+            fab:fab_size="mini" />
+
+    </com.github.clans.fab.FloatingActionMenu>
+
+</RelativeLayout>

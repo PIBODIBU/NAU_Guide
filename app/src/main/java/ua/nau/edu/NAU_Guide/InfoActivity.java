@@ -1,57 +1,43 @@
 package ua.nau.edu.NAU_Guide;
 
+import android.annotation.TargetApi;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import ua.nau.edu.Enum.EnumSharedPreferences;
+import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 
 public class InfoActivity extends BaseNavigationDrawerActivity {
+    private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
+    private static final String VK_PREFERENCES = EnumSharedPreferencesVK.VK_PREFERENCES.toString();
+    private static final String VK_INFO_KEY = EnumSharedPreferencesVK.VK_INFO_KEY.toString();
+    private static final String VK_EMAIL_KEY = EnumSharedPreferencesVK.VK_EMAIL_KEY.toString();
+    private static final String CORP_ID_KEY = EnumSharedPreferences.CORP_ID_KEY.toString();
+    private static final String CORP_LABEL_KEY = EnumSharedPreferences.CORP_LABEL_KEY.toString();
 
-    private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
-    private static final String FIRST_LAUNCH_KEY = "FIRST_LAUNCH_KEY";
 
-    SharedPreferences settings_global = null;
-    SharedPreferences settings_vk = null;
-    SharedPreferences.Editor editor_global;
-    SharedPreferences.Editor editor_vk;
-
-    /***
-     * VKONTAKTE SDK VARIABLES
-     ***/
-
-    private int appId = 5084652;
-
-    private static final String VK_PREFERENCES = "VK_PREFERENCES";
-    private static final String VK_INFO_KEY = "VK_INFO_KEY";
-    private static final String VK_PHOTO_KEY = "VK_PHOTO_KEY";
-    private static final String VK_EMAIL_KEY = "VK_EMAIL_KEY";
-    private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
-    private static final String VK_ID_KEY = "VK_ID_KEY";
-
-    /*****/
+    private SharedPreferences settings = null;
+    private SharedPreferences settingsVK = null;
 
     public InfoActivity() {
     }
 
-    /***
-     * VIEWS
-     ***/
-
-
-    /*****/
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        switch (getIntent().getIntExtra("Corp_id", -1)) {
+        switch (getIntent().getIntExtra(CORP_ID_KEY, -1)) {
             case 1: {
                 setContentView(R.layout.activity_info_1);
                 setLabel();
@@ -126,43 +112,85 @@ public class InfoActivity extends BaseNavigationDrawerActivity {
             }
 
             default: {
-                setContentView(R.layout.activity_info_default);
-                this.setTitle("null");
-
                 break;
             }
         }
 
 // Get and set system services & Buttons & SharedPreferences & Requests
-        settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
-        settings_vk = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
-        editor_global = settings_global.edit();
-        editor_vk = settings_vk.edit();
-//
+        settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
+        settingsVK = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
 
         getDrawer(
-                settings_vk.getString(VK_INFO_KEY, ""),
-                settings_vk.getString(VK_PHOTO_KEY, ""),
-                settings_vk.getString(VK_EMAIL_KEY, "")
+                settingsVK.getString(VK_INFO_KEY, ""),
+                settingsVK.getString(VK_EMAIL_KEY, "")
         );
 
-        // Multiple ScrollView/Text scrollViews
-        final TextView text = (TextView) findViewById(R.id.textView5);
-        final TextView text_head = (TextView) findViewById(R.id.textView10);
         ScrollView scroll_main = (ScrollView) findViewById(R.id.scroll_main);
-        text.setMovementMethod(new ScrollingMovementMethod());
 
-        final int i = text.getHeight();
-        toastShowLong(Integer.toString(i));
-        text.setHeight(0);
+/*****************************/
+        final RelativeLayout layout_vectors = (RelativeLayout) findViewById(R.id.body_info_contacts);
+        layout_vectors.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
 
-        text_head.setOnTouchListener(new View.OnTouchListener() {
+                final TextView text_contacts_head = (TextView) findViewById(R.id.textView11);
+                final ImageView arrow_contacts = (ImageView) findViewById(R.id.imageView2);
+                final RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) layout_vectors.getLayoutParams();
+                final int layout_vectors_size = layout_vectors.getHeight();
+                ViewTreeObserver vto = layout_vectors.getViewTreeObserver();
+
+                vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        layout_vectors.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    }
+                });
+
+                params.height = 0;
+                layout_vectors.setLayoutParams(params);
+
+                text_contacts_head.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if (params.height == 0) {
+                            params.height = layout_vectors_size;
+                            layout_vectors.setLayoutParams(params);
+                            rotateImageView(arrow_contacts, 180);
+                        } else {
+                            params.height = 0;
+                            layout_vectors.setLayoutParams(params);
+                            rotateImageView(arrow_contacts, 0);
+                        }
+
+                        return false;
+                    }
+                });
+
+                removeOnGlobalLayoutListener(layout_vectors, this);
+            }
+        });
+
+/*****************************/
+
+/*****************************/
+        final TextView text_vectors = (TextView) findViewById(R.id.textView5);
+        final TextView text_vectors_head = (TextView) findViewById(R.id.textView10);
+        final ImageView arrow_vectors = (ImageView) findViewById(R.id.fab_2);
+        final int text_vectors_size = text_vectors.getHeight();
+
+        text_vectors.setMovementMethod(new ScrollingMovementMethod());
+        text_vectors.setHeight(0);
+
+        text_vectors_head.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (text.getHeight() == 0)
-                    text.setHeight(200);
-                else
-                    text.setHeight(0);
+                if (text_vectors.getHeight() == 0) {
+                    text_vectors.setHeight(200);
+                    rotateImageView(arrow_vectors, 180);
+                } else {
+                    text_vectors.setHeight(0);
+                    rotateImageView(arrow_vectors, 0);
+                }
 
                 return false;
             }
@@ -171,22 +199,46 @@ public class InfoActivity extends BaseNavigationDrawerActivity {
         scroll_main.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                text.getParent().requestDisallowInterceptTouchEvent(false);
-
+                text_vectors.getParent().requestDisallowInterceptTouchEvent(false);
                 return false;
             }
         });
 
-        text.setOnTouchListener(new View.OnTouchListener() {
+        text_vectors.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                text.getParent().requestDisallowInterceptTouchEvent(true);
-
+                text_vectors.getParent().requestDisallowInterceptTouchEvent(true);
                 return false;
             }
         });
-        // **********************************
+/*****************************/
 
+    }
+
+    public static void removeOnGlobalLayoutListener(View v, ViewTreeObserver.OnGlobalLayoutListener victim) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            removeLayoutListenerJB(v, victim);
+        } else removeLayoutListener(v, victim);
+    }
+
+    @SuppressWarnings("deprecation")
+    private static void removeLayoutListenerJB(View v, ViewTreeObserver.OnGlobalLayoutListener victim) {
+        v.getViewTreeObserver().removeGlobalOnLayoutListener(victim);
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    private static void removeLayoutListener(View v, ViewTreeObserver.OnGlobalLayoutListener victim) {
+        v.getViewTreeObserver().removeOnGlobalLayoutListener(victim);
+    }
+
+    private void rotateImageView(ImageView imgview, float degree) {
+        final RotateAnimation rotateAnim = new RotateAnimation(0.0f, degree,
+                RotateAnimation.RELATIVE_TO_SELF, 0.5f,
+                RotateAnimation.RELATIVE_TO_SELF, 0.5f);
+
+        rotateAnim.setDuration(0);
+        rotateAnim.setFillAfter(true);
+        imgview.startAnimation(rotateAnim);
     }
 
     @Override
@@ -203,9 +255,9 @@ public class InfoActivity extends BaseNavigationDrawerActivity {
     }
 
     public void setLabel() {
-        this.setTitle(Integer.toString(getIntent().getIntExtra("Corp_id", -1)) +
+        this.setTitle(Integer.toString(getIntent().getIntExtra(CORP_ID_KEY, -1)) +
                 getString(R.string.corp) +
                 ", " +
-                getIntent().getStringExtra("Corp_label"));
+                getIntent().getStringExtra(CORP_LABEL_KEY));
     }
 }

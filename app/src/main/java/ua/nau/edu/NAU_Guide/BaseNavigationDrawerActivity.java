@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -27,25 +26,27 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
-import java.io.File;
+import ua.nau.edu.Enum.EnumSharedPreferences;
+import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 
 public class BaseNavigationDrawerActivity extends AppCompatActivity {
-    private static final String VK_PREFERENCES = "VK_PREFERENCES";
-    private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
-
-    private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
-    private static final String GLOBAL_SIGNED_IN = "GLOBAL_SIGNED_IN";
-
-    private SharedPreferences settings_global = null;
-    private SharedPreferences settings_vk = null;
-    private SharedPreferences.Editor editor_global;
-    private SharedPreferences.Editor editor_vk;
-
     protected Drawer drawerResult = null;
     private InputMethodManager MethodManager = null;
     private SearchView searchView;
     private boolean wasInputActive = false;
+
+    private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
+    private static final String SIGNED_IN_KEY = EnumSharedPreferences.SIGNED_IN_KEY.toString();
+    private static final String VK_PREFERENCES = EnumSharedPreferencesVK.VK_PREFERENCES.toString();
+    private static final String VK_SIGNED_KEY = EnumSharedPreferencesVK.VK_SIGNED_KEY.toString();
+    private static final String PROFILE_PHOTO_LOCATION_KEY = EnumSharedPreferences.PROFILE_PHOTO_LOCATION_KEY.toString();
+    private static String profilePhotoLocation;
+
+    private SharedPreferences sharedPrefs = null;
+    private SharedPreferences sharedPrefsVK = null;
 
     BaseNavigationDrawerActivity() {
     }
@@ -75,7 +76,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         }
     }
 
-    public void getDrawer(String ACCOUNT_NAME, String ACCOUNT_PHOTO, String ACCOUNT_EMAIL) {
+    public void getDrawer(String ACCOUNT_NAME, String ACCOUNT_EMAIL) {
 
 // Инициализируем Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -98,7 +99,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withIdentifier(Activities.DownloadActivity.ordinal());
 
         final PrimaryDrawerItem chat = new PrimaryDrawerItem()
-                .withName("Чат")
+                .withName(R.string.drawer_item_chat)
                 .withIcon(GoogleMaterial.Icon.gmd_chat)
                 .withIdentifier(Activities.ChatActivity.ordinal())
                 .withEnabled(false);
@@ -126,9 +127,9 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 
 // Create the AccountHeader;
         ProfileDrawerItem profileMain;
-        String profilePhotoLocation = getFilesDir().getPath() + "/profilePhoto_200.jpg";
+        profilePhotoLocation = sharedPrefs.getString(PROFILE_PHOTO_LOCATION_KEY, "");
 
-        if (settings_vk.getBoolean(VK_SIGNED_KEY, false)) {
+        if (sharedPrefsVK.getBoolean(VK_SIGNED_KEY, false) && !profilePhotoLocation .equals("")) {
             profileMain = new ProfileDrawerItem().withName(ACCOUNT_NAME).withEmail(ACCOUNT_EMAIL).withIcon(profilePhotoLocation);
         } else {
             profileMain = new ProfileDrawerItem().withIcon(R.drawable.ic_account_circle_white_48dp);
@@ -143,7 +144,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
                     public boolean onProfileChanged(View view, IProfile iProfile, boolean b) {
-                        if(!settings_global.getBoolean(GLOBAL_SIGNED_IN, false)) {
+                        if(!BaseNavigationDrawerActivity.this.sharedPrefs.getBoolean(SIGNED_IN_KEY, false)) {
                             startActivity(new Intent(BaseNavigationDrawerActivity.this, FirstLaunchActivity.class)
                                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                         }
@@ -239,7 +240,6 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                     }
                                 }
                                 case SettingsActivity: {
-                                    startActivity(new Intent(BaseNavigationDrawerActivity.this, SettingsActivity.class));
                                     break;
                                 }
                                 case SearchActivity: {
@@ -351,9 +351,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 
         MethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
 
-        settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
-        settings_vk = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
-        editor_global = settings_global.edit();
-        editor_vk = settings_vk.edit();
+        sharedPrefs = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
+        sharedPrefsVK = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
     }
 }

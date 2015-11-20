@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -19,37 +18,15 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import ua.nau.edu.Enum.EnumSharedPreferences;
+import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 import ua.nau.edu.University.NAU;
 
 public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private int GLOBAL_MARKER_ID = -1;
     private String GLOBAL_MARKER_LABEL = "";
-    private Marker activeMarker = null;
-    private static final String GLOBAL_PREFERENCES = "GLOBAL_PREFERENCES";
-    private static final String GLOBAL_SIGNED_KEY = "GLOBAL_SIGNED_KEY";
-
-    SharedPreferences settings_global = null;
-    SharedPreferences settings_vk = null;
-    SharedPreferences.Editor editor_global;
-    SharedPreferences.Editor editor_vk;
-
-    /***
-     * VKONTAKTE SDK VARIABLES
-     ***/
-
-    private int appId = 5084652;
-
-    private static final String VK_PREFERENCES = "VK_PREFERENCES";
-    private static final String VK_INFO_KEY = "VK_INFO_KEY";
-    private static final String VK_PHOTO_KEY = "VK_PHOTO_KEY";
-    private static final String VK_EMAIL_KEY = "VK_EMAIL_KEY";
-    private static final String VK_SIGNED_KEY = "VK_SIGNED_KEY";
-    private static final String VK_ID_KEY = "VK_ID_KEY";
-
-    /*****/
 
     public MapsActivity() {
     }
@@ -61,15 +38,20 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private NAU university;
 
-    private SlidingUpPanelLayout slidingUpPanelLayout;
-    private TextView titleSlidingLayout;
-
-    private Button button_scheme;
-    private Button button_info;
-
     private FloatingActionMenu fab_menu;
 
     /*****/
+
+    private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
+    private static final String VK_PREFERENCES = EnumSharedPreferencesVK.VK_PREFERENCES.toString();
+    private static final String VK_INFO_KEY = EnumSharedPreferencesVK.VK_INFO_KEY.toString();
+    private static final String VK_EMAIL_KEY = EnumSharedPreferencesVK.VK_EMAIL_KEY.toString();
+    private static final String CORP_ID_KEY = EnumSharedPreferences.CORP_ID_KEY.toString();
+    private static final String CORP_LABEL_KEY = EnumSharedPreferences.CORP_LABEL_KEY.toString();
+
+    private SharedPreferences settings = null;
+    private SharedPreferences settingsVK = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,43 +62,19 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         university.init();
 
 // Get and set system services & Buttons & SharedPreferences & Requests
-        settings_global = getSharedPreferences(GLOBAL_PREFERENCES, MODE_PRIVATE);
-        settings_vk = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
-        editor_global = settings_global.edit();
-        editor_vk = settings_vk.edit();
+        settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
+        settingsVK = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
 
-        button_scheme = (Button) findViewById(R.id.button_scheme);
-        button_info = (Button) findViewById(R.id.button_info);
-//
 
         getDrawer(
-                settings_vk.getString(VK_INFO_KEY, ""),
-                settings_vk.getString(VK_PHOTO_KEY, ""),
-                settings_vk.getString(VK_EMAIL_KEY, "")
+                settingsVK.getString(VK_INFO_KEY, ""),
+                settingsVK.getString(VK_EMAIL_KEY, "")
         );
 
         setUpMapIfNeeded();
-
-        initSlidingPanel();
+        setUpMapIfNeeded();
 
         initFloatingActionMenu();
-
-        button_scheme.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MapsActivity.this, FloorActivity.class));
-            }
-        });
-
-        button_info.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MapsActivity.this, InfoActivity.class)
-                        .putExtra("Corp_id", GLOBAL_MARKER_ID)
-                        .putExtra("Corp_label", GLOBAL_MARKER_LABEL));
-            }
-        });
-
     }
 
     @Override
@@ -151,10 +109,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         try {
             if (keyCode == KeyEvent.KEYCODE_BACK) {
-                if (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
-                    slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                /*if () {
                 } else
-                    super.onBackPressed();
+                    super.onBackPressed();*/
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -228,7 +185,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                     break;
                 }
                 case 13: {
-                    addMarker_custom(i, R.drawable.mark_cki, getString(R.string.cki));
+                    addMarker_custom(i, R.drawable.mark_ckm, getString(R.string.cki));
                     break;
                 }
                 case 14: {
@@ -244,7 +201,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                     break;
                 }
                 case 17: {
-                    addMarker_custom(i, R.drawable.mark_host, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_1, i - 16 + getString(R.string.host));
                     break;
                 }
                 /*case 18: {
@@ -252,31 +209,39 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                     break;
                 }*/
                 case 19: {
-                    addMarker_custom(i, R.drawable.mark_host, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_3, i - 16 + getString(R.string.host));
                     break;
                 }
                 case 20: {
-                    addMarker_custom(i, R.drawable.mark_host, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_4, i - 16 + getString(R.string.host));
                     break;
                 }
                 case 21: {
-                    addMarker_custom(i, R.drawable.mark_host, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_5, i - 16 + getString(R.string.host));
                     break;
                 }
                 case 22: {
-                    addMarker_custom(i, R.drawable.mark_host, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_6, i - 16 + getString(R.string.host));
                     break;
                 }
                 case 23: {
-                    addMarker_custom(i, R.drawable.mark_host, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_7, i - 16 + getString(R.string.host));
                     break;
                 }
                 case 24: {
-                    addMarker_custom(i, R.drawable.mark_host, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_8, i - 16 + getString(R.string.host));
                     break;
                 }
                 case 25: {
-                    addMarker_custom(i, R.drawable.mark_host, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_9, i - 16 + getString(R.string.host));
+                    break;
+                }
+                case 26: {
+                    addMarker_custom(i, R.drawable.host_10, i - 16 + getString(R.string.host));
+                    break;
+                }
+                case 27: {
+                    addMarker_custom(i, R.drawable.host_11, i - 16 + getString(R.string.host));
                     break;
                 }
                 default: {
@@ -289,15 +254,11 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                //Отображаем маленькую панель в 30dp+15dp
-                slidingUpPanelLayout.setPanelHeight(45);
-
                 //Отображение названия объекта
                 String title_inst = "";
 
                 switch (getMarkerId(marker)) {
                     case 0: {
-
                         break;
                     }
                     case 1: {
@@ -313,7 +274,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                         break;
                     }
                     case 4: {
-                        title_inst = "";
+                        title_inst = "CORP";
                         break;
                     }
                     case 5: {
@@ -337,7 +298,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                         break;
                     }
                     case 10: {
-                        title_inst = "";
+                        title_inst = "CORP";
                         break;
                     }
                     case 11: {
@@ -345,7 +306,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                         break;
                     }
                     case 12: {
-                        title_inst = "";
+                        title_inst = "CORP";
                         break;
                     }
                     case 13: {
@@ -369,15 +330,12 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                     }
                 }
 
-                titleSlidingLayout.setText(title_inst);
-
                 //Записываем id текущего маркера в глобальную переменную
                 GLOBAL_MARKER_ID = getMarkerId(marker);
 
                 //Записываем label текущего маркера в глобальную переменную
                 GLOBAL_MARKER_LABEL = title_inst;
 
-                activeMarker = marker;
                 return false;
             }
         });
@@ -385,14 +343,13 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-               if (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
-                    slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                    activeMarker.showInfoWindow();
-                } else
-                    slidingUpPanelLayout.setPanelHeight(0);
+                if (fab_menu.isOpened()) {
+                    fab_menu.close(true);
+                    GLOBAL_MARKER_ID = -1;
+                    GLOBAL_MARKER_LABEL = "";
+                }
             }
         });
-
     }
 
     @Override
@@ -411,39 +368,24 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     public void onMapReady(GoogleMap googleMap) {
     }
 
-    private void initSlidingPanel() {
-        this.slidingUpPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-
-        //Высота слайдера в закрытом режиме
-        this.slidingUpPanelLayout.setPanelHeight(0);
-        //Фактор тени слайдера
-        this.slidingUpPanelLayout.setShadowHeight(0);
-        //пока не понятно что это
-        this.slidingUpPanelLayout.setClipPanel(false);
-        //пока не понятно что это
-        this.slidingUpPanelLayout.setAnchorPoint(0.0f);
-        //Увеличение нижнего отступа карты-елемента при открытии слайдера
-        this.slidingUpPanelLayout.setParalaxOffset(0);
-
-        this.titleSlidingLayout = (TextView) findViewById(R.id.titleSlidingLayout);
-    }
-
     private void initFloatingActionMenu() {
         fab_menu = (FloatingActionMenu) findViewById(R.id.fab_menu);
 
-        FloatingActionButton fab_1 = (FloatingActionButton) findViewById(R.id.fab_1);
-        FloatingActionButton fab_2 = (FloatingActionButton) findViewById(R.id.fab_2);
+        FloatingActionButton fab_info = (FloatingActionButton) findViewById(R.id.fab_info);
+        FloatingActionButton fab_location = (FloatingActionButton) findViewById(R.id.fab_location);
 
-        fab_1.setOnClickListener(new View.OnClickListener() {
+        fab_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MapsActivity.this, InfoActivity.class)
-                        .putExtra("Corp_id", GLOBAL_MARKER_ID)
-                        .putExtra("Corp_label", GLOBAL_MARKER_LABEL));
+                if (!GLOBAL_MARKER_LABEL.equals("") && GLOBAL_MARKER_ID != 0) {
+                    startActivity(new Intent(MapsActivity.this, InfoActivity.class)
+                            .putExtra(CORP_ID_KEY, GLOBAL_MARKER_ID)
+                            .putExtra(CORP_LABEL_KEY, GLOBAL_MARKER_LABEL));
+                }
             }
         });
 
-        fab_2.setOnClickListener(new View.OnClickListener() {
+        fab_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(MapsActivity.this, FloorActivity.class));

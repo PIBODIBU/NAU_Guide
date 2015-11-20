@@ -1,11 +1,12 @@
 package ua.nau.edu.NAU_Guide;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.widget.ImageView;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
-import ua.nau.edu.Systems.SVG;
-import ua.nau.edu.Systems.SVGParser;
+import com.caverock.androidsvg.SVG;
+import com.caverock.androidsvg.SVGImageView;
+import com.caverock.androidsvg.SVGParseException;
 
 public class FloorActivity extends BaseNavigationDrawerActivity {
     public FloorActivity() {
@@ -16,11 +17,24 @@ public class FloorActivity extends BaseNavigationDrawerActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_floor);
 
-        SVG svg = SVGParser.getSVGFromResource(getResources(), R.raw.splatter);
-        Drawable svgDrawable = svg.createPictureDrawable();
+        try {
+            SVG svg = SVG.getFromResource(this, R.raw.splatter);
 
-        ImageView map = (ImageView) findViewById(R.id.map);
-        map.setImageDrawable(svgDrawable);
+            SVGImageView svgImageView = new SVGImageView(this);
+            svgImageView.setSVG(svg);
+            svgImageView.setLayoutParams(
+                    new ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT));
+
+            RelativeLayout layout =
+                    (RelativeLayout) findViewById(R.id.main_layout);
+
+            layout.addView(svgImageView);
+
+        } catch (SVGParseException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
