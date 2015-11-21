@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.gc.materialdesign.views.CustomView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -254,10 +255,22 @@ public class FirstLaunchActivity extends Activity {
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
+
             }
         };
 
         Picasso.with(this).load(Uri).into(loadtarget);
+    }
+
+    private void initDialog_loading() {
+        new MaterialDialog.Builder(FirstLaunchActivity.this)
+                .content("Подождите")
+                .progress(true, 0)
+                .progressIndeterminateStyle(true)
+                .backgroundColor(getResources().getColor(R.color.white))
+                .dividerColor(getResources().getColor(R.color.colorAppPrimary))
+                .contentColor(getResources().getColor(R.color.colorAppPrimary))
+                .show();
     }
 
 }

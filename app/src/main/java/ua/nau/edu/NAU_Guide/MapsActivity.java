@@ -1,12 +1,21 @@
 package ua.nau.edu.NAU_Guide;
 
+import android.animation.Animator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
+import com.gc.materialdesign.views.CustomView;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -73,6 +82,18 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
         setUpMapIfNeeded();
         setUpMapIfNeeded();
+
+        final Animation animRevealReverse = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_reveal_reverse);
+        final RelativeLayout layoutHelp = (RelativeLayout) findViewById(R.id.layout_help);
+        Button layoutHelp_button_exit = (Button) findViewById(R.id.layout_help_exit);
+
+        layoutHelp_button_exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutHelp.setVisibility(View.GONE);
+                layoutHelp.startAnimation(animRevealReverse);
+            }
+        });
 
         initFloatingActionMenu();
     }
@@ -373,6 +394,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
         FloatingActionButton fab_info = (FloatingActionButton) findViewById(R.id.fab_info);
         FloatingActionButton fab_location = (FloatingActionButton) findViewById(R.id.fab_location);
+        FloatingActionButton fab_help = (FloatingActionButton) findViewById(R.id.fab_help);
 
         fab_info.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -389,6 +411,22 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(MapsActivity.this, FloorActivity.class));
+            }
+        });
+
+        final Animation animReveal = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_reveal);
+        final RelativeLayout layoutHelp = (RelativeLayout) findViewById(R.id.layout_help);
+        fab_help.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (layoutHelp.getVisibility() == View.GONE) {
+                    layoutHelp.setVisibility(View.VISIBLE); //It has to be invisible before here
+                    layoutHelp.startAnimation(animReveal);
+                    fab_menu.close(true);
+                } /*else if (layoutHelp.getVisibility() == View.VISIBLE) {
+                    layoutHelp.setVisibility(View.GONE); //It has to be visible before here
+                    layoutHelp.startAnimation(animRevealReverse);
+                }*/
             }
         });
     }
