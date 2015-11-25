@@ -12,6 +12,7 @@ import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 import ua.nau.edu.Systems.FileAdapter;
 
+
 public class TimetableActivity extends BaseNavigationDrawerActivity {
 
     public TimetableActivity() {
