@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/MaterialDesignLibrary/MaterialDesign" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/vksdk_library" />
+            <option value="$PROJECT_DIR$/voronImageView" />
           </set>
         </option>
       </GradleProjectSettings>

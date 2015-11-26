@@ -120,10 +120,10 @@ public class InfoActivity extends BaseNavigationDrawerActivity {
         settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
         settingsVK = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
 
-        /*getDrawer(
+        getDrawer(
                 settingsVK.getString(VK_INFO_KEY, ""),
                 settingsVK.getString(VK_EMAIL_KEY, "")
-        );*/
+        );
 
         ScrollView scroll_main = (ScrollView) findViewById(R.id.scroll_main);
 

@@ -1,0 +1,10 @@
+int attr rotation 0x7f010000
+int drawable ic_launcher 0x7f020000
+int id by90degree 0x7f050000
+int id disable 0x7f050001
+int id rotation 0x7f050002
+int string app_name 0x7f040000
+int style AppBaseTheme 0x7f030000
+int style AppTheme 0x7f030001
+int[] styleable VoronImageView { 0x7f010000 }
+int styleable VoronImageView_rotation 0
