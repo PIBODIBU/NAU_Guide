@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import io.codetail.animation.SupportAnimator;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 import ua.nau.edu.University.NAU;
@@ -80,7 +81,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                 settingsVK.getString(VK_EMAIL_KEY, "")
         );
 
-        setUpMapIfNeeded();
         setUpMapIfNeeded();
 
         final Animation animRevealReverse = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_reveal_reverse);
@@ -423,10 +423,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                     layoutHelp.setVisibility(View.VISIBLE); //It has to be invisible before here
                     layoutHelp.startAnimation(animReveal);
                     fab_menu.close(true);
-                } /*else if (layoutHelp.getVisibility() == View.VISIBLE) {
-                    layoutHelp.setVisibility(View.GONE); //It has to be visible before here
-                    layoutHelp.startAnimation(animRevealReverse);
-                }*/
+                }
             }
         });
     }

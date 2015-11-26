@@ -126,9 +126,9 @@ public class FirstLaunchActivity extends Activity {
         login_skip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
                 startActivity(new Intent(FirstLaunchActivity.this, MainActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                finish();
             }
         });
 

@@ -1,15 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:voron="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/main_layout">
+    android:layout_height="match_parent">
 
     <include
         android:id="@+id/toolbar"
         layout="@layout/toolbar" />
 
-    <include
-        android:id="@+id/shadow"
-        layout="@layout/toolbar_shadow" />
+    <RelativeLayout
+        android:id="@+id/layout_map_1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar">
+
+        <ua.nau.edu.Systems.TouchImageView
+            android:id="@+id/map_1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_map_2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar">
+
+        <org.voron.voronimageview.VoronImageView
+            android:id="@+id/map_2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            voron:rotation="rotation" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

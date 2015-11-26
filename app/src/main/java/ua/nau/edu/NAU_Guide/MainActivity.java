@@ -8,6 +8,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Picture;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -17,12 +20,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.caverock.androidsvg.SVG;
+import com.caverock.androidsvg.SVGParseException;
 import com.gc.materialdesign.views.CustomView;
 import com.github.clans.fab.FloatingActionButton;
 import com.squareup.picasso.Picasso;
@@ -56,6 +62,8 @@ import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
+import com.vk.sdk.api.model.VKApiPost;
+import com.vk.sdk.api.model.VKList;
 
 import java.io.File;
 import java.io.IOException;
@@ -169,6 +177,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private SharedPreferences settingsVK = null;
 
     private VKRequest request_share;
+    private VKRequest request_wallOverhear;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,6 +207,41 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                 Integer.toString(settingsVK.getInt(VK_ID_KEY, -1)),
                 VKApiConst.MESSAGE,
                 getString(R.string.VK_share_text)));
+
+
+
+
+
+        Button anim_1 = (Button) findViewById(R.id.anim_1);
+        Button anim_2 = (Button) findViewById(R.id.anim_2);
+        anim_1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, FloorActivity.class)
+                    .putExtra("AnimChoose", 1));
+            }
+        });
+        anim_2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, FloorActivity.class)
+                        .putExtra("AnimChoose", 2));
+            }
+        });
+        /*request_wallOverhear = VKApi.wall().get(VKParameters.from(
+                VKApiConst.OWNER_ID, 115833261,
+                VKApiConst.COUNT, 5
+                ));
+
+        request_wallOverhear.executeWithListener(new VKRequest.VKRequestListener() {
+            @Override
+            public void onComplete(VKResponse response) {
+                VKList<VKApiPost> posts = (VKList<VKApiPost>) response.parsedModel;
+
+                //VKApiPost post = posts.get(0);
+                plus_user.setText(posts.toString());
+            }
+        });*/
 //
 
 // Load Navigation Drawer
@@ -273,7 +317,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         plusText = (TextView) findViewById(R.id.plus_text);
         plus_user = (TextView) findViewById(R.id.plus_user);
         mCirclesListView = (ListView) findViewById(R.id.circles_list);
-
 
         mCirclesList = new ArrayList<>();
         mCirclesAdapter = new ArrayAdapter<String>(
