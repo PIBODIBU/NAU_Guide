@@ -23,18 +23,4 @@
 
     </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/layout_map_2"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar">
-
-        <org.voron.voronimageview.VoronImageView
-            android:id="@+id/map_2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            voron:rotation="rotation" />
-
-    </RelativeLayout>
-
 </RelativeLayout>

@@ -17,8 +17,6 @@ import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGImageView;
 import com.caverock.androidsvg.SVGParseException;
 
-import org.voron.voronimageview.VoronImageView;
-
 import ua.nau.edu.Systems.TouchImageView;
 
 public class FloorActivity extends BaseNavigationDrawerActivity {
@@ -31,71 +29,11 @@ public class FloorActivity extends BaseNavigationDrawerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_floor);
+        setContentView(R.layout.activity_floor_test);
 
-        switch (getIntent().getIntExtra("AnimChoose", -1)) {
-            case 1: {
-                RelativeLayout rl_1 = (RelativeLayout) findViewById(R.id.layout_map_1);
-                rl_1.setVisibility(View.VISIBLE);
-
-                RelativeLayout rl_2 = (RelativeLayout) findViewById(R.id.layout_map_2);
-                rl_2.setVisibility(View.GONE);
-
-                TouchImageView map_1 = (TouchImageView) findViewById(R.id.map_1);
-                //map_1.setImageBitmap(svgToBitmap(getResources(), R.raw.splatter, 300, 200));
-                map_1.setImageResource(R.drawable.map);
-
-                mGestureDetector = new GestureDetector(getApplicationContext(), new GestureDetector.OnGestureListener() {
-                    @Override
-                    public boolean onDown(MotionEvent e) {
-                        return false;
-                    }
-
-                    @Override
-                    public void onShowPress(MotionEvent e) {
-
-                    }
-
-                    @Override
-                    public boolean onSingleTapUp(MotionEvent e) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                        return false;
-                    }
-
-                    @Override
-                    public void onLongPress(MotionEvent e) {
-                        Toast.makeText(getApplicationContext(), "onLongPress", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                        Toast.makeText(getApplicationContext(), "onFling", Toast.LENGTH_SHORT).show();
-                        return false;
-                    }
-                });
-
-                break;
-            }
-            case 2: {
-                RelativeLayout rl_1 = (RelativeLayout) findViewById(R.id.layout_map_1);
-                rl_1.setVisibility(View.GONE);
-
-                RelativeLayout rl_2 = (RelativeLayout) findViewById(R.id.layout_map_2);
-                rl_2.setVisibility(View.VISIBLE);
-
-                VoronImageView vImageView = (VoronImageView) findViewById(R.id.map_2);
-                vImageView.setImageResource(R.drawable.map);
-
-                break;
-            }
-            default: {
-                break;
-            }
-        }
+        //TouchImageView map_1 = (TouchImageView) findViewById(R.id.map_1);
+        //map_1.setImageBitmap(svgToBitmap(getResources(), R.raw.splatter, 300, 200));
+        //map_1.setImageResource(R.drawable.map);
     }
 
     @Override
@@ -129,14 +67,5 @@ public class FloorActivity extends BaseNavigationDrawerActivity {
             e.printStackTrace();
         }
         return null;
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        mGestureDetector.onTouchEvent(event);
-
-        return super.onTouchEvent(event);
-        // Return true if you have consumed the event, false if you haven't.
-        // The default implementation always returns false.
     }
 }

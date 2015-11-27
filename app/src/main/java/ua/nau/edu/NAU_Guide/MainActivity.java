@@ -212,28 +212,9 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
 
 
-        Button anim_1 = (Button) findViewById(R.id.anim_1);
-        Button anim_2 = (Button) findViewById(R.id.anim_2);
-        anim_1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, FloorActivity.class)
-                    .putExtra("AnimChoose", 1));
-            }
-        });
-        anim_2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, FloorActivity.class)
-                        .putExtra("AnimChoose", 2));
-            }
-        });
-        /*request_wallOverhear = VKApi.wall().get(VKParameters.from(
-                VKApiConst.OWNER_ID, 115833261,
-                VKApiConst.COUNT, 5
-                ));
 
-        request_wallOverhear.executeWithListener(new VKRequest.VKRequestListener() {
+
+        /*request_wallOverhear.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
                 VKList<VKApiPost> posts = (VKList<VKApiPost>) response.parsedModel;
