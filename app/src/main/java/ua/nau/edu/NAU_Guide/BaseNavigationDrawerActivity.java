@@ -5,14 +5,10 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,13 +26,8 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
-import java.io.File;
-import java.io.FileOutputStream;
-
+import ua.nau.edu.Enum.Activities;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 
@@ -45,6 +36,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
     private InputMethodManager MethodManager = null;
     private SearchView searchView;
     private boolean wasInputActive = false;
+    private int menuId = -1;
 
     private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
     private static final String SIGNED_IN_KEY = EnumSharedPreferences.SIGNED_IN_KEY.toString();
@@ -88,18 +80,10 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
     }
 
     public void getDrawer(String ACCOUNT_NAME, String ACCOUNT_EMAIL) {
-
 // Инициализируем Toolbar
-        Toolbar toolbar = null;
-        try {
-            toolbar = (Toolbar) findViewById(R.id.toolbar);
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        } catch (NullPointerException e){
-            e.printStackTrace();
-        }
-
-
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final PrimaryDrawerItem home = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_home)
@@ -162,7 +146,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
                     public boolean onProfileChanged(View view, IProfile iProfile, boolean b) {
-                        if(!BaseNavigationDrawerActivity.this.sharedPrefs.getBoolean(SIGNED_IN_KEY, false)) {
+                        if (!BaseNavigationDrawerActivity.this.sharedPrefs.getBoolean(SIGNED_IN_KEY, false)) {
                             startActivity(new Intent(BaseNavigationDrawerActivity.this, FirstLaunchActivity.class)
                                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                         }
@@ -176,7 +160,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 // Инициализируем Navigation Drawer
         drawerResult = new DrawerBuilder()
                 .withActivity(this)
-                .withToolbar((toolbar == null) ? toolbar : null)
+                .withToolbar(toolbar)
                 .withActionBarDrawerToggle(true)
                 .withActionBarDrawerToggleAnimated(true)
                 .withAccountHeader(headerResult)
@@ -319,26 +303,27 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // Закрытие/Открытие Navigation Drawer при нажатии клавиш "МЕНЮ" и "НАЗАД"
         try {
-            if (keyCode == KeyEvent.KEYCODE_MENU) {
-                if (drawerResult.isDrawerOpen())
-                    drawerResult.closeDrawer();
-                else {
-                    drawerResult.openDrawer();
-
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_MENU: {
+                    if (drawerResult.isDrawerOpen())
+                        drawerResult.closeDrawer();
+                    else
+                        drawerResult.openDrawer();
+                    break;
                 }
-            } else if (keyCode == KeyEvent.KEYCODE_BACK) {
-                if (drawerResult.isDrawerOpen())
-                    drawerResult.closeDrawer();
-                else if (!searchView.isIconified())
-                    searchView.onActionViewCollapsed();
-                else
-                    super.onBackPressed();
+                case KeyEvent.KEYCODE_BACK: {
+                    if (drawerResult.isDrawerOpen())
+                        drawerResult.closeDrawer();
+                    else if (!searchView.isIconified())
+                        searchView.onActionViewCollapsed();
+                    else
+                        super.onBackPressed();
+                    break;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            super.onBackPressed();
         }
         return true;
     }
@@ -351,10 +336,18 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
     }
 
+    void setMenuId (int menu) {
+        this.menuId = menu;
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
+
+        if(menuId != -1)
+            inflater.inflate(menuId, menu);
+        else
+            inflater.inflate(R.menu.menu_main, menu);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) menu.findItem(R.id.search).getActionView();

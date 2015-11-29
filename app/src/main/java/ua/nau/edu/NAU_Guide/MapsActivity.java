@@ -1,15 +1,24 @@
 package ua.nau.edu.NAU_Guide;
 
 import android.animation.Animator;
+import android.app.Activity;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
+import android.util.TypedValue;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -18,6 +27,7 @@ import android.widget.RelativeLayout;
 import com.gc.materialdesign.views.CustomView;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -34,9 +44,10 @@ import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 import ua.nau.edu.University.NAU;
 
 public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
-
     private int GLOBAL_MARKER_ID = -1;
     private String GLOBAL_MARKER_LABEL = "";
+    private InputMethodManager MethodManager = null;
+    private SearchView searchView;
 
     public MapsActivity() {
     }
@@ -62,7 +73,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     private SharedPreferences settings = null;
     private SharedPreferences settingsVK = null;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,13 +84,14 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 // Get and set system services & Buttons & SharedPreferences & Requests
         settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
         settingsVK = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
-
+        MethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
 
         getDrawer(
                 settingsVK.getString(VK_INFO_KEY, ""),
                 settingsVK.getString(VK_EMAIL_KEY, "")
         );
 
+        setMenuId(R.menu.menu_maps);
         setUpMapIfNeeded();
 
         final Animation animRevealReverse = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_reveal_reverse);
@@ -105,6 +116,18 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         setUpMapIfNeeded();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.location:
+                getMyLocation();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
@@ -126,25 +149,11 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                 );
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        try {
-            if (keyCode == KeyEvent.KEYCODE_BACK) {
-                /*if () {
-                } else
-                    super.onBackPressed();*/
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return true;
-    }
-
     private void setUpMap() {
         //Стартовое положение камеры
         LatLng nau = new LatLng(50.437476, 30.428322);
         CameraPosition cameraPosition_start = new CameraPosition.Builder()
-                .target(nau)      // Sets the center of the map to Mountain View
+                .target(nau)      // Sets the center of the map to NAU
                 .zoom(15)                   // Sets the zoom
                 .bearing(160)                // Sets the orientation of the camera to east
                         //.tilt(30)                   // Sets the tilt of the camera to 30 degrees
@@ -153,56 +162,59 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition_start));
 
         mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mMap.getUiSettings().setCompassEnabled(false);
 
         //Добавление маркеров на карту из класса НАУ
         for (Integer i : university.getCorps().keySet()) {
             switch (i) {
                 case 1: {
-                    addMarker_custom(i, R.drawable.corp_1, i + getString(R.string.corp));
+                    addMarker_custom(i, R.drawable.corp_1, getString(R.string.corp) + " " + i);
                     break;
                 }
                 case 2: {
-                    addMarker_custom(i, R.drawable.corp_2, i + getString(R.string.corp));
+                    addMarker_custom(i, R.drawable.corp_2, getString(R.string.corp) + " " + i);
                     break;
                 }
                 case 3: {
-                    addMarker_custom(i, R.drawable.corp_3, i + getString(R.string.corp));
+                    addMarker_custom(i, R.drawable.corp_3, getString(R.string.corp) + " " + i);
                     break;
                 }
                 case 4: {
-                    addMarker_custom(i, R.drawable.corp_4, i + getString(R.string.corp));
+                    addMarker_custom(i, R.drawable.corp_4, getString(R.string.corp) + " " + i);
                     break;
                 }
                 case 5: {
-                    addMarker_custom(i, R.drawable.corp_5, i + getString(R.string.corp));
+                    addMarker_custom(i, R.drawable.corp_5, getString(R.string.corp) + " " + i);
                     break;
                 }
                 case 6: {
-                    addMarker_custom(i, R.drawable.corp_6, i + getString(R.string.corp));
+                    addMarker_custom(i, R.drawable.corp_6, getString(R.string.corp) + " " + i);
                     break;
                 }
                 case 7: {
-                    addMarker_custom(i, R.drawable.corp_7, i + getString(R.string.corp));
+                    addMarker_custom(i, R.drawable.corp_7, getString(R.string.corp) + " " + i);
                     break;
                 }
                 case 8: {
-                    addMarker_custom(i, R.drawable.corp_8, i + getString(R.string.corp));
+                    addMarker_custom(i, R.drawable.corp_8, getString(R.string.corp) + " " + i);
                     break;
                 }
                 case 9: {
-                    addMarker_custom(i, R.drawable.corp_9, i + getString(R.string.corp));
+                    addMarker_custom(i, R.drawable.corp_9, getString(R.string.corp) + " " + i);
                     break;
                 }
                 case 10: {
-                    addMarker_custom(i, R.drawable.corp_10, i + getString(R.string.corp));
+                    addMarker_custom(i, R.drawable.corp_10, getString(R.string.corp) + " " + i);
                     break;
                 }
                 case 11: {
-                    addMarker_custom(i, R.drawable.corp_11, i + getString(R.string.corp));
+                    addMarker_custom(i, R.drawable.corp_11, getString(R.string.corp) + " " + i);
                     break;
                 }
                 case 12: {
-                    addMarker_custom(i, R.drawable.corp_12, i + getString(R.string.corp));
+                    addMarker_custom(i, R.drawable.corp_12, getString(R.string.corp) + " " + i);
                     break;
                 }
                 case 13: {
@@ -222,7 +234,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                     break;
                 }
                 case 17: {
-                    addMarker_custom(i, R.drawable.host_1, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_1, getString(R.string.host) + " " + (i - 16));
                     break;
                 }
                 /*case 18: {
@@ -230,39 +242,39 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                     break;
                 }*/
                 case 19: {
-                    addMarker_custom(i, R.drawable.host_3, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_3, getString(R.string.host) + " " + (i - 16));
                     break;
                 }
                 case 20: {
-                    addMarker_custom(i, R.drawable.host_4, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_4, getString(R.string.host) + " " + (i - 16));
                     break;
                 }
                 case 21: {
-                    addMarker_custom(i, R.drawable.host_5, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_5, getString(R.string.host) + " " + (i - 16));
                     break;
                 }
                 case 22: {
-                    addMarker_custom(i, R.drawable.host_6, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_6, getString(R.string.host) + " " + (i - 16));
                     break;
                 }
                 case 23: {
-                    addMarker_custom(i, R.drawable.host_7, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_7, getString(R.string.host) + " " + (i - 16));
                     break;
                 }
                 case 24: {
-                    addMarker_custom(i, R.drawable.host_8, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_8, getString(R.string.host) + " " + (i - 16));
                     break;
                 }
                 case 25: {
-                    addMarker_custom(i, R.drawable.host_9, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_9, getString(R.string.host) + " " + (i - 16));
                     break;
                 }
                 case 26: {
-                    addMarker_custom(i, R.drawable.host_10, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_10, getString(R.string.host) + " " + (i - 16));
                     break;
                 }
                 case 27: {
-                    addMarker_custom(i, R.drawable.host_11, i - 16 + getString(R.string.host));
+                    addMarker_custom(i, R.drawable.host_11, getString(R.string.host) + " " + (i - 16));
                     break;
                 }
                 default: {
@@ -275,6 +287,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                //Открываем FabMenu
+                fab_menu.open(true);
+
                 //Отображение названия объекта
                 String title_inst = "";
 
@@ -375,6 +390,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        //Открываем FabMenu
+        fab_menu.open(true);
+
         //Manually open the window
         marker.showInfoWindow();
 
@@ -436,6 +454,10 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         i++;
         return i;
     }
-//
 
+    private void getMyLocation() {
+        LatLng latLng = new LatLng(mMap.getMyLocation().getLatitude(), mMap.getMyLocation().getLongitude());
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16);
+        mMap.animateCamera(cameraUpdate);
+    }
 }

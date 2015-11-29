@@ -1,4 +1,4 @@
-package ua.nau.edu.NAU_Guide;
+package ua.nau.edu.Enum;
 
 /**
  * Created by gaponec on 05.11.15.

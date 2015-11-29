@@ -243,28 +243,6 @@
                     android:layout_centerHorizontal="true" />
             </RelativeLayout>
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Anim_1"
-                android:id="@+id/anim_1"
-                android:layout_below="@+id/relativeLayout"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginTop="64dp"
-                android:background="@color/colorAppPrimary" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Anim_2"
-                android:id="@+id/anim_2"
-                android:layout_alignBottom="@+id/anim_1"
-                android:layout_toRightOf="@+id/anim_1"
-                android:layout_toEndOf="@+id/anim_1"
-                android:background="@color/colorAppPrimary"
-                android:layout_marginLeft="50dp" />
-
         </RelativeLayout>
     </ScrollView>
 
