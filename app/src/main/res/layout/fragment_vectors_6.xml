@@ -10,25 +10,25 @@
         android:layout_height="wrap_content">
 
         <RelativeLayout
-            android:id="@+id/main_1"
+            android:id="@+id/block_gerb"
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_margin="8dp"
             android:background="@color/white" />
 
         <RelativeLayout
-            android:id="@+id/main_2"
+            android:id="@+id/call_block"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:layout_below="@+id/main_1"
+            android:layout_below="@+id/block_gerb"
             android:layout_margin="8dp"
             android:background="@color/white" />
 
         <RelativeLayout
-            android:id="@+id/main_3"
+            android:id="@+id/web_block"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:layout_below="@+id/main_2"
+            android:layout_below="@+id/call_block"
             android:layout_margin="8dp"
             android:background="@color/white" />
 
@@ -36,7 +36,7 @@
             android:id="@+id/main_4"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:layout_below="@+id/main_3"
+            android:layout_below="@+id/web_block"
             android:layout_margin="8dp"
             android:background="@color/white" />
 

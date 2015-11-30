@@ -10,14 +10,16 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.astuetz.PagerSlidingTabStrip;
+import com.google.android.gms.maps.model.LatLng;
 
+import ua.nau.edu.Enum.EnumExtras;
 import ua.nau.edu.Enum.EnumSharedPreferences;
-import ua.nau.edu.InfoAdapter.InfoAdapter;
+import ua.nau.edu.AdapterInfoActivity.AdapterInfo;
 
 public class InfoActivity extends BaseToolbarActivity {
     private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
-    private static final String CORP_ID_KEY = EnumSharedPreferences.CORP_ID_KEY.toString();
-    private static final String CORP_LABEL_KEY = EnumSharedPreferences.CORP_LABEL_KEY.toString();
+    private static final String CORP_ID_KEY = EnumExtras.CORP_ID_KEY.toString();
+    private static final String CORP_LABEL_KEY = EnumExtras.CORP_LABEL_KEY.toString();
 
     private SharedPreferences settings = null;
 
@@ -32,21 +34,17 @@ public class InfoActivity extends BaseToolbarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-        settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
-        settings.edit().putInt(CORP_ID_KEY, getIntent().getIntExtra(CORP_ID_KEY, -1)).apply();
-
         /*** SUPPORT METHODS ***/
-        setLabel();
+        setActivityLabel();
         getToolbar();
 
         // Initialize the ViewPager and set an adapter
         pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(new InfoAdapter(getSupportFragmentManager()));
+        pager.setAdapter(new AdapterInfo(getSupportFragmentManager()));
 
         // Bind the tabs to the ViewPager
         tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
         tabs.setViewPager(pager);
-
     }
 
     @Override
@@ -82,11 +80,11 @@ public class InfoActivity extends BaseToolbarActivity {
         Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_SHORT).show();
     }
 
-    public void setLabel() {
-        this.setTitle(getString(R.string.corp) +
-                " " +
-                Integer.toString(getIntent().getIntExtra(CORP_ID_KEY, -1)) +
-                ", " +
-                getIntent().getStringExtra(CORP_LABEL_KEY));
+    public void setActivityLabel() {
+        this.setTitle(getIntent().getStringExtra(CORP_LABEL_KEY));
+    }
+
+    public LatLng getMyCoordinate() {
+        return new LatLng(getIntent().getDoubleExtra("myLatitude", 1.0), getIntent().getDoubleExtra("myLongitude", 1.0));
     }
 }

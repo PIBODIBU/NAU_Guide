@@ -17,4 +17,11 @@
         android:title="Мое местоположение"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/traffic"
+        android:gravity="center"
+        android:icon="@drawable/ic_traffic_white_24dp"
+        android:title="Пробки"
+        app:showAsAction="always" />
+
 </menu>

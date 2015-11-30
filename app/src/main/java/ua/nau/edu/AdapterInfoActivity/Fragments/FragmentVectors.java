@@ -1,4 +1,4 @@
-package ua.nau.edu.InfoAdapter.Fragments;
+package ua.nau.edu.AdapterInfoActivity.Fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

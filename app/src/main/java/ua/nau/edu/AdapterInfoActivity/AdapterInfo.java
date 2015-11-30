@@ -1,18 +1,18 @@
-package ua.nau.edu.InfoAdapter;
+package ua.nau.edu.AdapterInfoActivity;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import ua.nau.edu.InfoAdapter.Fragments.FragmentInfo;
-import ua.nau.edu.InfoAdapter.Fragments.FragmentVectors;
+import ua.nau.edu.AdapterInfoActivity.Fragments.FragmentInfo;
+import ua.nau.edu.AdapterInfoActivity.Fragments.FragmentVectors;
 
 /**
  * Created by Roman on 27.11.2015.
  */
-public class InfoAdapter extends FragmentPagerAdapter {
+public class AdapterInfo extends FragmentPagerAdapter {
 
-    public InfoAdapter(FragmentManager fm) {
+    public AdapterInfo(FragmentManager fm) {
         super(fm);
     }
 

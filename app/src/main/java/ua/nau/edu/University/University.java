@@ -3,7 +3,6 @@ package ua.nau.edu.University;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.HashMap;
-import java.util.Scanner;
 import java.util.Set;
 
 /**
@@ -15,7 +14,16 @@ public abstract class University {
     private String fullName;
 
     private HashMap<Integer, LatLng> Corps;
-    private HashMap<Integer, Set> lectureHalls;
+    private HashMap<Integer, Integer> CorpsIcon;
+    private HashMap<Integer, Integer> CorpsGerb;
+    private HashMap<Integer, Set> LectureHalls;
+    private HashMap<Integer, String> CorpsMarkerLabel;
+    private HashMap<Integer, String> CorpsLabel;
+
+    private HashMap<Integer, String> CorpsInfoNameShort;
+    private HashMap<Integer, String> CorpsInfoNameFull;
+    private HashMap<Integer, String> CorpsInfoPhone;
+    private HashMap<Integer, String> CorpsInfoUrl;
 
     public University() {
 
@@ -26,7 +34,9 @@ public abstract class University {
         this.nameAbbreviation = nameAbbreviation;
     }
 
-    //SETTERS
+    /**
+     * SETTERS
+     **/
     public void setNameAbbreviation(String nameAbbreviation) {
         this.nameAbbreviation = nameAbbreviation;
     }
@@ -36,14 +46,48 @@ public abstract class University {
     }
 
     public void setCorps(HashMap<Integer, LatLng> corps) {
-        Corps = corps;
+        this.Corps = corps;
+    }
+
+    public void setCorpsIcon(HashMap<Integer, Integer> corpsIcon) {
+        this.CorpsIcon = corpsIcon;
+    }
+
+    public void setCorpsGerb(HashMap<Integer, Integer> corpsGerb) {
+        this.CorpsGerb = corpsGerb;
+    }
+
+    public void setCorpsMarkerLabel(HashMap<Integer, String> corpsMarkerLabel) {
+        this.CorpsMarkerLabel = corpsMarkerLabel;
+    }
+
+    public void setCorpsLabel(HashMap<Integer, String> corpsLabel) {
+        this.CorpsLabel = corpsLabel;
+    }
+
+    public void setCorpsInfoNameShort(HashMap<Integer, String> corpsInfoNameShort) {
+        this.CorpsInfoNameShort = corpsInfoNameShort;
+    }
+
+    public void setCorpsInfoNameFull(HashMap<Integer, String> corpsInfoNameFull) {
+        this.CorpsInfoNameFull = corpsInfoNameFull;
+    }
+
+    public void setCorpsInfoPhone(HashMap<Integer, String> corpsInfoPhone) {
+        this.CorpsInfoPhone = corpsInfoPhone;
+    }
+
+    public void setCorpsInfoUrl(HashMap<Integer, String> corpsInfoUrl) {
+        this.CorpsInfoUrl = corpsInfoUrl;
     }
 
     public void setLectureHalls(HashMap<Integer, Set> lectureHalls) {
-        this.lectureHalls = lectureHalls;
+        this.LectureHalls = lectureHalls;
     }
 
-    //GETTERS
+    /**
+     * GETTERS
+     **/
     public String getNameAbbreviation() {
         return nameAbbreviation;
     }
@@ -56,7 +100,39 @@ public abstract class University {
         return Corps;
     }
 
+    public HashMap<Integer, Integer> getCorpsIcon() {
+        return CorpsIcon;
+    }
+
+    public HashMap<Integer, Integer> getCorpsGerb() {
+        return CorpsGerb;
+    }
+
+    public HashMap<Integer, String> getCorpsMarkerLabel() {
+        return CorpsMarkerLabel;
+    }
+
+    public HashMap<Integer, String> getCorpsLabel() {
+        return CorpsLabel;
+    }
+
+    public HashMap<Integer, String> getCorpsInfoNameShort() {
+        return CorpsInfoNameShort;
+    }
+
+    public HashMap<Integer, String> getCorpsInfoNameFull() {
+        return CorpsInfoNameFull;
+    }
+
+    public HashMap<Integer, String> getCorpsInfoPhone() {
+        return CorpsInfoPhone;
+    }
+
+    public HashMap<Integer, String> getCorpsInfoUrl() {
+        return CorpsInfoUrl;
+    }
+
     public HashMap<Integer, Set> getLectureHalls() {
-        return lectureHalls;
+        return LectureHalls;
     }
 }

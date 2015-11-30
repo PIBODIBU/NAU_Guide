@@ -47,6 +47,18 @@
         fab:menu_openDirection="up">
 
         <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_route"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="8dp"
+            android:src="@drawable/ic_directions_white_24dp"
+            fab:fab_colorNormal="@color/colorAppPrimary"
+            fab:fab_colorPressed="@color/colorAppPressed"
+            fab:fab_colorRipple="@color/colorAppRipped"
+            fab:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fab_help"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

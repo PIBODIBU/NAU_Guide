@@ -10,55 +10,70 @@
         android:layout_height="wrap_content">
 
         <RelativeLayout
-            android:id="@+id/main_1"
+            android:id="@+id/block_gerb"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:background="@color/white">
-
-            <ImageView
-                android:id="@+id/imageView3"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_centerVertical="true"
-                android:layout_margin="8dp"
-                android:src="@drawable/gerb_6" />
+            android:background="@drawable/rounded_corner"
+            android:paddingBottom="16dp">
 
             <TextView
+                android:id="@+id/gerb_text_head"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_margin="8dp"
-                android:layout_toEndOf="@+id/imageView3"
-                android:layout_toRightOf="@+id/imageView3"
-                android:gravity="center"
-                android:text="Институт Компьютерных Информационных Технологий"
-                android:textAlignment="gravity"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:text="ИКИТ"
                 android:textColor="@color/black"
-                android:textSize="15sp" />
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/gerb_text_subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/gerb_text_head"
+                android:layout_alignStart="@+id/gerb_text_head"
+                android:layout_below="@+id/gerb_text_head"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_toLeftOf="@+id/gerb_image"
+                android:text="Институт Компьютерных Информационных Технологий"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/gerb_image"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/gerb_6" />
 
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/main_2"
+            android:id="@+id/call_block"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/main_1"
+            android:layout_below="@+id/block_gerb"
             android:layout_margin="8dp"
-            android:background="@color/white"
+            android:background="@drawable/rounded_corner"
             android:paddingBottom="8dp">
 
             <ImageView
-                android:id="@+id/main_2_image"
+                android:id="@+id/call_image"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
-                android:src="@drawable/phone_icon" />
+                android:src="@drawable/ic_phone_black_48dp" />
 
             <TextView
-                android:id="@+id/textView12"
+                android:id="@+id/call_text_head"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
@@ -68,59 +83,182 @@
                 android:textSize="24sp" />
 
             <TextView
-                android:id="@+id/text_call"
+                android:id="@+id/call_text_subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/textView12"
-                android:layout_alignStart="@+id/textView12"
-                android:layout_below="@+id/textView12"
+                android:layout_alignLeft="@+id/call_text_head"
+                android:layout_alignStart="@+id/call_text_head"
+                android:layout_below="@+id/call_text_head"
                 android:layout_marginTop="4dp"
                 android:text="(044) 406-73-88"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
 
             <com.gc.materialdesign.views.ButtonFlat
-                android:id="@+id/button_call"
+                android:id="@+id/call_button_call"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/main_2_image"
+                android:layout_below="@+id/call_text_subhead"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
                 android:background="@color/colorAppPrimary"
                 android:text="Позвонить" />
 
             <com.gc.materialdesign.views.ButtonFlat
-                android:id="@+id/button_copy"
+                android:id="@+id/call_button_copy"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/colorAppPrimary"
-                android:text="Копировать"
                 android:layout_alignParentBottom="true"
-                android:layout_toRightOf="@+id/button_call"
-                android:layout_toEndOf="@+id/button_call"
                 android:layout_marginLeft="8dp"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                android:layout_toEndOf="@+id/call_button_call"
+                android:layout_toRightOf="@+id/call_button_call"
+                android:background="@color/colorAppPrimary"
+                android:text="Копировать" />
 
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/main_3"
+            android:id="@+id/web_block"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_below="@+id/main_2"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/call_block"
             android:layout_margin="8dp"
-            android:background="@color/white" />
+            android:background="@drawable/rounded_corner"
+            android:paddingBottom="8dp">
+
+            <ImageView
+                android:id="@+id/web_image"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/ic_language_black_48dp" />
+
+            <TextView
+                android:id="@+id/web_text_head"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="24dp"
+                android:text="Веб-сайт"
+                android:textColor="@color/black"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/web_text_subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/web_text_head"
+                android:layout_alignStart="@+id/web_text_head"
+                android:layout_below="@+id/web_text_head"
+                android:layout_marginTop="4dp"
+                android:text="http://icit.nau.edu.ua/"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <com.gc.materialdesign.views.ButtonFlat
+                android:id="@+id/web_button_go"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/web_text_subhead"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/colorAppPrimary"
+                android:text="Перейти" />
+
+            <com.gc.materialdesign.views.ButtonFlat
+                android:id="@+id/web_button_copy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignTop="@+id/web_text_subhead"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_toEndOf="@+id/web_button_go"
+                android:layout_toRightOf="@+id/web_button_go"
+                android:background="@color/colorAppPrimary"
+                android:text="Копировать" />
+
+        </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/main_4"
+            android:id="@+id/nav_block"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_below="@+id/main_3"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/web_block"
             android:layout_margin="8dp"
-            android:background="@color/white" />
+            android:background="@drawable/rounded_corner"
+            android:paddingBottom="8dp">
 
+            <ImageView
+                android:id="@+id/nav_image"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/ic_navigation_black_48dp" />
+
+            <TextView
+                android:id="@+id/nav_text_head"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="24dp"
+                android:text="Адрес"
+                android:textColor="@color/black"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/nav_text_subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/nav_text_head"
+                android:layout_alignStart="@+id/nav_text_head"
+                android:layout_below="@+id/nav_text_head"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_toLeftOf="@+id/nav_image"
+                android:text="Україна, Київ, пр. Космонавта Комарова 1, корп. 6"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <com.gc.materialdesign.views.ButtonFlat
+                android:id="@+id/nav_button_go"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/nav_text_subhead"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/colorAppPrimary"
+                android:text="Перейти" />
+
+            <com.gc.materialdesign.views.ButtonFlat
+                android:id="@+id/nav_button_copy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignTop="@+id/nav_text_subhead"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_toEndOf="@+id/nav_button_go"
+                android:layout_toRightOf="@+id/nav_button_go"
+                android:background="@color/colorAppPrimary"
+                android:text="Копировать" />
+
+        </RelativeLayout>
     </RelativeLayout>
 </ScrollView>

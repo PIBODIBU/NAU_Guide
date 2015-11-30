@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="arrayCorpNameShort">
+        <item>EMPTY</item>
+        <!-- Для работы с циклом при заполнении HashMap (цикл начинается с 1, а не с 0) -->
+        <item>ЮИ</item>
+        <item>ИЕМ</item>
+        <item>ИАП</item>
+        <item>NULL</item>
+        <item>ИАН</item>
+        <item>ИКИТ</item>
+        <item>ИМО</item>
+        <item>ГМИ</item>
+        <item>НДИ-Дизайн</item>
+        <item>NULL</item>
+        <item>ИИДС</item>
+        <item>NULL</item>
+    </array>
+
+    <array name="arrayCorpNameFull">
+        <item>EMPTY</item>
+        <!-- Для работы с циклом при заполнении HashMap (цикл начинается с 1, а не с 0) -->
+        <item>ЮИ-ЮИ-ЮИ</item>
+        <item>ИЕМ-ИЕМ-ИЕМ</item>
+        <item>ИАП-ИАП-ИАП</item>
+        <item>NULL</item>
+        <item>ИАН-ИАН-ИАН</item>
+        <item>Институт Компьютерных Информационных Технологий</item>
+        <item>ИМО-ИМО-ИМО</item>
+        <item>ГМИ-ГМИ-ГМИ</item>
+        <item>НДИ-Дизайн=НДИ-Дизайн=НДИ-Дизайн</item>
+        <item>NULL</item>
+        <item>ИИДС-ИИДС-ИИДС</item>
+        <item>NULL</item>
+    </array>
+
+    <array name="arrayCorpPhone">
+        <item>EMPTY</item>
+        <!-- Для работы с циклом при заполнении HashMap (цикл начинается с 1, а не с 0) -->
+        <item>(044) 406-73-8811</item>
+        <item>(044) 406-73-8822</item>
+        <item>(044) 406-73-8833</item>
+        <item>(044) 406-73-8844</item>
+        <item>(044) 406-73-8855</item>
+        <item>(044) 406-73-8866</item>
+        <item>(044) 406-73-8877</item>
+        <item>(044) 406-73-8888</item>
+        <item>(044) 406-73-8899</item>
+        <item>(044) 406-73-881010</item>
+        <item>(044) 406-73-881111</item>
+        <item>(044) 406-73-881212</item>
+    </array>
+
+    <array name="arrayCorpUrl">
+        <item>EMPTY</item>
+        <!-- Для работы с циклом при заполнении HashMap (цикл начинается с 1, а не с 0) -->
+        <item>http://icit1.nau.edu.ua/</item>
+        <item>http://icit2.nau.edu.ua/</item>
+        <item>http://icit3.nau.edu.ua/</item>
+        <item>http://icit4.nau.edu.ua/</item>
+        <item>http://icit5.nau.edu.ua/</item>
+        <item>http://icit6.nau.edu.ua/</item>
+        <item>http://icit7.nau.edu.ua/</item>
+        <item>http://icit8.nau.edu.ua/</item>
+        <item>http://icit9.nau.edu.ua/</item>
+        <item>http://icit10.nau.edu.ua/</item>
+        <item>http://icit11.nau.edu.ua/</item>
+        <item>http://icit12.nau.edu.ua/</item>
+    </array>
+</resources>
