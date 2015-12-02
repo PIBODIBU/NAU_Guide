@@ -15,6 +15,7 @@ public class NAU extends University {
     private String[] arrayCorpNameFull;
     private String[] arrayCorpInfoPhone;
     private String[] arrayCorpInfoUrl;
+    private int hashMapSize = -1;
 
     public NAU(Context currentContext) {
         this.setFullName("National aviation university");
@@ -189,6 +190,18 @@ public class NAU extends University {
             CorpsLabel.put(i, context.getApplicationContext().getResources().getString(R.string.host) + " " + Integer.toString(i - 16));
         }
 
+/** LIBRARY **/
+        Corps.put(28, new LatLng(50.439730, 30.428707));
+
+        CorpsIcon.put(28, R.drawable.mark_library);
+
+        CorpsMarkerLabel.put(28, context.getApplicationContext().getResources().getString(R.string.library));
+
+        CorpsLabel.put(28, context.getApplicationContext().getResources().getString(R.string.library));
+
+/** SIZE **/
+        hashMapSize = CorpsIcon.size();
+
         this.setCorps(Corps);
         this.setCorpsLabel(CorpsLabel);
         this.setCorpsMarkerLabel(CorpsMarkerLabel);
@@ -199,5 +212,7 @@ public class NAU extends University {
         this.setCorpsInfoNameFull(CorpsInfoNameFull);
         this.setCorpsInfoPhone(CorpsInfoPhone);
         this.setCorpsInfoUrl(CorpsInfoUrl);
+
+        this.setHashMapSize(hashMapSize);
     }
 }

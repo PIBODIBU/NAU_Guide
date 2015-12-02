@@ -10,8 +10,9 @@ import java.util.Set;
  */
 public abstract class University {
     private String nameAbbreviation;
-
     private String fullName;
+
+    private int hashMapSize = -1;
 
     private HashMap<Integer, LatLng> Corps;
     private HashMap<Integer, Integer> CorpsIcon;
@@ -85,6 +86,10 @@ public abstract class University {
         this.LectureHalls = lectureHalls;
     }
 
+    public void setHashMapSize(int size) {
+        this.hashMapSize = size;
+    }
+
     /**
      * GETTERS
      **/
@@ -135,4 +140,9 @@ public abstract class University {
     public HashMap<Integer, Set> getLectureHalls() {
         return LectureHalls;
     }
+
+    public int getHashMapSize() {
+        return hashMapSize;
+    }
+
 }

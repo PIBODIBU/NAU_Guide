@@ -1,9 +1,12 @@
 package ua.nau.edu.NAU_Guide;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,32 +28,42 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import ua.nau.edu.Enum.EnumExtras;
 import ua.nau.edu.Enum.EnumMaps;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
+import ua.nau.edu.Systems.JSONParser;
+import ua.nau.edu.Systems.Route;
 import ua.nau.edu.University.NAU;
 
 public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
-    private int currentMarkerID = -1;
-    private String currentMarkerLabel = "";
-    private Marker currentMarkerObject = null;
-    private InputMethodManager MethodManager = null;
-
     public MapsActivity() {
     }
 
-    /***
-     * VIEWS
-     ***/
+    private int currentMarkerID = -1;
+    private String currentMarkerLabel = "";
+    private Marker mainActivityMarker = null;
+
+    private InputMethodManager MethodManager = null;
+    private SharedPreferences settings = null;
+    private SharedPreferences settingsVK = null;
+
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private NAU university;
-
+    private Route supportRoute = new Route();
     private FloatingActionMenu fab_menu;
-
-    /*****/
 
     private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
     private static final String VK_PREFERENCES = EnumSharedPreferencesVK.VK_PREFERENCES.toString();
@@ -59,12 +72,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
     private static final String CORP_ID_KEY = EnumExtras.CORP_ID_KEY.toString();
     private static final String CORP_LABEL_KEY = EnumExtras.CORP_LABEL_KEY.toString();
-    
+
     private static final String CURRENT_LATITUDE = EnumMaps.CURRENT_LATITUDE.toString();
     private static final String CURRENT_LONGTITUDE = EnumMaps.CURRENT_LONGTITUDE.toString();
-
-    private SharedPreferences settings = null;
-    private SharedPreferences settingsVK = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +110,23 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         });
 
         initFloatingActionMenu();
+
+        if (mainActivityMarker != null) {
+            //Записываем id текущего маркера в глобальную переменную
+            currentMarkerID = getMarkerId(mainActivityMarker);
+
+            //Записываем label текущего маркера в глобальную переменную
+            currentMarkerLabel = university.getCorpsLabel().get(getMarkerId(mainActivityMarker));
+
+            //Открываем FabMenu
+            fab_menu.open(true);
+
+            //Manually open the window
+            mainActivityMarker.showInfoWindow();
+
+            //Animate to center
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(mainActivityMarker.getPosition()));
+        }
     }
 
     @Override
@@ -143,11 +170,14 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     }
 
     private void addMarkerCustom(Integer i, int icon, String title) {
-        mMap.addMarker(new MarkerOptions()
+        Marker mMapMarker = mMap.addMarker(new MarkerOptions()
                 .position(university.getCorps().get(i))
-                .title(title))
-                .setIcon(BitmapDescriptorFactory.fromResource(icon)
-                );
+                .title(title));
+
+        mMapMarker.setIcon(BitmapDescriptorFactory.fromResource(icon));
+
+        if (getIntent().getIntExtra("MAINACTIVITY_CORP_ID", -1) == i)
+            mainActivityMarker = mMapMarker;
     }
 
     private void setUpMap() {
@@ -168,7 +198,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         mMap.getUiSettings().setCompassEnabled(false);
 
         //Добавление маркеров на карту из класса НАУ
-        for (int i = 1; i <= 27; i++) {
+        for (int i = 1; i <= 28; i++) {
             addMarkerCustom(i, university.getCorpsIcon().get(i), university.getCorpsMarkerLabel().get(i));
         }
 
@@ -184,9 +214,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
                 //Записываем label текущего маркера в глобальную переменную
                 currentMarkerLabel = university.getCorpsLabel().get(getMarkerId(marker));
-
-                //Записываем текущий маркер в глобальную переменную
-                currentMarkerObject = marker;
 
                 return false;
             }
@@ -234,7 +261,19 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         fab_route.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                initNavigationWindow(currentMarkerID);
+                try {
+                    supportRoute.drawRoute(mMap, MapsActivity.this, getMyCoordinate(), university.getCorps().get(currentMarkerID), Route.TRANSPORT_TRANSIT, true, Route.LANGUAGE_RUSSIAN, R.drawable.ic_place_black_24dp);
+
+                    CameraPosition currentPosition = new CameraPosition.Builder()
+                            .target(getMyCoordinate())
+                            .bearing(180)
+                            .zoom(13f)
+                            .build();
+                    mMap.moveCamera(CameraUpdateFactory.newCameraPosition(currentPosition));
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -255,14 +294,18 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         fab_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!currentMarkerLabel.equals("") && currentMarkerID != 0) {
-                    settings.edit().putInt(CORP_ID_KEY, currentMarkerID).apply();
+                try {
+                    if (!currentMarkerLabel.equals("") && currentMarkerID != 0 && currentMarkerID > 0 && currentMarkerID <= university.getHashMapSize()) {
+                        settings.edit().putInt(CORP_ID_KEY, currentMarkerID).apply();
 
-                    startActivity(new Intent(MapsActivity.this, InfoActivity.class)
-                            .putExtra(CORP_ID_KEY, currentMarkerID)
-                            .putExtra(CORP_LABEL_KEY, currentMarkerLabel)
-                            .putExtra(CURRENT_LATITUDE, mMap.getMyLocation().getLatitude())
-                            .putExtra(CURRENT_LONGTITUDE, mMap.getMyLocation().getLongitude()));
+                        startActivity(new Intent(MapsActivity.this, InfoActivity.class)
+                                .putExtra(CORP_ID_KEY, currentMarkerID)
+                                .putExtra(CORP_LABEL_KEY, currentMarkerLabel)
+                                .putExtra(CURRENT_LATITUDE, mMap.getMyLocation().getLatitude())
+                                .putExtra(CURRENT_LONGTITUDE, mMap.getMyLocation().getLongitude()));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -290,7 +333,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         mMap.animateCamera(cameraUpdate);
     }
 
-    public LatLng getMyCoordinate() {
+    private LatLng getMyCoordinate() {
         return new LatLng(mMap.getMyLocation().getLatitude(), mMap.getMyLocation().getLongitude());
     }
 
@@ -309,4 +352,5 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
             e.printStackTrace();
         }
     }
+
 }

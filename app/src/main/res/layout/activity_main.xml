@@ -26,6 +26,713 @@
             android:background="@color/grey_light"
             android:paddingBottom="16dp">
 
+            <RelativeLayout
+                android:id="@+id/block_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:background="@drawable/rounded_corner"
+                android:paddingBottom="16dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/text_head_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="ЮИ"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/text_subhead_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/text_head_1"
+                    android:layout_alignStart="@+id/text_head_1"
+                    android:layout_below="@+id/text_head_1"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toLeftOf="@+id/image_1"
+                    android:text="Юридический Институт"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+
+                <com.gc.materialdesign.views.ButtonFlat
+                    android:id="@+id/button_map_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/text_subhead_1"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/colorAppPrimary"
+                    android:text="На карту" />
+
+                <ImageView
+                    android:id="@+id/image_1"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/gerb_6" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/block_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/block_1"
+                android:layout_margin="8dp"
+                android:background="@drawable/rounded_corner"
+                android:paddingBottom="16dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/text_head_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="ИЕМ"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/text_subhead_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/text_head_2"
+                    android:layout_alignStart="@+id/text_head_2"
+                    android:layout_below="@+id/text_head_2"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toLeftOf="@+id/image_2"
+                    android:text="Институт Экономических Мемосиков"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+
+                <com.gc.materialdesign.views.ButtonFlat
+                    android:id="@+id/button_map_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/text_subhead_2"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/colorAppPrimary"
+                    android:text="На карту" />
+
+                <ImageView
+                    android:id="@+id/image_2"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/gerb_6" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/block_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/block_2"
+                android:layout_margin="8dp"
+                android:background="@drawable/rounded_corner"
+                android:paddingBottom="16dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/text_head_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="ИАП"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/text_subhead_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/text_head_3"
+                    android:layout_alignStart="@+id/text_head_3"
+                    android:layout_below="@+id/text_head_3"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toLeftOf="@+id/image_3"
+                    android:text="Институт Агрономической Политики"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+
+                <com.gc.materialdesign.views.ButtonFlat
+                    android:id="@+id/button_map_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/text_subhead_3"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/colorAppPrimary"
+                    android:text="На карту" />
+
+                <ImageView
+                    android:id="@+id/image_3"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/gerb_3" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/block_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/block_3"
+                android:layout_margin="8dp"
+                android:background="@drawable/rounded_corner"
+                android:paddingBottom="16dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/text_head_4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="НЕЗНАЮ"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/text_subhead_4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/text_head_4"
+                    android:layout_alignStart="@+id/text_head_4"
+                    android:layout_below="@+id/text_head_4"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toLeftOf="@+id/image_4"
+                    android:text="Ненаю Что Это"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+
+                <com.gc.materialdesign.views.ButtonFlat
+                    android:id="@+id/button_map_4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/text_subhead_4"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/colorAppPrimary"
+                    android:text="На карту" />
+
+                <ImageView
+                    android:id="@+id/image_4"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/gerb_6" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/block_5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/block_4"
+                android:layout_margin="8dp"
+                android:background="@drawable/rounded_corner"
+                android:paddingBottom="16dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/text_head_5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="ИАН"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/text_subhead_5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/text_head_5"
+                    android:layout_alignStart="@+id/text_head_5"
+                    android:layout_below="@+id/text_head_5"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toLeftOf="@+id/image_5"
+                    android:text="Институт Аэронавигации"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+
+                <com.gc.materialdesign.views.ButtonFlat
+                    android:id="@+id/button_map_5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/text_subhead_5"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/colorAppPrimary"
+                    android:text="На карту" />
+
+                <ImageView
+                    android:id="@+id/image_5"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/gerb_5" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/block_6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/block_5"
+                android:layout_margin="8dp"
+                android:background="@drawable/rounded_corner"
+                android:paddingBottom="16dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/text_head_6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="ИКИТ"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/text_subhead_6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/text_head_6"
+                    android:layout_alignStart="@+id/text_head_6"
+                    android:layout_below="@+id/text_head_6"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toLeftOf="@+id/image_6"
+                    android:text="Институт Компьютерных Информационных Технологий"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+
+                <com.gc.materialdesign.views.ButtonFlat
+                    android:id="@+id/button_map_6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/text_subhead_6"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/colorAppPrimary"
+                    android:text="На карту" />
+
+                <ImageView
+                    android:id="@+id/image_6"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/gerb_6" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/block_7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/block_6"
+                android:layout_margin="8dp"
+                android:background="@drawable/rounded_corner"
+                android:paddingBottom="16dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/text_head_7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="ИМО"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/text_subhead_7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/text_head_7"
+                    android:layout_alignStart="@+id/text_head_7"
+                    android:layout_below="@+id/text_head_7"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toLeftOf="@+id/image_7"
+                    android:text="Институт Международных отношений"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+
+                <com.gc.materialdesign.views.ButtonFlat
+                    android:id="@+id/button_map_7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/text_subhead_7"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/colorAppPrimary"
+                    android:text="На карту" />
+
+                <ImageView
+                    android:id="@+id/image_7"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/gerb_6" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/block_8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/block_7"
+                android:layout_margin="8dp"
+                android:background="@drawable/rounded_corner"
+                android:paddingBottom="16dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/text_head_8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="ГМИ"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/text_subhead_8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/text_head_8"
+                    android:layout_alignStart="@+id/text_head_8"
+                    android:layout_below="@+id/text_head_8"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toLeftOf="@+id/image_8"
+                    android:text="Институт Генной Инженерии"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+
+                <com.gc.materialdesign.views.ButtonFlat
+                    android:id="@+id/button_map_8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/text_subhead_8"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/colorAppPrimary"
+                    android:text="На карту" />
+
+                <ImageView
+                    android:id="@+id/image_8"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/gerb_6" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/block_9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/block_8"
+                android:layout_margin="8dp"
+                android:background="@drawable/rounded_corner"
+                android:paddingBottom="16dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/text_head_9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="НДИ-Дизайн"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/text_subhead_9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/text_head_9"
+                    android:layout_alignStart="@+id/text_head_9"
+                    android:layout_below="@+id/text_head_9"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toLeftOf="@+id/image_9"
+                    android:text="Институт Нано Дизайна"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+
+                <com.gc.materialdesign.views.ButtonFlat
+                    android:id="@+id/button_map_9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/text_subhead_9"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/colorAppPrimary"
+                    android:text="На карту" />
+
+                <ImageView
+                    android:id="@+id/image_9"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/gerb_6" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/block_10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/block_9"
+                android:layout_margin="8dp"
+                android:background="@drawable/rounded_corner"
+                android:paddingBottom="16dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/text_head_10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="НУЛЛ"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/text_subhead_10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/text_head_10"
+                    android:layout_alignStart="@+id/text_head_10"
+                    android:layout_below="@+id/text_head_10"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toLeftOf="@+id/image_10"
+                    android:text="Институт Кароч Это НУЛЛ"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+
+                <com.gc.materialdesign.views.ButtonFlat
+                    android:id="@+id/button_map_10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/text_subhead_10"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/colorAppPrimary"
+                    android:text="На карту" />
+
+                <ImageView
+                    android:id="@+id/image_10"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/gerb_6" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/block_11"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/block_10"
+                android:layout_margin="8dp"
+                android:background="@drawable/rounded_corner"
+                android:paddingBottom="16dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/text_head_11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="ИИДС"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/text_subhead_11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/text_head_11"
+                    android:layout_alignStart="@+id/text_head_11"
+                    android:layout_below="@+id/text_head_11"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toLeftOf="@+id/image_11"
+                    android:text="Институт Диагностических Систем"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+
+                <com.gc.materialdesign.views.ButtonFlat
+                    android:id="@+id/button_map_11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/text_subhead_11"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/colorAppPrimary"
+                    android:text="На карту" />
+
+                <ImageView
+                    android:id="@+id/image_11"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/gerb_11" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/block_12"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/block_11"
+                android:layout_margin="8dp"
+                android:background="@drawable/rounded_corner"
+                android:paddingBottom="16dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/text_head_12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="НУЛЛ"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/text_subhead_12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/text_head_12"
+                    android:layout_alignStart="@+id/text_head_12"
+                    android:layout_below="@+id/text_head_12"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toLeftOf="@+id/image_12"
+                    android:text="Институт Это Вообще Не знаю"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+
+                <com.gc.materialdesign.views.ButtonFlat
+                    android:id="@+id/button_map_12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/text_subhead_12"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/colorAppPrimary"
+                    android:text="На карту" />
+
+                <ImageView
+                    android:id="@+id/image_12"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/gerb_11" />
+
+            </RelativeLayout>
+
             <com.google.android.gms.common.SignInButton
                 android:id="@+id/sign_in_button"
                 android:layout_width="120dp"
@@ -61,10 +768,10 @@
                 android:layout_alignParentStart="true"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginTop="500dp"
+                android:layout_marginTop="100dp"
                 android:orientation="vertical"
                 android:padding="0dip"
-                android:visibility="invisible" />
+                android:visibility="gone" />
 
             <com.gc.materialdesign.views.ButtonRectangle
                 android:id="@+id/vk_sign_out"
@@ -72,7 +779,7 @@
                 android:layout_height="50dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_marginTop="600dp"
+                android:layout_marginTop="2000dp"
                 android:background="@color/colorAppPrimary"
                 android:text="VK Sign out"
                 android:textColor="#ffffff" />
@@ -104,161 +811,8 @@
                 android:textColor="@color/black"
                 android:textSize="15dp" />
 
-
-            <RelativeLayout
-                android:id="@+id/relativeLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:orientation="horizontal">
-
-                <android.support.v7.widget.CardView
-                    android:id="@+id/view"
-                    android:layout_width="145dp"
-                    android:layout_height="120dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginLeft="6dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_toLeftOf="@+id/center"
-                    card_view:cardPreventCornerOverlap="false"
-                    card_view:cardUseCompatPadding="true">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_alignParentTop="true"
-                            android:baselineAlignBottom="false"
-                            android:scaleType="fitXY"
-                            android:src="@drawable/grid_plane"
-                            android:layout_alignParentStart="true"
-                            android:layout_alignParentEnd="true" />
-
-                        <TextView
-                            android:id="@+id/textView7"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentBottom="true"
-                            android:layout_marginLeft="8dp"
-                            android:paddingBottom="8dp"
-                            android:text="Информация"
-                            android:textColor="@color/white" />
-                    </RelativeLayout>
-                </android.support.v7.widget.CardView>
-
-                <android.support.v7.widget.CardView
-                    android:id="@+id/view_1"
-                    android:layout_width="145dp"
-                    android:layout_height="120dp"
-                    android:layout_alignParentLeft="false"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginRight="6dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_toRightOf="@+id/center"
-                    card_view:cardPreventCornerOverlap="false"
-                    card_view:cardUseCompatPadding="true">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_alignParentTop="true"
-                            android:baselineAlignBottom="false"
-                            android:scaleType="fitXY"
-                            android:src="@drawable/grid_desk"
-                            android:layout_alignParentEnd="true"
-                            android:layout_alignParentStart="true" />
-
-                        <TextView
-                            android:id="@+id/textView8"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentBottom="true"
-                            android:layout_marginLeft="8dp"
-                            android:paddingBottom="8dp"
-                            android:text="Ректорат"
-                            android:textColor="@color/white" />
-                    </RelativeLayout>
-                </android.support.v7.widget.CardView>
-
-
-                <android.support.v7.widget.CardView
-                    android:id="@+id/view_2"
-                    android:layout_width="145dp"
-                    android:layout_height="150dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="false"
-                    android:layout_below="@+id/view"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginRight="4dp"
-                    android:layout_marginTop="4dp"
-                    card_view:cardPreventCornerOverlap="false"
-                    card_view:cardUseCompatPadding="true">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:baselineAlignBottom="false"
-                            android:scaleType="fitXY"
-                            android:src="@drawable/grid_papers"
-                            android:layout_alignParentTop="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_alignParentEnd="true"
-                            android:layout_alignParentStart="true" />
-
-                        <TextView
-                            android:id="@+id/textView9"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentBottom="true"
-                            android:layout_marginLeft="8dp"
-                            android:paddingBottom="8dp"
-                            android:text="История"
-                            android:textColor="@color/white" />
-                    </RelativeLayout>
-                </android.support.v7.widget.CardView>
-
-                <RelativeLayout
-                    android:id="@+id/center"
-                    android:layout_width="4dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/view"
-                    android:layout_alignParentBottom="false"
-                    android:layout_alignParentTop="false"
-                    android:layout_alignTop="@+id/view"
-                    android:layout_centerHorizontal="true" />
-            </RelativeLayout>
-
         </RelativeLayout>
     </ScrollView>
-
-    <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/restart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:src="@drawable/ic_autorenew_white_24dp"
-        fab:fab_colorNormal="@color/colorAppPrimary"
-        fab:fab_colorPressed="@color/colorAppPressed"
-        fab:fab_colorRipple="@color/colorAppRipped"
-        fab:fab_label="Restart" />
 
     <include
         android:id="@+id/shadow"

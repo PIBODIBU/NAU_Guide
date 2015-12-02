@@ -33,6 +33,7 @@
     <string name="sport">Спорткомплекс</string>
     <string name="bistro">Бистро</string>
     <string name="host">Общага</string>
+    <string name="library">Библиотека</string>
 
     <string name="VK_bad_token">Неправильный access token</string>
     <string name="VK_sign_error">Ошибка авторизации</string>
@@ -41,6 +42,7 @@
     <string name="VK_share_text">Test String</string>
 
     <string name="Text_copied">Текст скопирован в буфер обмена</string>
+    <string name="maps_dialog_fetching">Получение маршрута, подождите&#8230;</string> <!-- &#8230; == "..." -->
 
     <string name="activity_info_6_vectors">
         <b>0501 Інформатика та обчислювальна техніка\n</b>
@@ -60,4 +62,5 @@
     <string name="hello_world">Hello world!</string>
     <string name="input_group">Введите свою группу</string>
     <string name="timetable">Расписание</string>
+
 </resources>

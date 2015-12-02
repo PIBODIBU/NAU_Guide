@@ -22,7 +22,6 @@ import com.google.android.gms.maps.model.LatLng;
 import ua.nau.edu.Enum.ClipBoardKeys;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.NAU_Guide.InfoActivity;
-import ua.nau.edu.NAU_Guide.MapsActivity;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.University.NAU;
 
@@ -63,6 +62,7 @@ public class FragmentInfo extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         settings = this.getActivity().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         currentCorp = settings.getInt(CORP_ID_KEY, -1);
+
         supportActivity = (InfoActivity) getActivity();
         clipboard = (ClipboardManager) getActivity().getSystemService(Activity.CLIPBOARD_SERVICE);
 
@@ -72,9 +72,10 @@ public class FragmentInfo extends Fragment {
     }
 
     private void setUpLayout(LayoutInflater inflater, ViewGroup container) {
+        // TODO remove layout ID check
         if (currentCorp <= 12) {
             // This is corp
-            FragmentView = inflater.inflate(R.layout.fragment_info_6, container, false);
+            FragmentView = inflater.inflate(R.layout.fragment_info, container, false);
             initHashMaps(FragmentView.getContext());
             setUpLayoutCorp();
         } else if (currentCorp == 13) {
