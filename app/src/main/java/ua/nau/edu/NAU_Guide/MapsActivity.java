@@ -298,7 +298,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                     if (!currentMarkerLabel.equals("") && currentMarkerID != 0 && currentMarkerID > 0 && currentMarkerID <= university.getHashMapSize()) {
                         settings.edit().putInt(CORP_ID_KEY, currentMarkerID).apply();
 
-                        startActivity(new Intent(MapsActivity.this, InfoActivity.class)
+                        startActivity(new Intent(MapsActivity.this, InfoActivity.class) // TODO Блять, где проверка на gps?
                                 .putExtra(CORP_ID_KEY, currentMarkerID)
                                 .putExtra(CORP_LABEL_KEY, currentMarkerLabel)
                                 .putExtra(CURRENT_LATITUDE, mMap.getMyLocation().getLatitude())

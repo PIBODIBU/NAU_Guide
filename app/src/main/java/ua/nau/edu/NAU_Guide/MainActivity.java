@@ -3,39 +3,32 @@ package ua.nau.edu.NAU_Guide;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Picture;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.text.Layout;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.caverock.androidsvg.SVG;
-import com.caverock.androidsvg.SVGParseException;
 import com.gc.materialdesign.views.CustomView;
-import com.github.clans.fab.FloatingActionButton;
-import com.squareup.picasso.Picasso;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
@@ -66,11 +59,7 @@ import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
-import com.vk.sdk.api.model.VKApiPost;
-import com.vk.sdk.api.model.VKApiUserFull;
-import com.vk.sdk.api.model.VKList;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -183,33 +172,109 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private VKRequest request_share;
     private VKRequest request_wallOverhear;
 
+    private FragmentManager fm = getFragmentManager();
+    private Context MainContext = this;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Setting Content View
+        setContentView(R.layout.activity_main);
+
+        if (fm != null) {
+            // Perform the FragmentTransaction to load in the list tab content.
+            // Using FragmentTransaction#replace will destroy any Fragments
+            // currently inside R.id.fragment_content and add the new Fragment
+            // in its place.
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.replace(R.id.fragment_main, new MainFragment());
+            ft.commit();
+        }
+
         if (getIntent().getBooleanExtra(EXIT_KEY, false)) {
             finish();
         }
-        super.onCreate(savedInstanceState);
 
-// Setting Content View
-        setContentView(R.layout.activity_main);
+        if (savedInstanceState != null) {
+            mSignInProgress = savedInstanceState
+                    .getInt(SAVED_PROGRESS, STATE_DEFAULT);
+        }
 
-// Get and set system services & Buttons & SharedPreferences & Requests
-        inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-
+        mClient = buildGoogleApiClient();
         settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
         settingsVK = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
 
+// Load Navigation Drawer
+        getDrawer(
+                settingsVK.getString(VK_INFO_KEY, ""),
+                settingsVK.getString(VK_EMAIL_KEY, "")
+        );
+
+/** GOOGLE **/
+        mSignInButoon = (SignInButton) findViewById(R.id.sign_in_button);
+        mSignInButoon.setOnClickListener(this);
+
+        mSignOutButton = (Button) findViewById(R.id.sign_out_button);
+        mSignOutButton.setOnClickListener(this);
+/****/
+
+        if (getIntent().getBooleanExtra(JUST_SIGNED_KEY, false))
+            initDialog_share();
+
+        // Get and set system services & Buttons & SharedPreferences & Requests
+        inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+
         vk_sign_out = (CustomView) findViewById(R.id.vk_sign_out);
+        vk_sign_out.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected void onPreExecute() {
+                        startActivity(new Intent(MainActivity.this, FirstLaunchActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                        finish();
+                    }
+
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        settings
+                                .edit()
+                                .putBoolean(SIGNED_IN_KEY, false)
+                                .putString(PROFILE_PHOTO_LOCATION_KEY, "")
+                                .apply();
+                        settingsVK
+                                .edit()
+                                .putString(VK_PHOTO_KEY, "")
+                                .putString(VK_EMAIL_KEY, "")
+                                .putString(VK_INFO_KEY, "")
+                                .putBoolean(VK_SIGNED_KEY, false)
+                                .apply();
+
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        super.onPostExecute(aVoid);
+                    }
+                }.execute();
+            }
+        });
 
         if (!settingsVK.getBoolean(VK_SIGNED_KEY, false)) {
             vk_sign_out.setEnabled(false);
         }
 
-        request_share = VKApi.wall().post(VKParameters.from(
-                VKApiConst.OWNER_ID,
-                Integer.toString(settingsVK.getInt(VK_ID_KEY, -1)),
-                VKApiConst.MESSAGE,
-                getString(R.string.VK_share_text)));
+        plusText = (TextView) findViewById(R.id.plus_text);
+        plus_user = (TextView) findViewById(R.id.plus_user);
+        mCirclesListView = (ListView) findViewById(R.id.circles_list);
+
+        mCirclesList = new ArrayList<>();
+        mCirclesAdapter = new ArrayAdapter<String>(
+                MainContext, R.layout.circle_member, mCirclesList);
+        mCirclesListView.setAdapter(mCirclesAdapter);
 
         /*request_wallOverhear.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
@@ -221,201 +286,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
             }
         });*/
 
-//
-
-// Load Navigation Drawer
-        getDrawer(
-                settingsVK.getString(VK_INFO_KEY, ""),
-                settingsVK.getString(VK_EMAIL_KEY, "")
-        );
-
-        if (getIntent().getBooleanExtra(JUST_SIGNED_KEY, false))
-            initDialog_share();
-
-/*** BUTTONS ***/
-// VK sign out button
-        vk_sign_out.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /*File avatar = new File(settings.getString(PROFILE_PHOTO_LOCATION_KEY, ""));
-                avatar.delete();*/
-
-                settings
-                        .edit()
-                        .putBoolean(SIGNED_IN_KEY, false)
-                        .putString(PROFILE_PHOTO_LOCATION_KEY, "")
-                        .apply();
-
-                settingsVK
-                        .edit()
-                        .putString(VK_PHOTO_KEY, "")
-                        .putString(VK_EMAIL_KEY, "")
-                        .putString(VK_INFO_KEY, "")
-                        .putBoolean(VK_SIGNED_KEY, false)
-                        .apply();
-
-
-                startActivity(new Intent(MainActivity.this, FirstLaunchActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-
-                finish();
-            }
-        });
-//
-
-/*****/
-
-/** Google+ **/
-
-        if (savedInstanceState != null) {
-            mSignInProgress = savedInstanceState
-                    .getInt(SAVED_PROGRESS, STATE_DEFAULT);
-        }
-
-        mClient = buildGoogleApiClient();
-
-        mSignInButoon = (SignInButton) findViewById(R.id.sign_in_button);
-        mSignInButoon.setOnClickListener(this);
-
-        mSignOutButton = (Button) findViewById(R.id.sign_out_button);
-        mSignOutButton.setOnClickListener(this);
-
-        plusText = (TextView) findViewById(R.id.plus_text);
-        plus_user = (TextView) findViewById(R.id.plus_user);
-        mCirclesListView = (ListView) findViewById(R.id.circles_list);
-
-        mCirclesList = new ArrayList<>();
-        mCirclesAdapter = new ArrayAdapter<String>(
-                this, R.layout.circle_member, mCirclesList);
-        mCirclesListView.setAdapter(mCirclesAdapter);
-
-/*****/
-/*
-// Main Layout
-        RelativeLayout blockLayout = new RelativeLayout(this);
-        RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.MATCH_PARENT);
-        rlp.addRule(RelativeLayout.BELOW, R.id.shadow);
-        //rlp.height = dpToPx(110);
-        rlp.setMargins(8, 8, 8, 8);
-        blockLayout.setBackgroundColor(getResources().getColor(R.color.white));
-// TextView head
-        TextView block_text_head = new TextView(this);
-        RelativeLayout.LayoutParams block_text_head_params = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT);
-        block_text_head_params.setMargins(dpToPx(16), dpToPx(16), 0, 0);
-        block_text_head.setLayoutParams(block_text_head_params);
-
-        block_text_head.setTextSize(24);
-        block_text_head.setTextColor(getResources().getColor(R.color.black));
-        block_text_head.setText("ИКИТ");
-
-        blockLayout.addView(block_text_head);
-
-// TextView head
-        TextView block_text_subhead = new TextView(this);
-        RelativeLayout.LayoutParams block_text_subhead_params = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT);
-        block_text_subhead_params.setMargins(dpToPx(8), dpToPx(16 + 16 + 4), 0, 0);
-        block_text_subhead.setLayoutParams(block_text_subhead_params);
-
-        block_text_subhead.setTextSize(14);
-        block_text_subhead.setTextColor(getResources().getColor(R.color.black));
-        block_text_subhead.setText("Институт Компьютерных Информационных Технологий");
-
-        blockLayout.addView(block_text_subhead);
-// Add main Layout
-        RelativeLayout mainlayout = (RelativeLayout) findViewById(R.id.main_layout);
-        mainlayout.addView(blockLayout, rlp);
-        */
-
-        CustomView button_1 = (CustomView) findViewById(R.id.button_map_1);
-        CustomView button_2 = (CustomView) findViewById(R.id.button_map_2);
-        CustomView button_3 = (CustomView) findViewById(R.id.button_map_3);
-        CustomView button_4 = (CustomView) findViewById(R.id.button_map_4);
-        CustomView button_5 = (CustomView) findViewById(R.id.button_map_5);
-        CustomView button_6 = (CustomView) findViewById(R.id.button_map_6);
-
-        View.OnClickListener click = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.button_map_1: {
-                        startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                                .putExtra("MAINACTIVITY_CORP_ID", 1));
-                        break;
-                    }
-                    case R.id.button_map_2: {
-                        startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                                .putExtra("MAINACTIVITY_CORP_ID", 2));
-                        break;
-                    }
-                    case R.id.button_map_3: {
-                        startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                                .putExtra("MAINACTIVITY_CORP_ID", 3));
-                        break;
-                    }
-                    case R.id.button_map_4: {
-                        startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                                .putExtra("MAINACTIVITY_CORP_ID", 4));
-                        break;
-                    }
-                    case R.id.button_map_5: {
-                        startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                                .putExtra("MAINACTIVITY_CORP_ID", 5));
-                        break;
-                    }
-                    case R.id.button_map_6: {
-                        startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                                .putExtra("MAINACTIVITY_CORP_ID", 6));
-                        break;
-                    }
-                    case R.id.button_map_7: {
-                        startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                                .putExtra("MAINACTIVITY_CORP_ID", 7));
-                        break;
-                    }
-                    case R.id.button_map_8: {
-                        startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                                .putExtra("MAINACTIVITY_CORP_ID", 8));
-                        break;
-                    }
-                    case R.id.button_map_9: {
-                        startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                                .putExtra("MAINACTIVITY_CORP_ID", 9));
-                        break;
-                    }
-                    case R.id.button_map_10: {
-                        startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                                .putExtra("MAINACTIVITY_CORP_ID", 10));
-                        break;
-                    }
-                    case R.id.button_map_11: {
-                        startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                                .putExtra("MAINACTIVITY_CORP_ID", 11));
-                        break;
-                    }
-                    case R.id.button_map_12: {
-                        startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                                .putExtra("MAINACTIVITY_CORP_ID", 12));
-                        break;
-                    }
-                    default: {
-                        break;
-                    }
-                }
-            }
-        };
-
-        button_1.setOnClickListener(click);
-        button_2.setOnClickListener(click);
-        button_3.setOnClickListener(click);
-        button_4.setOnClickListener(click);
-        button_5.setOnClickListener(click);
-        button_6.setOnClickListener(click);
     }
 
     public static int pxToDp(int px) {
@@ -427,6 +297,12 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     }
 
     private void initDialog_share() {
+        request_share = VKApi.wall().post(VKParameters.from(
+                VKApiConst.OWNER_ID,
+                Integer.toString(settingsVK.getInt(VK_ID_KEY, -1)),
+                VKApiConst.MESSAGE,
+                getString(R.string.VK_share_text)));
+
         MaterialDialog dialog = new MaterialDialog.Builder(this)
                 .title("Вы вошли!")
                 .content("Вы успешно авторизовались! Спасибо, что используете наше приложение. Расскажите о нем своим друзьям!")
@@ -464,9 +340,8 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                             }
                         });
 
+                        startActivity(new Intent(MainActivity.this, MainActivity.class));
                         finish();
-                        startActivity(new Intent(MainActivity.this, MainActivity.class)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     }
                 })
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
@@ -474,9 +349,8 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         dialog.dismiss();
 
+                        startActivity(new Intent(MainActivity.this, MainActivity.class));
                         finish();
-                        startActivity(new Intent(MainActivity.this, MainActivity.class)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     }
                 })
                 .onNeutral(new MaterialDialog.SingleButtonCallback() {
@@ -560,27 +434,29 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
     @Override
     public void onClick(View view) {
-        if (!mClient.isConnecting()) {
-            switch (view.getId()) {
-                case R.id.sign_in_button: {
+        switch (view.getId()) {
+            case R.id.sign_in_button: {
+                if (!mClient.isConnecting()) {
                     mSignInProgress = STATE_SIGN_IN;
                     mClient.connect();
-                    break;
                 }
-                case R.id.sign_out_button: {
-                    if (mClient.isConnected()) {
-                        Plus.AccountApi.clearDefaultAccount(mClient);
-                        mClient.disconnect();
-                    }
-
-                    onSignedOut();
-                    break;
-                }
-
-                default:
-                    break;
+                break;
             }
+            case R.id.sign_out_button: {
+                if (mClient.isConnected()) {
+                    Plus.AccountApi.clearDefaultAccount(mClient);
+                    mClient.disconnect();
+                }
+                onSignedOut();
+                break;
+            }
+            /*case R.id.vk_sign_out: {
+                break;
+            }*/
+            default:
+                break;
         }
+
     }
 
     @Override

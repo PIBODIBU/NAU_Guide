@@ -22,7 +22,7 @@ private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFEREN
 // Get and set system services & Buttons & SharedPreferences
         settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
 
-        Thread background = new Thread() {
+        new Thread() {
             public void run() {
                 try {
                     // Thread will sleep for 1 seconds
@@ -34,16 +34,12 @@ private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFEREN
                     } else {
                         startActivity(new Intent(getBaseContext(), FirstLaunchActivity.class));
                     }
-
                     //Remove activity
                     finish();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-        };
-
-        // start thread
-        background.start();
+        }.start();
     }
 }

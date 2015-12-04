@@ -222,8 +222,9 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                     } else {
                                         startActivity(new Intent(BaseNavigationDrawerActivity.this, MainActivity.class)
                                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                        finish();
+                                        break;
                                     }
-                                    break;
                                 }
                                 case MapsActivity: {
                                     if (CURRENT_CLASS.equals(MAP_CLASS)) {
