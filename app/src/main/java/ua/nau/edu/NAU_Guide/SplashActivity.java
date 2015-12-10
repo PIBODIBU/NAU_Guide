@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
-import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 
 public class SplashActivity extends Activity {
 private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
@@ -32,7 +30,7 @@ private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFEREN
                     if (settings.getBoolean(SIGNED_IN_KEY, false)) {
                         startActivity(new Intent(getBaseContext(), MainActivity.class));
                     } else {
-                        startActivity(new Intent(getBaseContext(), FirstLaunchActivity.class));
+                        startActivity(new Intent(getBaseContext(), LoginActivity.class));
                     }
                     //Remove activity
                     finish();

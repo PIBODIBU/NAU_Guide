@@ -1,4 +1,4 @@
-package ua.nau.edu.NAU_Guide;
+package ua.nau.edu.Fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,10 +12,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import ua.nau.edu.NAU_Guide.R;
+
 /**
  * Created by gaponec on 14.09.15.
  */
-public class MyFragment extends Fragment {
+public class MapsFragment extends Fragment {
 
     private SupportMapFragment fragment;
     private GoogleMap map;

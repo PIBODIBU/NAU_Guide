@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -31,15 +30,11 @@ import com.vk.sdk.api.model.VKList;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 
-public class FirstLaunchActivity extends Activity {
+public class LoginActivity extends Activity {
     /***
      * VIEWS
      ***/
@@ -84,11 +79,11 @@ public class FirstLaunchActivity extends Activity {
         VKSdk.initialize(getApplicationContext(), VK_APP_ID, "");
 
 // Setting Content View
-        setContentView(R.layout.activity_first);
+        setContentView(R.layout.activity_login);
 
 // Get and set system services & Buttons & SharedPreferences
         settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
-        settingsVK = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
+        settingsVK = getSharedPreferences(VK_PREFERENCES, LoginActivity.MODE_PRIVATE);
 
         vk_log_in = (CustomView) findViewById(R.id.vk_sign_in);
         gg_log_in = (CustomView) findViewById(R.id.gg_sign_in);
@@ -102,7 +97,7 @@ public class FirstLaunchActivity extends Activity {
             @Override
             public void onClick(View view) {
                 // VK login execute
-                VKSdk.login(FirstLaunchActivity.this, VKScope.EMAIL, VKScope.PHOTOS, VKScope.WALL);
+                VKSdk.login(LoginActivity.this, VKScope.EMAIL, VKScope.PHOTOS, VKScope.WALL);
             }
         });
 
@@ -119,16 +114,6 @@ public class FirstLaunchActivity extends Activity {
             @Override
             public void onClick(View view) {
                 toastShowLong("Facebook sign in");
-            }
-        });
-
-// Skip button
-        login_skip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getBaseContext(), MainActivity.class));
-                //overridePendingTransition(0, 0);
-                finish();
             }
         });
 
@@ -169,7 +154,7 @@ public class FirstLaunchActivity extends Activity {
 
                         loadAvatar(users_full.photo_200, FilePath, FileName);
 
-                        startActivity(new Intent(FirstLaunchActivity.this, MainActivity.class)
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class)
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                 .putExtra(JUST_SIGNED_KEY, true));
                         finish();
@@ -221,6 +206,16 @@ public class FirstLaunchActivity extends Activity {
         Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_SHORT).show();
     }
 
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.login_skip: {
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                finish();
+                break;
+            }
+        }
+    }
+
     @Override
     protected void onStop() {
 
@@ -263,7 +258,7 @@ public class FirstLaunchActivity extends Activity {
     }
 
     private void initDialog_loading() {
-        new MaterialDialog.Builder(FirstLaunchActivity.this)
+        new MaterialDialog.Builder(LoginActivity.this)
                 .content("Подождите")
                 .progress(true, 0)
                 .progressIndeterminateStyle(true)

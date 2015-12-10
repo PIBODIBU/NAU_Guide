@@ -27,9 +27,9 @@
             android:paddingBottom="16dp">
 
             <FrameLayout
+                android:id="@+id/fragment_main"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/fragment_main"/>
+                android:layout_height="match_parent" />
 
             <com.google.android.gms.common.SignInButton
                 android:id="@+id/sign_in_button"
@@ -80,7 +80,8 @@
                 android:layout_marginTop="2000dp"
                 android:background="@color/colorAppPrimary"
                 android:text="VK Sign out"
-                android:textColor="#ffffff" />
+                android:textColor="#ffffff"
+                android:onClick="onClick"/>
 
             <TextView
                 android:id="@+id/plus_text"

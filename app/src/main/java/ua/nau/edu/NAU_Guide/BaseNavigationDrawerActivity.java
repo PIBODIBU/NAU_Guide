@@ -147,7 +147,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                     @Override
                     public boolean onProfileChanged(View view, IProfile iProfile, boolean b) {
                         if (!BaseNavigationDrawerActivity.this.sharedPrefs.getBoolean(SIGNED_IN_KEY, false)) {
-                            startActivity(new Intent(BaseNavigationDrawerActivity.this, FirstLaunchActivity.class)
+                            startActivity(new Intent(BaseNavigationDrawerActivity.this, LoginActivity.class)
                                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                         }
                         return false;

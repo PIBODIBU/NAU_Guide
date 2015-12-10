@@ -270,7 +270,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                             .zoom(13f)
                             .build();
                     mMap.moveCamera(CameraUpdateFactory.newCameraPosition(currentPosition));
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

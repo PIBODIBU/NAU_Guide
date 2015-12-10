@@ -2,11 +2,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_bg"
+    android:background="@color/white"
     android:orientation="vertical"
-    tools:context=".FirstLaunchActivity">
+    tools:context=".LoginActivity">
 
-    <View
+    <ImageView
         android:id="@+id/head"
         android:layout_width="match_parent"
         android:layout_height="320dp"
@@ -61,6 +61,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginRight="20dp"
         android:background="@color/colorAppPrimary"
+        android:onClick="onClick"
         android:text="Пропустить"
         android:textAlignment="gravity" />
 

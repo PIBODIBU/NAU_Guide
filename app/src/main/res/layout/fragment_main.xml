@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
 
     <RelativeLayout
         android:id="@+id/block_1"
@@ -9,6 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:background="@drawable/rounded_corner"
+        android:onClick="onClick"
         android:paddingBottom="16dp"
         android:visibility="visible">
 
@@ -47,6 +49,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:background="@color/colorAppPrimary"
+            android:onClick="onClick"
             android:text="На карту" />
 
         <ImageView
@@ -56,8 +59,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/gerb_6" />
+            android:layout_marginTop="16dp" />
 
     </RelativeLayout>
 
@@ -68,6 +70,7 @@
         android:layout_below="@id/block_1"
         android:layout_margin="8dp"
         android:background="@drawable/rounded_corner"
+        android:onClick="onClick"
         android:paddingBottom="16dp"
         android:visibility="visible">
 
@@ -106,6 +109,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:background="@color/colorAppPrimary"
+            android:onClick="onClick"
             android:text="На карту" />
 
         <ImageView
@@ -115,8 +119,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/gerb_6" />
+            android:layout_marginTop="16dp" />
 
     </RelativeLayout>
 
@@ -127,6 +130,7 @@
         android:layout_below="@id/block_2"
         android:layout_margin="8dp"
         android:background="@drawable/rounded_corner"
+        android:onClick="onClick"
         android:paddingBottom="16dp"
         android:visibility="visible">
 
@@ -165,6 +169,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:background="@color/colorAppPrimary"
+            android:onClick="onClick"
             android:text="На карту" />
 
         <ImageView
@@ -174,8 +179,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/gerb_3" />
+            android:layout_marginTop="16dp" />
 
     </RelativeLayout>
 
@@ -186,6 +190,7 @@
         android:layout_below="@id/block_3"
         android:layout_margin="8dp"
         android:background="@drawable/rounded_corner"
+        android:onClick="onClick"
         android:paddingBottom="16dp"
         android:visibility="visible">
 
@@ -224,6 +229,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:background="@color/colorAppPrimary"
+            android:onClick="onClick"
             android:text="На карту" />
 
         <ImageView
@@ -233,8 +239,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/gerb_6" />
+            android:layout_marginTop="16dp" />
 
     </RelativeLayout>
 
@@ -245,6 +250,7 @@
         android:layout_below="@+id/block_4"
         android:layout_margin="8dp"
         android:background="@drawable/rounded_corner"
+        android:onClick="onClick"
         android:paddingBottom="16dp"
         android:visibility="visible">
 
@@ -283,6 +289,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:background="@color/colorAppPrimary"
+            android:onClick="onClick"
             android:text="На карту" />
 
         <ImageView
@@ -292,8 +299,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/gerb_5" />
+            android:layout_marginTop="16dp" />
 
     </RelativeLayout>
 
@@ -304,6 +310,7 @@
         android:layout_below="@+id/block_5"
         android:layout_margin="8dp"
         android:background="@drawable/rounded_corner"
+        android:onClick="onClick"
         android:paddingBottom="16dp"
         android:visibility="visible">
 
@@ -342,6 +349,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:background="@color/colorAppPrimary"
+            android:onClick="onClick"
             android:text="На карту" />
 
         <ImageView
@@ -351,8 +359,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/gerb_6" />
+            android:layout_marginTop="16dp" />
 
     </RelativeLayout>
 
@@ -363,6 +370,7 @@
         android:layout_below="@+id/block_6"
         android:layout_margin="8dp"
         android:background="@drawable/rounded_corner"
+        android:onClick="onClick"
         android:paddingBottom="16dp"
         android:visibility="visible">
 
@@ -401,6 +409,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:background="@color/colorAppPrimary"
+            android:onClick="onClick"
             android:text="На карту" />
 
         <ImageView
@@ -410,8 +419,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/gerb_6" />
+            android:layout_marginTop="16dp" />
 
     </RelativeLayout>
 
@@ -422,6 +430,7 @@
         android:layout_below="@+id/block_7"
         android:layout_margin="8dp"
         android:background="@drawable/rounded_corner"
+        android:onClick="onClick"
         android:paddingBottom="16dp"
         android:visibility="visible">
 
@@ -460,6 +469,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:background="@color/colorAppPrimary"
+            android:onClick="onClick"
             android:text="На карту" />
 
         <ImageView
@@ -469,8 +479,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/gerb_6" />
+            android:layout_marginTop="16dp" />
 
     </RelativeLayout>
 
@@ -481,6 +490,7 @@
         android:layout_below="@+id/block_8"
         android:layout_margin="8dp"
         android:background="@drawable/rounded_corner"
+        android:onClick="onClick"
         android:paddingBottom="16dp"
         android:visibility="visible">
 
@@ -519,6 +529,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:background="@color/colorAppPrimary"
+            android:onClick="onClick"
             android:text="На карту" />
 
         <ImageView
@@ -528,8 +539,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/gerb_6" />
+            android:layout_marginTop="16dp" />
 
     </RelativeLayout>
 
@@ -540,6 +550,7 @@
         android:layout_below="@+id/block_9"
         android:layout_margin="8dp"
         android:background="@drawable/rounded_corner"
+        android:onClick="onClick"
         android:paddingBottom="16dp"
         android:visibility="visible">
 
@@ -578,6 +589,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:background="@color/colorAppPrimary"
+            android:onClick="onClick"
             android:text="На карту" />
 
         <ImageView
@@ -587,8 +599,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/gerb_6" />
+            android:layout_marginTop="16dp" />
 
     </RelativeLayout>
 
@@ -599,6 +610,7 @@
         android:layout_below="@+id/block_10"
         android:layout_margin="8dp"
         android:background="@drawable/rounded_corner"
+        android:onClick="onClick"
         android:paddingBottom="16dp"
         android:visibility="visible">
 
@@ -637,6 +649,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:background="@color/colorAppPrimary"
+            android:onClick="onClick"
             android:text="На карту" />
 
         <ImageView
@@ -646,8 +659,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/gerb_11" />
+            android:layout_marginTop="16dp" />
 
     </RelativeLayout>
 
@@ -658,6 +670,7 @@
         android:layout_below="@+id/block_11"
         android:layout_margin="8dp"
         android:background="@drawable/rounded_corner"
+        android:onClick="onClick"
         android:paddingBottom="16dp"
         android:visibility="visible">
 
@@ -696,6 +709,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:background="@color/colorAppPrimary"
+            android:onClick="onClick"
             android:text="На карту" />
 
         <ImageView
@@ -705,8 +719,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/gerb_11" />
+            android:layout_marginTop="16dp" />
 
     </RelativeLayout>
 
