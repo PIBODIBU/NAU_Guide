@@ -22,7 +22,7 @@ android {
 }
 
 dependencies {
-    compile 'com.nineoldandroids:library:2.4.+'
+    compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.android.support:support-v4:22.+'
     compile fileTree(dir: 'libs', include: '*.jar')
 }

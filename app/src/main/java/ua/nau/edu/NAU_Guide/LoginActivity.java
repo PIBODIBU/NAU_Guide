@@ -33,6 +33,7 @@ import java.io.FileOutputStream;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
+import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class LoginActivity extends Activity {
     /***
@@ -49,7 +50,7 @@ public class LoginActivity extends Activity {
     private static final String SIGNED_IN_KEY = EnumSharedPreferences.SIGNED_IN_KEY.toString();
     private static final String JUST_SIGNED_KEY = EnumSharedPreferences.JUST_SIGNED_KEY.toString();
     private static final String VK_PREFERENCES = EnumSharedPreferencesVK.VK_PREFERENCES.toString();
-    private static final String VK_INFO_KEY = EnumSharedPreferencesVK.VK_INFO_KEY.toString();
+    private static final String VK_NAME_KEY = EnumSharedPreferencesVK.VK_INFO_KEY.toString();
     private static final String VK_PHOTO_KEY = EnumSharedPreferencesVK.VK_PHOTO_KEY.toString();
     private static final String VK_EMAIL_KEY = EnumSharedPreferencesVK.VK_EMAIL_KEY.toString();
     private static final String VK_SIGNED_KEY = EnumSharedPreferencesVK.VK_SIGNED_KEY.toString();
@@ -61,6 +62,7 @@ public class LoginActivity extends Activity {
 
     private SharedPreferences settings = null;
     private SharedPreferences settingsVK = null;
+    private SharedPrefUtils sharedPrefUtils;
     private Target loadtarget;
     private int VK_APP_ID;
 
@@ -73,26 +75,21 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//VK initialize
         VK_APP_ID = getResources().getInteger(R.integer.VK_APP_ID);
         vkAccessTokenTracker.startTracking();
         VKSdk.initialize(getApplicationContext(), VK_APP_ID, "");
 
-// Setting Content View
         setContentView(R.layout.activity_login);
 
-// Get and set system services & Buttons & SharedPreferences
         settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
         settingsVK = getSharedPreferences(VK_PREFERENCES, LoginActivity.MODE_PRIVATE);
+        sharedPrefUtils = new SharedPrefUtils(settings, settingsVK);
 
         vk_log_in = (CustomView) findViewById(R.id.vk_sign_in);
         gg_log_in = (CustomView) findViewById(R.id.gg_sign_in);
         fb_log_in = (CustomView) findViewById(R.id.fb_sign_in);
         login_skip = (CustomView) findViewById(R.id.login_skip);
 
-/*** BUTTONS ***/
-
-// VK sing in button
         vk_log_in.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,7 +98,6 @@ public class LoginActivity extends Activity {
             }
         });
 
-// Google+ sign in button
         gg_log_in.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -109,7 +105,6 @@ public class LoginActivity extends Activity {
             }
         });
 
-// Facebook sign in button
         fb_log_in.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -117,7 +112,6 @@ public class LoginActivity extends Activity {
             }
         });
 
-/*****/
     }
 
     @Override
@@ -139,12 +133,14 @@ public class LoginActivity extends Activity {
 /*** Shared Preferences ***/
                         settingsVK
                                 .edit()
-                                .putString(VK_INFO_KEY, users_full.first_name + " " + users_full.last_name)
+                                        //.putString(VK_NAME_KEY, users_full.first_name + " " + users_full.last_name)
                                 .putString(VK_PHOTO_KEY, users_full.photo_200)
                                 .putString(VK_EMAIL_KEY, VKSdk.getAccessToken().email)
                                 .putInt(VK_ID_KEY, users_full.id)
                                 .putBoolean(VK_SIGNED_KEY, true)
                                 .apply();
+
+                        sharedPrefUtils.setUsername(users_full.first_name + " " + users_full.last_name);
 
                         settings
                                 .edit()

@@ -8,8 +8,9 @@ import android.os.Bundle;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 
 public class SplashActivity extends Activity {
-private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
+    private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
     private static final String SIGNED_IN_KEY = EnumSharedPreferences.SIGNED_IN_KEY.toString();
+    private static final String FIRST_LAUNCH = EnumSharedPreferences.FIRST_LAUNCH.toString();
     private SharedPreferences settings = null;
 
     @Override
@@ -24,14 +25,15 @@ private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFEREN
             public void run() {
                 try {
                     // Thread will sleep for 1 seconds
-                    sleep(1000);
+                    //sleep(1000);
 
                     // After 1 seconds redirect to another intent
-                    if (settings.getBoolean(SIGNED_IN_KEY, false)) {
-                        startActivity(new Intent(getBaseContext(), MainActivity.class));
+                    if (settings.getBoolean(FIRST_LAUNCH, true)) {
+                        startActivity(new Intent(SplashActivity.this, LoginActivity.class));
                     } else {
-                        startActivity(new Intent(getBaseContext(), LoginActivity.class));
+                        startActivity(new Intent(SplashActivity.this, MainActivity.class));
                     }
+
                     //Remove activity
                     finish();
                 } catch (Exception e) {

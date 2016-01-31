@@ -16,6 +16,7 @@ public class NAU extends University {
     private String[] arrayCorpInfoPhone;
     private String[] arrayCorpInfoUrl;
     private int hashMapSize = -1;
+    private int corpsNum = -1;
 
     public NAU(Context currentContext) {
         this.setFullName("National aviation university");
@@ -97,7 +98,7 @@ public class NAU extends University {
         CorpsGerb.put(9, R.drawable.gerb_3);
         CorpsGerb.put(10, R.drawable.gerb_3);
         CorpsGerb.put(11, R.drawable.gerb_11);
-        CorpsGerb.put(12, R.drawable.gerb_3);
+        CorpsGerb.put(12, R.drawable.gerb_12);
 
         for (int i = 1; i <= 12; i++) {
             CorpsMarkerLabel.put(i, context.getApplicationContext().getResources().getString(R.string.corp) + " " + i);
@@ -201,6 +202,7 @@ public class NAU extends University {
 
 /** SIZE **/
         hashMapSize = CorpsIcon.size();
+        corpsNum = CorpsGerb.size();
 
         this.setCorps(Corps);
         this.setCorpsLabel(CorpsLabel);
@@ -214,5 +216,6 @@ public class NAU extends University {
         this.setCorpsInfoUrl(CorpsInfoUrl);
 
         this.setHashMapSize(hashMapSize);
+        this.setCorpsNum(corpsNum);
     }
 }

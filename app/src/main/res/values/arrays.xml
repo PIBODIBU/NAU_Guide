@@ -4,34 +4,34 @@
         <item>EMPTY</item>
         <!-- Для работы с циклом при заполнении HashMap (цикл начинается с 1, а не с 0) -->
         <item>ЮИ</item>
-        <item>ИЕМ</item>
+        <item>ИЭМ</item>
         <item>ИАП</item>
-        <item>NULL</item>
+        <item>4-й корпус</item>
         <item>ИАН</item>
         <item>ИКИТ</item>
         <item>ИМО</item>
         <item>ГМИ</item>
         <item>НДИ-Дизайн</item>
-        <item>NULL</item>
+        <item>АКИ</item>
         <item>ИИДС</item>
-        <item>NULL</item>
+        <item>ИЭБ</item>
     </array>
 
     <array name="arrayCorpNameFull">
         <item>EMPTY</item>
         <!-- Для работы с циклом при заполнении HashMap (цикл начинается с 1, а не с 0) -->
-        <item>ЮИ-ЮИ-ЮИ</item>
-        <item>ИЕМ-ИЕМ-ИЕМ</item>
-        <item>ИАП-ИАП-ИАП</item>
-        <item>NULL</item>
-        <item>ИАН-ИАН-ИАН</item>
+        <item>Юридический Институт</item>
+        <item>Институт Экономики и Менеджмента</item>
+        <item>Институт Аэропортов</item>
+        <item>Аудитории</item>
+        <item>Институт Аэронавигации</item>
         <item>Институт Компьютерных Информационных Технологий</item>
-        <item>ИМО-ИМО-ИМО</item>
-        <item>ГМИ-ГМИ-ГМИ</item>
-        <item>НДИ-Дизайн=НДИ-Дизайн=НДИ-Дизайн</item>
-        <item>NULL</item>
-        <item>ИИДС-ИИДС-ИИДС</item>
-        <item>NULL</item>
+        <item>Институт Международных Отношений</item>
+        <item>Гуманитарный Институт</item>
+        <item>НДИ-Дизайн</item>
+        <item>Аэрокосмический Институт</item>
+        <item>Институт Информационно-Диагностических Систем</item>
+        <item>Институт Экологической Безопасности</item>
     </array>
 
     <array name="arrayCorpPhone">

@@ -8,6 +8,7 @@ public enum EnumSharedPreferences {
     SIGNED_IN_KEY,
     PROFILE_PHOTO_LOCATION_KEY,
     JUST_SIGNED_KEY,
+    FIRST_LAUNCH,
     CORP_ID_KEY,
     CORP_LABEL_KEY,
     EXIT,

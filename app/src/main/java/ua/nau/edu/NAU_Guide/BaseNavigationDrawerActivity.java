@@ -137,33 +137,33 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
             profileMain = new ProfileDrawerItem().withIcon(R.drawable.ic_account_circle_white_48dp);
         }
 
-        AccountHeader headerResult = new AccountHeaderBuilder()
-                .withActivity(this)
-                .withHeaderBackground(R.drawable.header_png)
-                .addProfiles(
-                        profileMain
-                )
-                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
-                    @Override
-                    public boolean onProfileChanged(View view, IProfile iProfile, boolean b) {
-                        if (!BaseNavigationDrawerActivity.this.sharedPrefs.getBoolean(SIGNED_IN_KEY, false)) {
-                            startActivity(new Intent(BaseNavigationDrawerActivity.this, LoginActivity.class)
-                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                        }
-                        return false;
-                    }
-                })
-                .withProfileImagesClickable(true)
-                .withSelectionListEnabled(false)
-                .build();
-
 // Инициализируем Navigation Drawer
         drawerResult = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withActionBarDrawerToggle(true)
                 .withActionBarDrawerToggleAnimated(true)
-                .withAccountHeader(headerResult)
+                .withAccountHeader(
+                        new AccountHeaderBuilder()
+                                .withActivity(this)
+                                .withHeaderBackground(R.drawable.header_png)
+                                .addProfiles(
+                                        profileMain
+                                )
+                                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                                    @Override
+                                    public boolean onProfileChanged(View view, IProfile iProfile, boolean b) {
+                                        if (!BaseNavigationDrawerActivity.this.sharedPrefs.getBoolean(SIGNED_IN_KEY, false)) {
+                                            startActivity(new Intent(BaseNavigationDrawerActivity.this, LoginActivity.class)
+                                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                        }
+                                        return false;
+                                    }
+                                })
+                                .withProfileImagesClickable(true)
+                                .withSelectionListEnabled(false)
+                                .build()
+                )
                 .withHeaderDivider(false)
                 .withDrawerWidthDp(250)
                 .addDrawerItems(
@@ -337,7 +337,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
     }
 
-    void setMenuId (int menu) {
+    void setMenuId(int menu) {
         this.menuId = menu;
     }
 
@@ -345,7 +345,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
 
-        if(menuId != -1)
+        if (menuId != -1)
             inflater.inflate(menuId, menu);
         else
             inflater.inflate(R.menu.menu_main, menu);

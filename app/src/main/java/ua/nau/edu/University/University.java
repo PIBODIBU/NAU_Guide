@@ -13,6 +13,7 @@ public abstract class University {
     private String fullName;
 
     private int hashMapSize = -1;
+    private int corpsNum = -1;
 
     private HashMap<Integer, LatLng> Corps;
     private HashMap<Integer, Integer> CorpsIcon;
@@ -90,6 +91,10 @@ public abstract class University {
         this.hashMapSize = size;
     }
 
+    public void setCorpsNum(int size) {
+        this.corpsNum = size;
+    }
+
     /**
      * GETTERS
      **/
@@ -145,4 +150,7 @@ public abstract class University {
         return hashMapSize;
     }
 
+    public int getCopsNum() {
+        return corpsNum;
+    }
 }

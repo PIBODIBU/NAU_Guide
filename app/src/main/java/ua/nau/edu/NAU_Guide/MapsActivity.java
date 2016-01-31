@@ -43,6 +43,7 @@ import ua.nau.edu.Enum.EnumExtras;
 import ua.nau.edu.Enum.EnumMaps;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
+import ua.nau.edu.Fragments.MapsFragment;
 import ua.nau.edu.Systems.JSONParser;
 import ua.nau.edu.Systems.Route;
 import ua.nau.edu.University.NAU;
@@ -80,6 +81,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        //setFragment(R.id.fragment_maps);
 
         university = new NAU(this);
         university.init();
@@ -127,6 +129,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
             //Animate to center
             mMap.animateCamera(CameraUpdateFactory.newLatLng(mainActivityMarker.getPosition()));
         }
+
     }
 
     @Override
@@ -154,6 +157,17 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void setFragment(int fragmentId) {
+        /*FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(fragmentId, new MainFragment());
+        fragmentTransaction.commit();*/
+
+        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(fragmentId, new MapsFragment()).commit();
+
     }
 
     private void setUpMapIfNeeded() {

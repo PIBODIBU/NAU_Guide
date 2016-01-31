@@ -1,12 +1,16 @@
 package ua.nau.edu.NAU_Guide;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -20,16 +24,19 @@ import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 
+import java.util.ArrayList;
+
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
-import ua.nau.edu.Fragments.MainFragment;
+import ua.nau.edu.RecyclerViews.MainActivityAdapter;
+import ua.nau.edu.RecyclerViews.MainActivityDataModel;
+import ua.nau.edu.University.NAU;
 
 public class MainActivity extends BaseNavigationDrawerActivity implements
         View.OnClickListener {
 
     public MainActivity() {
     }
-
 
     /***
      * VIEWS
@@ -42,6 +49,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
     private static final String SIGNED_IN_KEY = EnumSharedPreferences.SIGNED_IN_KEY.toString();
     private static final String JUST_SIGNED_KEY = EnumSharedPreferences.JUST_SIGNED_KEY.toString();
+    private static final String FIRST_LAUNCH = EnumSharedPreferences.FIRST_LAUNCH.toString();
     private static final String VK_PREFERENCES = EnumSharedPreferencesVK.VK_PREFERENCES.toString();
     private static final String VK_INFO_KEY = EnumSharedPreferencesVK.VK_INFO_KEY.toString();
     private static final String VK_PHOTO_KEY = EnumSharedPreferencesVK.VK_PHOTO_KEY.toString();
@@ -55,6 +63,14 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private SharedPreferences settingsVK = null;
 
     private VKRequest request_share;
+
+
+    private static RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private static RecyclerView recyclerView;
+    private static ArrayList<MainActivityDataModel> data;
+    static View.OnClickListener myOnClickListener;
+    private static ArrayList<Integer> removedItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,10 +98,35 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
             vk_sign_out.setEnabled(false);
         }
 
-        FragmentManager fm = getFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.fragment_main, new MainFragment());
-        ft.commit();
+        if (settings.getBoolean(FIRST_LAUNCH, true))
+            settings.edit().putBoolean(FIRST_LAUNCH, false).apply();
+
+
+        recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        recyclerView.setHasFixedSize(true);
+
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        NAU UniData = new NAU(this);
+        UniData.init();
+
+        data = new ArrayList<MainActivityDataModel>();
+        for (int i = 1; i <= 12; i++) {
+            data.add(new MainActivityDataModel(
+                    UniData.getCorpsInfoNameShort().get(i),
+                    UniData.getCorpsInfoNameFull().get(i),
+                    i,
+                    UniData.getCorpsGerb().get(i)
+            ));
+        }
+
+        removedItems = new ArrayList<Integer>();
+
+        adapter = new MainActivityAdapter(data, this);
+        recyclerView.setAdapter(adapter);
+
 
     }
 
@@ -187,12 +228,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         super.onResume();
     }
 
-    /**
-     * Google plus
-     **/
-
-
-
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -216,71 +251,44 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
                 break;
             }
-
-            case R.id.button_map_1: {
-                startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                        .putExtra("MAINACTIVITY_CORP_ID", 1));
-                break;
-            }
-            case R.id.button_map_2: {
-                startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                        .putExtra("MAINACTIVITY_CORP_ID", 2));
-                break;
-            }
-            case R.id.button_map_3: {
-                startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                        .putExtra("MAINACTIVITY_CORP_ID", 3));
-                break;
-            }
-            case R.id.button_map_4: {
-                startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                        .putExtra("MAINACTIVITY_CORP_ID", 4));
-                break;
-            }
-            case R.id.button_map_5: {
-                startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                        .putExtra("MAINACTIVITY_CORP_ID", 5));
-                break;
-            }
-            case R.id.button_map_6: {
-                startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                        .putExtra("MAINACTIVITY_CORP_ID", 6));
-                break;
-            }
-            case R.id.button_map_7: {
-                startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                        .putExtra("MAINACTIVITY_CORP_ID", 7));
-                break;
-            }
-            case R.id.button_map_8: {
-                startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                        .putExtra("MAINACTIVITY_CORP_ID", 8));
-                break;
-            }
-            case R.id.button_map_9: {
-                startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                        .putExtra("MAINACTIVITY_CORP_ID", 9));
-                break;
-            }
-            case R.id.button_map_10: {
-                startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                        .putExtra("MAINACTIVITY_CORP_ID", 10));
-                break;
-            }
-            case R.id.button_map_11: {
-                startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                        .putExtra("MAINACTIVITY_CORP_ID", 11));
-                break;
-            }
-            case R.id.button_map_12: {
-                startActivity(new Intent(MainActivity.this, MapsActivity.class)
-                        .putExtra("MAINACTIVITY_CORP_ID", 12));
-                break;
-            }
             default:
                 break;
         }
-
     }
 
+    public Context getContext() {
+        return MainActivity.this;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.logOut: {
+
+                if (settings.getBoolean(SIGNED_IN_KEY, false)) {
+                    settings
+                            .edit()
+                            .putBoolean(SIGNED_IN_KEY, false)
+                            .putString(PROFILE_PHOTO_LOCATION_KEY, "")
+                            .apply();
+                    settingsVK
+                            .edit()
+                            .putString(VK_PHOTO_KEY, "")
+                            .putString(VK_EMAIL_KEY, "")
+                            .putString(VK_INFO_KEY, "")
+                            .putBoolean(VK_SIGNED_KEY, false)
+                            .apply();
+
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    finish();
+                }
+
+                return true;
+            }
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }
