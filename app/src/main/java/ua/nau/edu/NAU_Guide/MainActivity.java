@@ -1,21 +1,20 @@
 package ua.nau.edu.NAU_Guide;
 
+import android.support.v7.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.gc.materialdesign.views.CustomView;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
@@ -64,7 +63,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
     private VKRequest request_share;
 
-
     private static RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private static RecyclerView recyclerView;
@@ -80,7 +78,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
         settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
         settingsVK = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
-        vk_sign_out = (CustomView) findViewById(R.id.vk_sign_out);
+        //vk_sign_out = (CustomView) findViewById(R.id.vk_sign_out);        // VK SignOut Button
 
         if (getIntent().getBooleanExtra(EXIT_KEY, false)) {
             finish();
@@ -92,11 +90,11 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         );
 
         if (getIntent().getBooleanExtra(JUST_SIGNED_KEY, false))
-            initDialog_share();
+            showShareDialog();
 
-        if (!settingsVK.getBoolean(VK_SIGNED_KEY, false)) {
+        /*if (!settingsVK.getBoolean(VK_SIGNED_KEY, false)) {       // VK SignOut Button
             vk_sign_out.setEnabled(false);
-        }
+        }*/
 
         if (settings.getBoolean(FIRST_LAUNCH, true))
             settings.edit().putBoolean(FIRST_LAUNCH, false).apply();
@@ -138,31 +136,20 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 
-    private void initDialog_share() {
+    private void showShareDialog() {
         request_share = VKApi.wall().post(VKParameters.from(
                 VKApiConst.OWNER_ID,
                 Integer.toString(settingsVK.getInt(VK_ID_KEY, -1)),
                 VKApiConst.MESSAGE,
                 getString(R.string.VK_share_text)));
 
-        MaterialDialog dialog = new MaterialDialog.Builder(this)
-                .title("Вы вошли!")
-                .content("Вы успешно авторизовались! Спасибо, что используете наше приложение. Расскажите о нем своим друзьям!")
-                .positiveText("Рассказать")
-                .negativeText("Отмена")
-
-                .cancelable(false)
-
-                .backgroundColor(getResources().getColor(R.color.white))
-                .dividerColor(getResources().getColor(R.color.colorAppPrimary))
-                .positiveColor(getResources().getColor(R.color.colorAppPrimary))
-                .negativeColor(getResources().getColor(R.color.black))
-                .contentColor(getResources().getColor(R.color.black))
-                .titleColor(getResources().getColor(R.color.colorAppPrimary))
-
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder
+                .setTitle("Вы вошли!")
+                .setMessage("Вы успешно авторизовались! Спасибо, что используете наше приложение. Расскажите о нем своим друзьям!")
+                .setPositiveButton("Рассказать", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                    public void onClick(DialogInterface dialog, int which) {
                         request_share.executeWithListener(new VKRequest.VKRequestListener() {
                             @Override
                             public void onComplete(VKResponse response) {
@@ -186,23 +173,27 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                         finish();
                     }
                 })
-                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                .setNegativeButton("Позже", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                    public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
 
                         startActivity(new Intent(MainActivity.this, MainActivity.class));
                         finish();
                     }
-                })
-                .onNeutral(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
-                    }
-                })
-                .show();
-    }
+                });
 
+        final AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface arg) {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(MainActivity.this, R.color.colorAppPrimary));
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(MainActivity.this, R.color.colorAppPrimary));
+            }
+        });
+
+        dialog.show();
+    }
 
     public void toastShowLong(String TEXT) {
         Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
@@ -231,7 +222,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.vk_sign_out: {
+            /*case R.id.vk_sign_out: { // VK SignOut Button
                 settings
                         .edit()
                         .putBoolean(SIGNED_IN_KEY, false)
@@ -250,7 +241,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                 finish();
 
                 break;
-            }
+            }*/
             default:
                 break;
         }

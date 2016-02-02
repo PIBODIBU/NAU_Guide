@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -26,6 +27,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.squareup.picasso.Picasso;
 
 import ua.nau.edu.Enum.Activities;
 import ua.nau.edu.Enum.EnumSharedPreferences;
@@ -85,6 +87,12 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        String text = getSupportActionBar().getTitle().toString();
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        TextView title = (TextView) findViewById(R.id.toolbar_title);
+        title.setText(text);
+
         final PrimaryDrawerItem home = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_home)
                 .withIcon(GoogleMaterial.Icon.gmd_home)
@@ -100,22 +108,11 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withIcon(GoogleMaterial.Icon.gmd_file_download)
                 .withIdentifier(Activities.DownloadActivity.ordinal());
 
-        final PrimaryDrawerItem chat = new PrimaryDrawerItem()
-                .withName(R.string.drawer_item_chat)
-                .withIcon(GoogleMaterial.Icon.gmd_chat)
-                .withIdentifier(Activities.ChatActivity.ordinal())
-                .withEnabled(false);
-
         final PrimaryDrawerItem settings = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_settings)
                 .withIcon(GoogleMaterial.Icon.gmd_settings)
                 .withIdentifier(Activities.SettingsActivity.ordinal())
                 .withEnabled(false);
-
-        final PrimaryDrawerItem timetable = new PrimaryDrawerItem()
-                .withName(R.string.timetable)
-                .withIcon(GoogleMaterial.Icon.gmd_event_note)
-                .withIdentifier(Activities.TimetableActivity.ordinal());
 
         final PrimaryDrawerItem search = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_search)
@@ -165,13 +162,10 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                 .build()
                 )
                 .withHeaderDivider(false)
-                .withDrawerWidthDp(250)
                 .addDrawerItems(
                         home,
                         map,
-                        timetable,
                         download,
-                        chat,
                         new DividerDrawerItem(),
                         settings,
                         search,
@@ -231,14 +225,6 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                         break;
                                     } else {
                                         startActivity(new Intent(BaseNavigationDrawerActivity.this, MapsActivity.class));
-                                        break;
-                                    }
-                                }
-                                case TimetableActivity: {
-                                    if (CURRENT_CLASS.equals(TIMETABLE_CLASS)) {
-                                        break;
-                                    } else {
-                                        startActivity(new Intent(BaseNavigationDrawerActivity.this, TimetableActivity.class));
                                         break;
                                     }
                                 }

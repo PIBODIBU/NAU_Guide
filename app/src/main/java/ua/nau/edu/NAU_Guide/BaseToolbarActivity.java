@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -52,6 +53,12 @@ public class BaseToolbarActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        String text = getSupportActionBar().getTitle().toString();
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        TextView title = (TextView) findViewById(R.id.toolbar_title);
+        title.setText(text);
     }
 
     @Override

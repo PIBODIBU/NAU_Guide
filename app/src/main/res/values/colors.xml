@@ -10,6 +10,7 @@
     <color name="grey_bg">#E0E0E0</color>
     <color name="grey_light">#E0E0E0</color>
     <color name="white">#ffffff</color>
+    <color name="red">#f44336</color>
 
     <color name="colorAppPrimary">#0288d1</color>
     <color name="colorAppPressed">#02a6ff</color>

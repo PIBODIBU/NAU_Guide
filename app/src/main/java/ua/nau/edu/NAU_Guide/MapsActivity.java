@@ -2,25 +2,30 @@ package ua.nau.edu.NAU_Guide;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
+import android.view.InflateException;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -28,23 +33,14 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.io.IOException;
 
 import ua.nau.edu.Enum.EnumExtras;
 import ua.nau.edu.Enum.EnumMaps;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 import ua.nau.edu.Fragments.MapsFragment;
-import ua.nau.edu.Systems.JSONParser;
 import ua.nau.edu.Systems.Route;
 import ua.nau.edu.University.NAU;
 
@@ -98,21 +94,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
         setMenuId(R.menu.menu_maps);
         setUpMapIfNeeded();
-
-        final Animation animRevealReverse = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_reveal_reverse);
-        final RelativeLayout layoutHelp = (RelativeLayout) findViewById(R.id.layout_help);
-        Button layoutHelp_button_exit = (Button) findViewById(R.id.layout_help_exit);
-
-        layoutHelp_button_exit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                layoutHelp.setVisibility(View.GONE);
-                layoutHelp.startAnimation(animRevealReverse);
-            }
-        });
-
         initFloatingActionMenu();
 
+//Запустили активити не из дровера
         if (mainActivityMarker != null) {
             //Записываем id текущего маркера в глобальную переменную
             currentMarkerID = getMarkerId(mainActivityMarker);
@@ -130,6 +114,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
             mMap.animateCamera(CameraUpdateFactory.newLatLng(mainActivityMarker.getPosition()));
         }
 
+
     }
 
     @Override
@@ -145,13 +130,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         switch (item.getItemId()) {
             case R.id.location: {
                 zoomToMyLocation();
-                return true;
-            }
-            case R.id.traffic: {
-                if (mMap.isTrafficEnabled())
-                    mMap.setTrafficEnabled(false);
-                else
-                    mMap.setTrafficEnabled(true);
                 return true;
             }
             default:
@@ -173,9 +151,16 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
-            // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    // Try to obtain the map from the SupportMapFragment.
+                    mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+                            .getMap();
+                }
+            }).run();
+
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 setUpMap();
@@ -269,37 +254,27 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
         FloatingActionButton fab_info = (FloatingActionButton) findViewById(R.id.fab_info);
         FloatingActionButton fab_location = (FloatingActionButton) findViewById(R.id.fab_location);
-        FloatingActionButton fab_help = (FloatingActionButton) findViewById(R.id.fab_help);
         FloatingActionButton fab_route = (FloatingActionButton) findViewById(R.id.fab_route);
 
         fab_route.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    supportRoute.drawRoute(mMap, MapsActivity.this, getMyCoordinate(), university.getCorps().get(currentMarkerID), Route.TRANSPORT_TRANSIT, true, Route.LANGUAGE_RUSSIAN, R.drawable.ic_place_black_24dp);
+                    if (isInternetAvailable()) {
+                        supportRoute.drawRoute(mMap, MapsActivity.this, getMyCoordinate(), university.getCorps().get(currentMarkerID), Route.TRANSPORT_WALKING, false, Route.LANGUAGE_RUSSIAN, R.drawable.ic_place_black_24dp);
 
-                    CameraPosition currentPosition = new CameraPosition.Builder()
-                            .target(getMyCoordinate())
-                            .bearing(180)
-                            .zoom(13f)
-                            .build();
-                    mMap.moveCamera(CameraUpdateFactory.newCameraPosition(currentPosition));
+                        CameraPosition currentPosition = new CameraPosition.Builder()
+                                .target(getMyCoordinate())
+                                .bearing(180)
+                                .zoom(13f)
+                                .build();
+                        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(currentPosition));
+
+                    } else {
+                        showInternetDisabledAlertToUser();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
-            }
-        });
-
-        fab_help.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final Animation animReveal = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_reveal);
-                final RelativeLayout layoutHelp = (RelativeLayout) findViewById(R.id.layout_help);
-
-                if (layoutHelp.getVisibility() == View.GONE) {
-                    layoutHelp.setVisibility(View.VISIBLE); //It has to be invisible before here
-                    layoutHelp.startAnimation(animReveal);
-                    fab_menu.close(true);
                 }
             }
         });
@@ -307,19 +282,19 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         fab_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    if (!currentMarkerLabel.equals("") && currentMarkerID != 0 && currentMarkerID > 0 && currentMarkerID <= university.getHashMapSize()) {
-                        settings.edit().putInt(CORP_ID_KEY, currentMarkerID).apply();
+                //try {
+                if (!currentMarkerLabel.equals("") && currentMarkerID != 0 && currentMarkerID > 0 && currentMarkerID <= university.getHashMapSize()) {
+                    settings.edit().putInt(CORP_ID_KEY, currentMarkerID).apply();
 
-                        startActivity(new Intent(MapsActivity.this, InfoActivity.class) // TODO Блять, где проверка на gps?
-                                .putExtra(CORP_ID_KEY, currentMarkerID)
-                                .putExtra(CORP_LABEL_KEY, currentMarkerLabel)
-                                .putExtra(CURRENT_LATITUDE, mMap.getMyLocation().getLatitude())
-                                .putExtra(CURRENT_LONGTITUDE, mMap.getMyLocation().getLongitude()));
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    startActivity(new Intent(MapsActivity.this, InfoActivity.class)
+                            .putExtra(CORP_ID_KEY, currentMarkerID)
+                            .putExtra(CORP_LABEL_KEY, currentMarkerLabel));
+                    //.putExtra(CURRENT_LATITUDE, mMap.getMyLocation().getLatitude())
+                    //.putExtra(CURRENT_LONGTITUDE, mMap.getMyLocation().getLongitude()));
                 }
+                /*} catch (Exception e) {
+                    e.printStackTrace();
+                }*/
             }
         });
 
@@ -341,13 +316,119 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     }
 
     private void zoomToMyLocation() {
-        LatLng latLng = new LatLng(mMap.getMyLocation().getLatitude(), mMap.getMyLocation().getLongitude());
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16);
-        mMap.animateCamera(cameraUpdate);
+        new AsyncTask<Boolean, Void, Boolean>() {
+            @Override
+            protected void onPreExecute() {
+                Toast.makeText(getApplicationContext(), "Получение координат...", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            protected Boolean doInBackground(Boolean... params) {
+                if (isGPSEnabled()) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            LatLng latLng = new LatLng(mMap.getMyLocation().getLatitude(), mMap.getMyLocation().getLongitude());
+                            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16);
+                            mMap.animateCamera(cameraUpdate);
+                        }
+                    });
+
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBool) {
+                if (aBool)
+                    Toast.makeText(getApplicationContext(), "Получено!", Toast.LENGTH_SHORT).show();
+                else
+                    showGPSDisabledAlertToUser();
+            }
+        }.execute();
     }
 
     private LatLng getMyCoordinate() {
         return new LatLng(mMap.getMyLocation().getLatitude(), mMap.getMyLocation().getLongitude());
+    }
+
+    public boolean isInternetAvailable() {
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+            int exitValue = ipProcess.waitFor();
+            return (exitValue == 0);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean isGPSEnabled() {
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            return true;
+        else
+            return false;
+    }
+
+    private void showGPSDisabledAlertToUser() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder
+                .setMessage("Для определения местоположения необходимо включить GPS. Включить GPS сейчас?")
+                .setCancelable(false)
+                .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        final AlertDialog dialog = builder.create();
+
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface arg) {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorAppPrimary));
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorAppPrimary));
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void showInternetDisabledAlertToUser() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder
+                .setTitle("Ошибка")
+                .setMessage("Нету соединения с Интернетом. Пожалуйста, проверьте настройки сети.")
+                .setCancelable(false)
+                .setNegativeButton("Ок", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog dialog = builder.create();
+
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface arg) {
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorAppPrimary));
+            }
+        });
+
+        dialog.show();
     }
 
     public void initNavigationWindow(int markerid) {

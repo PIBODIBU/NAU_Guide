@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/AppTheme.ToolBar"
     android:layout_width="match_parent"
     android:layout_height="?actionBarSize"
     android:layout_alignParentTop="true"
     android:background="@color/colorAppPrimary"
-    android:gravity="center"
-    style="@style/AppTheme.ToolBar"/>
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/toolbar_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        android:textStyle="bold" />
+
+</android.support.v7.widget.Toolbar>

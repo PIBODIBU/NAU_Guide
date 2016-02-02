@@ -11,17 +11,13 @@
         android:id="@+id/toolbar"
         layout="@layout/toolbar" />
 
-    <include
-        android:id="@+id/shadow"
-        layout="@layout/toolbar_shadow" />
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/my_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:paddingBottom="8dp"/>
-
+<!--
     <com.gc.materialdesign.views.ButtonFlat
         android:id="@+id/vk_sign_out"
         android:layout_width="120dp"
@@ -29,6 +25,7 @@
         android:background="@color/colorAppPrimary"
         android:onClick="onClick"
         android:text="VK Sign out"
-        android:textColor="#ffffff" />
+        android:textColor="#ffffff"/>
+-->
 
 </LinearLayout>

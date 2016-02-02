@@ -15,13 +15,17 @@ import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.text.Html;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -303,7 +307,7 @@ public class Route {
                 Polyline line = mMap.addPolyline(new PolylineOptions()
                         .add(new LatLng(src.latitude, src.longitude), new LatLng(dest.latitude, dest.longitude))
                         .width(5) //Default = 4
-                        .color(Color.BLUE)
+                        .color(ContextCompat.getColor(context, R.color.colorAppPrimary))
                         .geodesic(true));
             }
 
@@ -317,7 +321,35 @@ public class Route {
                 //put initial point
 
                 for (int i = 0; i < stepsArray.length(); i++) {
-                    Step step = new Step(stepsArray.getJSONObject(i));
+                    final Step step = new Step(stepsArray.getJSONObject(i));
+                    /*mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                        @Override
+                        public boolean onMarkerClick(Marker marker) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder
+                                    .setTitle(step.distance)
+                                    .setMessage(step.instructions)
+                                    .setPositiveButton("Ок", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.cancel();
+                                        }
+                                    });
+                            final AlertDialog dialog = builder.create();
+                            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                                @Override
+                                public void onShow(DialogInterface arg) {
+                                    dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                                            .setTextColor(ContextCompat.getColor(context, R.color.colorAppPrimary));
+                                }
+                            });
+
+                            dialog.show();
+
+                            return false;
+                        }
+                    });*/
+
                     mMap.addMarker(new MarkerOptions()
                             .position(step.location)
                             .title(step.distance)
