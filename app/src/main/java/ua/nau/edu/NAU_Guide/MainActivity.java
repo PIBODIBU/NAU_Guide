@@ -27,8 +27,9 @@ import java.util.ArrayList;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
-import ua.nau.edu.RecyclerViews.MainActivityAdapter;
-import ua.nau.edu.RecyclerViews.MainActivityDataModel;
+import ua.nau.edu.RecyclerViews.MainActivity.MainActivityAdapter;
+import ua.nau.edu.RecyclerViews.MainActivity.MainActivityDataModel;
+import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 import ua.nau.edu.University.NAU;
 
 public class MainActivity extends BaseNavigationDrawerActivity implements
@@ -60,6 +61,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
     private SharedPreferences settings = null;
     private SharedPreferences settingsVK = null;
+    private SharedPrefUtils sharedPrefUtils;
 
     private VKRequest request_share;
 
@@ -76,8 +78,9 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
 
         setContentView(R.layout.activity_main);
 
-        settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
-        settingsVK = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
+        settings = getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, MODE_PRIVATE);
+        settingsVK = getSharedPreferences(sharedPrefUtils.VK_PREFERENCES, MainActivity.MODE_PRIVATE);
+        sharedPrefUtils = new SharedPrefUtils(settings, settingsVK);
         //vk_sign_out = (CustomView) findViewById(R.id.vk_sign_out);        // VK SignOut Button
 
         if (getIntent().getBooleanExtra(EXIT_KEY, false)) {
@@ -99,7 +102,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         if (settings.getBoolean(FIRST_LAUNCH, true))
             settings.edit().putBoolean(FIRST_LAUNCH, false).apply();
 
-
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         recyclerView.setHasFixedSize(true);
 
@@ -120,12 +122,8 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
             ));
         }
 
-        removedItems = new ArrayList<Integer>();
-
         adapter = new MainActivityAdapter(data, this);
         recyclerView.setAdapter(adapter);
-
-
     }
 
     public static int pxToDp(int px) {
@@ -271,8 +269,9 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                             .putBoolean(VK_SIGNED_KEY, false)
                             .apply();
 
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class)
-                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    sharedPrefUtils.setToken("");
+
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     finish();
                 }
 

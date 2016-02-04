@@ -5,6 +5,8 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -29,9 +31,12 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+
 import ua.nau.edu.Enum.Activities;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
+import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class BaseNavigationDrawerActivity extends AppCompatActivity {
     protected Drawer drawerResult = null;
@@ -52,8 +57,9 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPrefs = null;
     private SharedPreferences sharedPrefsVK = null;
+    private SharedPrefUtils sharedPrefUtils;
 
-    BaseNavigationDrawerActivity() {
+    public BaseNavigationDrawerActivity() {
     }
 
     public void getCurrentSelection() {
@@ -70,8 +76,8 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 drawerResult.setSelection(Activities.SearchActivity.ordinal());
                 break;
             }
-            case "TimetableActivity": {
-                drawerResult.setSelection(Activities.TimetableActivity.ordinal());
+            case "LectorsListActivity": {
+                drawerResult.setSelection(Activities.LectorsListActivity.ordinal());
                 break;
             }
             default: {
@@ -98,10 +104,20 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withIcon(GoogleMaterial.Icon.gmd_home)
                 .withIdentifier(Activities.MainActivity.ordinal());
 
+        final PrimaryDrawerItem myPage = new PrimaryDrawerItem()
+                .withName(R.string.drawer_item_mypage)
+                .withIcon(GoogleMaterial.Icon.gmd_pageview)
+                .withIdentifier(Activities.UserProfileActivity.ordinal());
+
         final PrimaryDrawerItem map = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_map)
                 .withIcon(GoogleMaterial.Icon.gmd_map)
                 .withIdentifier(Activities.MapsActivity.ordinal());
+
+        final PrimaryDrawerItem lectors = new PrimaryDrawerItem()
+                .withName(R.string.drawer_item_lectors)
+                .withIcon(GoogleMaterial.Icon.gmd_account_circle)
+                .withIdentifier(Activities.LectorsListActivity.ordinal());
 
         final PrimaryDrawerItem download = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_download)
@@ -128,7 +144,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         ProfileDrawerItem profileMain;
         profilePhotoLocation = sharedPrefs.getString(PROFILE_PHOTO_LOCATION_KEY, "");
 
-        if (sharedPrefsVK.getBoolean(VK_SIGNED_KEY, false)) {
+        if (sharedPrefs.getBoolean(SIGNED_IN_KEY, false)) {
             profileMain = new ProfileDrawerItem().withName(ACCOUNT_NAME).withEmail(ACCOUNT_EMAIL).withIcon(profilePhotoLocation);
         } else {
             profileMain = new ProfileDrawerItem().withIcon(R.drawable.ic_account_circle_white_48dp);
@@ -153,6 +169,10 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                         if (!BaseNavigationDrawerActivity.this.sharedPrefs.getBoolean(SIGNED_IN_KEY, false)) {
                                             startActivity(new Intent(BaseNavigationDrawerActivity.this, LoginActivity.class)
                                                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                        } else {
+                                            if (!sharedPrefs.getString(sharedPrefUtils.TOKEN_KEY, "").equals("")) {
+                                                startActivity(new Intent(BaseNavigationDrawerActivity.this, UserProfileActivity.class));
+                                            }
                                         }
                                         return false;
                                     }
@@ -165,6 +185,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .addDrawerItems(
                         home,
                         map,
+                        lectors,
                         download,
                         new DividerDrawerItem(),
                         settings,
@@ -205,7 +226,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                             String MAIN_CLASS = "MainActivity";
                             String SEARCH_CLASS = "SearchActivity";
                             String MAP_CLASS = "MapsActivity";
-                            String TIMETABLE_CLASS = "TimetableActivity";
+                            String LECTORS_CLASS = "LectorsListActivity";
 
                             Activities activities = Activities.values()[drawerItem.getIdentifier()];
 
@@ -224,7 +245,19 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                     if (CURRENT_CLASS.equals(MAP_CLASS)) {
                                         break;
                                     } else {
-                                        startActivity(new Intent(BaseNavigationDrawerActivity.this, MapsActivity.class));
+                                        startActivity(new Intent(BaseNavigationDrawerActivity.this, MapsActivity.class)
+                                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                        finish();
+                                        break;
+                                    }
+                                }
+                                case LectorsListActivity: {
+                                    if (CURRENT_CLASS.equals(LECTORS_CLASS)) {
+                                        break;
+                                    } else {
+                                        startActivity(new Intent(BaseNavigationDrawerActivity.this, LectorsListActivity.class)
+                                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                        finish();
                                         break;
                                     }
                                 }
@@ -285,6 +318,9 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                     }
                 })*/
                 .build();
+        if(!sharedPrefUtils.getToken().equals("")) {
+            drawerResult.addItemAtPosition(myPage, 2);
+        }
         getCurrentSelection();
     }
 
@@ -351,5 +387,6 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 
         sharedPrefs = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
         sharedPrefsVK = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
+        sharedPrefUtils = new SharedPrefUtils(sharedPrefs, sharedPrefsVK);
     }
 }

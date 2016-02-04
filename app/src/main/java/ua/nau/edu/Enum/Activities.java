@@ -7,6 +7,8 @@ public enum Activities {
     MainActivity,
     FirstLaunchActivity,
     MapsActivity,
+    UserProfileActivity,
+    LectorsListActivity,
     ChatActivity,
     SettingsActivity,
     TimetableActivity,

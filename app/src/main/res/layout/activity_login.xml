@@ -65,4 +65,18 @@
         android:text="Пропустить"
         android:textAlignment="gravity" />
 
+    <com.gc.materialdesign.views.ButtonFlat
+        android:id="@+id/login_lector"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="20dp"
+        android:background="@color/colorAppPrimary"
+        android:onClick="onClick"
+        android:text="Войти как\nпреподаватель"
+        android:textAlignment="gravity" />
+
 </RelativeLayout>

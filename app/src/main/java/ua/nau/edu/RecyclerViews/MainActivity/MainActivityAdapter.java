@@ -1,4 +1,4 @@
-package ua.nau.edu.RecyclerViews;
+package ua.nau.edu.RecyclerViews.MainActivity;
 
 import android.content.Context;
 import android.content.Intent;

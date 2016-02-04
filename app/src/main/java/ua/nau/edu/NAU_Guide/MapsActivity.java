@@ -259,23 +259,44 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         fab_route.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    if (isInternetAvailable()) {
-                        supportRoute.drawRoute(mMap, MapsActivity.this, getMyCoordinate(), university.getCorps().get(currentMarkerID), Route.TRANSPORT_WALKING, false, Route.LANGUAGE_RUSSIAN, R.drawable.ic_place_black_24dp);
-
-                        CameraPosition currentPosition = new CameraPosition.Builder()
-                                .target(getMyCoordinate())
-                                .bearing(180)
-                                .zoom(13f)
-                                .build();
-                        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(currentPosition));
-
-                    } else {
-                        showInternetDisabledAlertToUser();
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        Toast.makeText(MapsActivity.this, "Получение маршрута", Toast.LENGTH_SHORT).show();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        try {
+                            if (isInternetAvailable()) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        supportRoute.drawRoute(mMap, MapsActivity.this, getMyCoordinate(), university.getCorps().get(currentMarkerID), Route.TRANSPORT_WALKING, false, Route.LANGUAGE_RUSSIAN, R.drawable.ic_place_black_24dp);
+
+                                        CameraPosition currentPosition = new CameraPosition.Builder()
+                                                .target(getMyCoordinate())
+                                                .bearing(180)
+                                                .zoom(13f)
+                                                .build();
+                                        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(currentPosition));
+                                    }
+                                });
+                            } else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        showInternetDisabledAlertToUser();
+                                    }
+                                });
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+                }.execute();
             }
         });
 

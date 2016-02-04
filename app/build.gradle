@@ -37,9 +37,6 @@ repositories {
     jcenter()
 }
 
-
-
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':vksdk_library')
@@ -70,4 +67,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-ads:8.3.0'
     compile 'com.google.android.gms:play-services-identity:8.3.0'
     compile 'com.google.android.gms:play-services-gcm:8.3.0'
+
+// Dependencies for Server
+    compile 'com.mcxiaoke.volley:library-aar:1.0.0'
 }

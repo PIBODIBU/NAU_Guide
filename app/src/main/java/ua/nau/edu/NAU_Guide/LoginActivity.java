@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -33,6 +34,7 @@ import java.io.FileOutputStream;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
+import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorActivity;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class LoginActivity extends Activity {
@@ -112,6 +114,14 @@ public class LoginActivity extends Activity {
             }
         });
 
+        CustomView login_lector = (CustomView) findViewById(R.id.login_lector);
+        login_lector.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this, LoginLectorActivity.class));
+                finish();
+            }
+        });
     }
 
     @Override
@@ -130,7 +140,6 @@ public class LoginActivity extends Activity {
                         FileName = "profilePhoto_200.png";
                         PROFILE_PHOTO_LOCATION = FilePath + "/" + FileName;
 
-/*** Shared Preferences ***/
                         settingsVK
                                 .edit()
                                         //.putString(VK_NAME_KEY, users_full.first_name + " " + users_full.last_name)
@@ -140,13 +149,14 @@ public class LoginActivity extends Activity {
                                 .putBoolean(VK_SIGNED_KEY, true)
                                 .apply();
 
-                        sharedPrefUtils.setUsername(users_full.first_name + " " + users_full.last_name);
+                        sharedPrefUtils.setName(users_full.first_name + " " + users_full.last_name);
 
                         settings
                                 .edit()
                                 .putBoolean(SIGNED_IN_KEY, true) /*** Important! Add this after each success login ***/
                                 .putString(PROFILE_PHOTO_LOCATION_KEY, PROFILE_PHOTO_LOCATION)
                                 .apply();
+
 
                         loadAvatar(users_full.photo_200, FilePath, FileName);
 

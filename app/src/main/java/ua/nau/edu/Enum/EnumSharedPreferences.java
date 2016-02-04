@@ -11,6 +11,7 @@ public enum EnumSharedPreferences {
     FIRST_LAUNCH,
     CORP_ID_KEY,
     CORP_LABEL_KEY,
+    TOKEN_KEY,
     EXIT,
 
 }
