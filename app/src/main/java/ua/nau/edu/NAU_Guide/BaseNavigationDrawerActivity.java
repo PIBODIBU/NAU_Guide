@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.holder.ImageHolder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
@@ -91,7 +93,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         }
     }
 
-    public void setToolbarTitle(Toolbar toolbar){
+    public void setToolbarTitle(Toolbar toolbar) {
         String text = getSupportActionBar().getTitle().toString();
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -158,37 +160,40 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
             profileMain = new ProfileDrawerItem().withIcon(R.drawable.ic_account_circle_white_48dp);
         }
 
+// Create AccountHeader
+        AccountHeader accountHeader = new AccountHeaderBuilder()
+                .withActivity(this)
+                .addProfiles(
+                        profileMain
+                )
+                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile iProfile, boolean b) {
+                        if (!BaseNavigationDrawerActivity.this.sharedPrefs.getBoolean(SIGNED_IN_KEY, false)) {
+                            startActivity(new Intent(BaseNavigationDrawerActivity.this, LoginActivity.class)
+                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                        } else {
+                            if (!sharedPrefs.getString(sharedPrefUtils.TOKEN_KEY, "").equals("")) {
+                                startActivity(new Intent(BaseNavigationDrawerActivity.this, UserProfileActivity.class));
+                            }
+                        }
+                        return false;
+                    }
+                })
+                .withProfileImagesClickable(true)
+                .withSelectionListEnabled(false)
+                .build();
+        // Set up AccountHeader Background using Picasso
+        ImageView accountHeaderBackground = accountHeader.getHeaderBackgroundView();
+        Picasso.with(BaseNavigationDrawerActivity.this).load(R.drawable.header_png).into(accountHeaderBackground);
+
 // Инициализируем Navigation Drawer
         drawerResult = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withActionBarDrawerToggle(true)
                 .withActionBarDrawerToggleAnimated(true)
-                .withAccountHeader(
-                        new AccountHeaderBuilder()
-                                .withActivity(this)
-                                .withHeaderBackground(R.drawable.header_png)
-                                .addProfiles(
-                                        profileMain
-                                )
-                                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
-                                    @Override
-                                    public boolean onProfileChanged(View view, IProfile iProfile, boolean b) {
-                                        if (!BaseNavigationDrawerActivity.this.sharedPrefs.getBoolean(SIGNED_IN_KEY, false)) {
-                                            startActivity(new Intent(BaseNavigationDrawerActivity.this, LoginActivity.class)
-                                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                                        } else {
-                                            if (!sharedPrefs.getString(sharedPrefUtils.TOKEN_KEY, "").equals("")) {
-                                                startActivity(new Intent(BaseNavigationDrawerActivity.this, UserProfileActivity.class));
-                                            }
-                                        }
-                                        return false;
-                                    }
-                                })
-                                .withProfileImagesClickable(true)
-                                .withSelectionListEnabled(false)
-                                .build()
-                )
+                .withAccountHeader(accountHeader)
                 .withHeaderDivider(false)
                 .addDrawerItems(
                         home,
@@ -265,7 +270,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                         break;
                                     } else {
                                         startActivity(new Intent(BaseNavigationDrawerActivity.this, LectorsListActivity.class)
-                                                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                         finish();
                                         break;
                                     }
@@ -338,7 +343,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                     }
                 })*/
                 .build();
-        if(!sharedPrefUtils.getToken().equals("")) {
+        if (!sharedPrefUtils.getToken().equals("")) {
             drawerResult.addItemAtPosition(myPage, 2);
         }
         getCurrentSelection();

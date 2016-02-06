@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -33,6 +34,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 
@@ -149,23 +151,47 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     }
 
     private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap == null) {
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
+        final ProgressDialog dialog = new ProgressDialog(MapsActivity.this);
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected void onPreExecute() {
+                dialog.setMessage(getResources().getString(R.string.dialog_loading));
+                dialog.setIndeterminate(true);
+                dialog.setCancelable(false);
+                dialog.show();
+
+                super.onPreExecute();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                // Do a null check to confirm that we have not already instantiated the map.
+                if (mMap == null) {
                     // Try to obtain the map from the SupportMapFragment.
                     mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                             .getMap();
-                }
-            }).run();
 
-            // Check if we were successful in obtaining the map.
-            if (mMap != null) {
-                setUpMap();
+                    // Check if we were successful in obtaining the map.
+                    if (mMap != null) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setUpMap();
+                            }
+                        });
+                    }
+                }
+                return null;
             }
-        }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                super.onPostExecute(result);
+                dialog.dismiss();
+            }
+        }.execute();
     }
 
     private void addMarkerCustom(Integer i, int icon, String title) {

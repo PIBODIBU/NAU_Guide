@@ -47,4 +47,6 @@
     <string name="login_error_message_login">Введите логин</string>
     <string name="login_error_message_password">Введите пароль</string>
 
+    <string name="dialog_loading">Загрузка&#8230;</string>
+
 </resources>

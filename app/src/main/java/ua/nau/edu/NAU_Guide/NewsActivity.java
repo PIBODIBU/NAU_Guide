@@ -8,28 +8,31 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsAdapter;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsDataModel;
-import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
+import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
+import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
 import ua.nau.edu.Systems.LectorsDialogs;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
+public class NewsActivity extends BaseNavigationDrawerActivity {
 
-public class LectorsListActivity extends BaseNavigationDrawerActivity {
-
-    private static final String REQUEST_URL = "http://nauguide.esy.es/include/getLectors.php";
+    private static final String REQUEST_URL = "http://nauguide.esy.es/include/getPostAll.php";
     private static final String TAG = "LectorsListActivity";
 
     private static RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private static RecyclerView recyclerView;
-    private ArrayList<LectorsDataModel> data = new ArrayList<LectorsDataModel>();
+    private ArrayList<NewsDataModel> data = new ArrayList<NewsDataModel>();
 
     private SharedPrefUtils sharedPrefUtils;
     private SharedPreferences settings = null;
@@ -38,7 +41,7 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lectors);
+        setContentView(R.layout.activity_news);
 
         settings = getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, MODE_PRIVATE);
         settingsVK = getSharedPreferences(sharedPrefUtils.VK_PREFERENCES, LectorsListActivity.MODE_PRIVATE);
@@ -49,18 +52,17 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
                 sharedPrefUtils.getEmail()
         );
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerview_user_data);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerview_news);
         recyclerView.setHasFixedSize(true);
-        //recyclerView.addItemDecoration(new DividerItemDecoration(this));
 
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        adapter = new LectorsAdapter(data, LectorsListActivity.this);
+        adapter = new NewsAdapter(data, NewsActivity.this);
 
-        new AsyncTask<Void, Void, Void>() {
-            ProgressDialog loading = new ProgressDialog(LectorsListActivity.this);
+        new AsyncTask<String, Void, String>() {
+            ProgressDialog loading = new ProgressDialog(NewsActivity.this);
 
             @Override
             protected void onPreExecute() {
@@ -72,47 +74,61 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
             }
 
             @Override
-            protected Void doInBackground(Void... params) {
+            protected String doInBackground(String... params) {
                 LoginLectorUtils httpUtils = new LoginLectorUtils();
-                String response = httpUtils.sendPostRequest(REQUEST_URL);
+                HashMap<String, String> postData = new HashMap<String, String>();
+                postData.put("limit_from", "0");
+                postData.put("limit_to", "30");
+
+                final String response = httpUtils.sendPostRequestWithParams(REQUEST_URL, postData);
 
                 if (response.equalsIgnoreCase("error_connection")) {
                     Log.e(TAG, "No Internet avalible");
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            LectorsDialogs.InternetConnectionErrorWithExit(LectorsListActivity.this);
+                            LectorsDialogs.InternetConnectionErrorWithExit(NewsActivity.this);
                         }
                     });
                 } else if (response.equalsIgnoreCase("error_server")) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            LectorsDialogs.serverConnectionErrorWithExit(LectorsListActivity.this);
+                            LectorsDialogs.serverConnectionErrorWithExit(NewsActivity.this);
                         }
                     });
                     Log.e(TAG, "Server error. Response code != 200");
                     return null;
                 } else {
                     try {
-                        String name, uniqueId, photoUrl, institute;
+                        int id;
+                        String author;
+                        String authorUniqueId;
+                        String authorPhotoUrl;
+                        String message;
+                        String createTime;
 
-                        JSONArray array = new JSONArray(response);
+                        JSONObject response_object = new JSONObject(response);
+                        final JSONArray array = response_object.getJSONArray("post");
 
                         for (int i = 0; i < array.length(); i++) {
                             JSONObject jsonObject = array.getJSONObject(i);
 
-                            name = jsonObject.getString("name");
-                            uniqueId = jsonObject.getString("unique_id");
-                            photoUrl = jsonObject.getString("photo_url");
-                            institute = jsonObject.getString("institute") + ", " + jsonObject.getString("department");
+                            id = jsonObject.getInt("id");
+                            author = jsonObject.getString("author");
+                            authorUniqueId = jsonObject.getString("author_unique_id");
+                            authorPhotoUrl = jsonObject.getString("author_photo_url");
+                            message = jsonObject.getString("message");
+                            createTime = jsonObject.getString("created_at");
 
-                            if (!name.equals("") && !uniqueId.equals("") && !photoUrl.equals("")) {
-                                data.add(new LectorsDataModel(name, uniqueId, photoUrl, institute));
-                            }
+                            Log.e("NewsActivity", "Added:" + author);
+
+                            //if (!author.equals("") && !authorUniqueId.equals("") && !authorPhotoUrl.equals("") && !message.equals("") && !createTime.equals("")) {
+                                data.add(new NewsDataModel(id, author, authorUniqueId, authorPhotoUrl, message, createTime));
+                            //}
                         }
                     } catch (Exception e) {
-                        Log.e("LectorsListActivity", "Can't create JSONArray");
+                        Log.e("NewsActivity", "Can't create JSONArray");
                     }
                 }
 
@@ -120,7 +136,7 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
             }
 
             @Override
-            protected void onPostExecute(final Void str) {
+            protected void onPostExecute(final String str) {
                 super.onPostExecute(str);
                 loading.dismiss();
                 adapter.notifyDataSetChanged();

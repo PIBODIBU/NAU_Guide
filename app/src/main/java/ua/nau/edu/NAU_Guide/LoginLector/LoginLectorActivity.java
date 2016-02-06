@@ -97,7 +97,7 @@ public class LoginLectorActivity extends AppCompatActivity implements View.OnCli
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                loading = ProgressDialog.show(LoginLectorActivity.this, null, "Please Wait", true, true);
+                loading = ProgressDialog.show(LoginLectorActivity.this, null, getResources().getString(R.string.dialog_loading), true, true);
             }
 
             @Override

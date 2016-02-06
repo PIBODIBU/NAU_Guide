@@ -28,6 +28,7 @@ import com.vk.sdk.api.VKResponse;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
@@ -91,16 +92,11 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                 settingsVK.getString(VK_EMAIL_KEY, "")
         );
 
-        if (!sharedPrefUtils.getToken().equals("")) {
+        if (!sharedPrefUtils.getToken().equals(""))
             checkToken(sharedPrefUtils.getToken());
-        }
 
         if (getIntent().getBooleanExtra(JUST_SIGNED_KEY, false))
             showShareDialog();
-
-        /*if (!settingsVK.getBoolean(VK_SIGNED_KEY, false)) {       // VK SignOut Button
-            vk_sign_out.setEnabled(false);
-        }*/
 
         if (settings.getBoolean(FIRST_LAUNCH, true))
             settings.edit().putBoolean(FIRST_LAUNCH, false).apply();
@@ -285,12 +281,15 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         }
     }
 
-    private void checkToken(String token) {
+    private void checkToken(final String token) {
         new AsyncTask<String, Void, Void>() {
             @Override
             protected Void doInBackground(String... params) {
                 LoginLectorUtils apiUtils = new LoginLectorUtils();
-                String response = apiUtils.sendPostRequest("http://nauguide.esy.es/include/checkToken.php");
+                HashMap<String, String> data = new HashMap<>();
+                data.put("token", params[0]);
+
+                String response = apiUtils.sendPostRequestWithParams("http://nauguide.esy.es/include/checkToken.php", data);
 
                 if (response.equalsIgnoreCase("error_connection")) {
                     Log.e(TAG, "Can't check token: No Internet avalible");
@@ -301,6 +300,8 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                     try {
                         JSONObject jsonObject = new JSONObject(response);
                         if (jsonObject.getString("error").equalsIgnoreCase("true")) {
+                            Log.e("MainActivity", "Bad token: " + token);
+
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -325,7 +326,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                                 }
                             });
                         } else if (jsonObject.getString("error").equalsIgnoreCase("false")) {
-                            Log.i(TAG, "Check Token: Token accepted");
+                            Log.i(TAG, "Check Token: token " + token + " accepted");
                         }
                     } catch (Exception e) {
                         Log.e("MainActivity", "Can't create JSONObject");
