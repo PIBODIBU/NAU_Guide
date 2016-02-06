@@ -8,7 +8,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,10 +16,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
-import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsAdapter;
-import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsDataModel;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
+import ua.nau.edu.Systems.EndlessRecyclerOnScrollListener;
 import ua.nau.edu.Systems.LectorsDialogs;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
@@ -30,13 +28,16 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
     private static final String TAG = "LectorsListActivity";
 
     private static RecyclerView.Adapter adapter;
-    private RecyclerView.LayoutManager layoutManager;
+    private LinearLayoutManager layoutManager;
     private static RecyclerView recyclerView;
     private ArrayList<NewsDataModel> data = new ArrayList<NewsDataModel>();
 
     private SharedPrefUtils sharedPrefUtils;
     private SharedPreferences settings = null;
     private SharedPreferences settingsVK = null;
+
+    private int startLoadPosition = 0;
+    private int loadNumber = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,14 +57,23 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
         recyclerView.setHasFixedSize(true);
 
         layoutManager = new LinearLayoutManager(this);
+        adapter = new NewsAdapter(data, NewsActivity.this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int current_page) {
+                Log.i("NewsActivity", "Loading new data...");
+                loadPosts(startLoadPosition, loadNumber);
+                startLoadPosition += loadNumber;
+            }
+        });
 
-        adapter = new NewsAdapter(data, NewsActivity.this);
-
-        loadPosts(0, 30);
+        loadPosts(startLoadPosition, loadNumber);
+        startLoadPosition += loadNumber;
 
         recyclerView.setAdapter(adapter);
+
     }
 
     private void loadPosts(final int startPosition, final int loadNumber) {
