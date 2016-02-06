@@ -34,38 +34,42 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class LoginLectorUtils {
 
-    public String sendPostRequestWithParam(String requestURL, HashMap<String, String> postDataParams) {
+    public String sendPostRequestWithParams(String requestURL, HashMap<String, String> postDataParams) {
 
         URL url;
         String response = "";
 
-        try {
-            url = new URL(requestURL);
+        if (isInternetAvailable()) {
+            try {
+                url = new URL(requestURL);
 
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(15000);
-            conn.setConnectTimeout(15000);
-            conn.setRequestMethod("POST");
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(15000);
+                conn.setConnectTimeout(15000);
+                conn.setRequestMethod("POST");
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
 
-            OutputStream os = conn.getOutputStream();
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-            writer.write(getPostDataString(postDataParams));
+                OutputStream os = conn.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                writer.write(getPostDataString(postDataParams));
 
-            writer.flush();
-            writer.close();
-            os.close();
-            int responseCode = conn.getResponseCode();
+                writer.flush();
+                writer.close();
+                os.close();
+                int responseCode = conn.getResponseCode();
 
-            if (responseCode == HttpsURLConnection.HTTP_OK) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                response = br.readLine();
-            } else {
-                response = "error";
+                if (responseCode == HttpsURLConnection.HTTP_OK) {
+                    BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    response = br.readLine();
+                } else {
+                    response = "error_server";
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else {
+            response = "error_connection";
         }
 
         return response;
@@ -76,26 +80,30 @@ public class LoginLectorUtils {
         URL url;
         String response = "";
 
-        try {
-            url = new URL(requestURL);
+        if (isInternetAvailable()) {
+            try {
+                url = new URL(requestURL);
 
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(15000);
-            conn.setConnectTimeout(15000);
-            conn.setRequestMethod("POST");
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(15000);
+                conn.setConnectTimeout(15000);
+                conn.setRequestMethod("POST");
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
 
-            int responseCode = conn.getResponseCode();
+                int responseCode = conn.getResponseCode();
 
-            if (responseCode == HttpsURLConnection.HTTP_OK) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                response = br.readLine();
-            } else {
-                response = "error";
+                if (responseCode == HttpsURLConnection.HTTP_OK) {
+                    BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    response = br.readLine();
+                } else {
+                    response = "error";
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else {
+            response = "error_connection";
         }
 
         return response;
@@ -147,5 +155,21 @@ public class LoginLectorUtils {
         }
 
         return result.toString();
+    }
+
+    public boolean isInternetAvailable() {
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+            int exitValue = ipProcess.waitFor();
+            return (exitValue == 0);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }

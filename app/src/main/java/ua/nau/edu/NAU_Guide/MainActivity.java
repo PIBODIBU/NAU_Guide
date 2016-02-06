@@ -1,5 +1,6 @@
 package ua.nau.edu.NAU_Guide;
 
+import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +12,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -23,10 +25,13 @@ import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
+import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
 import ua.nau.edu.RecyclerViews.MainActivity.MainActivityAdapter;
 import ua.nau.edu.RecyclerViews.MainActivity.MainActivityDataModel;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
@@ -38,13 +43,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     public MainActivity() {
     }
 
-    /***
-     * VIEWS
-     ***/
-
-    private CustomView vk_sign_out;
-
-    /*****/
+    private static final String TAG = "MainActivity";
 
     private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
     private static final String SIGNED_IN_KEY = EnumSharedPreferences.SIGNED_IN_KEY.toString();
@@ -91,6 +90,10 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                 settingsVK.getString(VK_INFO_KEY, ""),
                 settingsVK.getString(VK_EMAIL_KEY, "")
         );
+
+        if (!sharedPrefUtils.getToken().equals("")) {
+            checkToken(sharedPrefUtils.getToken());
+        }
 
         if (getIntent().getBooleanExtra(JUST_SIGNED_KEY, false))
             showShareDialog();
@@ -281,4 +284,61 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    private void checkToken(String token) {
+        new AsyncTask<String, Void, Void>() {
+            @Override
+            protected Void doInBackground(String... params) {
+                LoginLectorUtils apiUtils = new LoginLectorUtils();
+                String response = apiUtils.sendPostRequest("http://nauguide.esy.es/include/checkToken.php");
+
+                if (response.equalsIgnoreCase("error_connection")) {
+                    Log.e(TAG, "Can't check token: No Internet avalible");
+                } else if (response.equalsIgnoreCase("error_server")) {
+                    Log.e(TAG, "Can't check token: Server error. Response code != 200");
+                    return null;
+                } else {
+                    try {
+                        JSONObject jsonObject = new JSONObject(response);
+                        if (jsonObject.getString("error").equalsIgnoreCase("true")) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(MainActivity.this, "Bad token. Exiting...", Toast.LENGTH_LONG).show();
+
+                                    settings
+                                            .edit()
+                                            .putBoolean(SIGNED_IN_KEY, false)
+                                            .putString(PROFILE_PHOTO_LOCATION_KEY, "")
+                                            .apply();
+                                    settingsVK
+                                            .edit()
+                                            .putString(VK_PHOTO_KEY, "")
+                                            .putString(VK_EMAIL_KEY, "")
+                                            .putString(VK_INFO_KEY, "")
+                                            .putBoolean(VK_SIGNED_KEY, false)
+                                            .apply();
+                                    sharedPrefUtils.setToken("");
+
+                                    startActivity(new Intent(MainActivity.this, LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                    finish();
+                                }
+                            });
+                        } else if (jsonObject.getString("error").equalsIgnoreCase("false")) {
+                            Log.i(TAG, "Check Token: Token accepted");
+                        }
+                    } catch (Exception e) {
+                        Log.e("MainActivity", "Can't create JSONObject");
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void arg) {
+                super.onPostExecute(arg);
+            }
+        }.execute(token);
+    }
+
 }

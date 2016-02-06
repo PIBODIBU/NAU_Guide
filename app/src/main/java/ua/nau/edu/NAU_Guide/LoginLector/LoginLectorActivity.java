@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -68,7 +69,7 @@ public class LoginLectorActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login_test);
+        setContentView(R.layout.activity_lectorlogin);
 
         editTextUserName = (EditText) findViewById(R.id.username);
         editTextPassword = (EditText) findViewById(R.id.password);
@@ -81,7 +82,6 @@ public class LoginLectorActivity extends AppCompatActivity implements View.OnCli
         settingsVK = getSharedPreferences(VK_PREFERENCES, LoginLectorActivity.MODE_PRIVATE);
         sharedPrefUtils = new SharedPrefUtils(settings, settingsVK);
     }
-
 
     private void login() {
         String username = editTextUserName.getText().toString().trim();
@@ -110,7 +110,7 @@ public class LoginLectorActivity extends AppCompatActivity implements View.OnCli
 
                         if (jsonObject.getString("error").equals("true")) {
                             showDialogBadUsername();
-                        } else if (jsonObject.getString("error").equals("false")) {
+                        } else if (jsonObject.getString("error").equalsIgnoreCase("false")) {
                             doLoginStuff(
                                     jsonObject.getString("name"),
                                     jsonObject.getString("email"),
@@ -134,7 +134,7 @@ public class LoginLectorActivity extends AppCompatActivity implements View.OnCli
                 data.put("password", params[1]);
 
                 LoginLectorUtils httpUtils = new LoginLectorUtils();
-                return httpUtils.sendPostRequestWithParam(LOGIN_URL, data);
+                return httpUtils.sendPostRequestWithParams(LOGIN_URL, data);
             }
         }.execute(username, password);
     }

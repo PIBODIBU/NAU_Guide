@@ -16,7 +16,7 @@ import com.google.android.gms.maps.model.LatLng;
 import ua.nau.edu.Enum.EnumExtras;
 import ua.nau.edu.Enum.EnumMaps;
 import ua.nau.edu.Enum.EnumSharedPreferences;
-import ua.nau.edu.AdapterInfoActivity.AdapterInfo;
+import ua.nau.edu.Adapters.AdapterInfoActivity.AdapterInfo;
 
 public class InfoActivity extends BaseToolbarActivity {
     private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();

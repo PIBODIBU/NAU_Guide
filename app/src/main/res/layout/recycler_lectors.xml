@@ -3,13 +3,15 @@
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="0dp"
     android:layout_marginLeft="0dp"
     android:layout_marginRight="0dp"
     android:layout_marginTop="0dp"
     card_view:cardBackgroundColor="@color/white"
     card_view:cardCornerRadius="0dp"
-    card_view:cardElevation="2dp"
-    card_view:cardUseCompatPadding="true">
+    card_view:cardElevation="0dp"
+    card_view:cardUseCompatPadding="true"
+    card_view:contentPadding="-2dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -40,7 +42,6 @@
             android:text="SUBHEAD"
             android:textColor="@color/black"
             android:textSize="14sp" />
-
 
         <ImageView
             android:id="@+id/imageView"

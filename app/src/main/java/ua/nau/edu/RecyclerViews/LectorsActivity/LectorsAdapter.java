@@ -1,6 +1,7 @@
 package ua.nau.edu.RecyclerViews.LectorsActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 import ua.nau.edu.NAU_Guide.R;
+import ua.nau.edu.NAU_Guide.UserProfileActivity;
 import ua.nau.edu.Systems.CircleTransform;
 
 public class LectorsAdapter extends RecyclerView.Adapter<LectorsAdapter.MyViewHolder> {
@@ -65,6 +67,15 @@ public class LectorsAdapter extends RecyclerView.Adapter<LectorsAdapter.MyViewHo
         textViewName.setText(dataSet.get(listPosition).getName());
         textViewId.setText(dataSet.get(listPosition).getInstitute());
         Picasso.with(context).load(Uri.parse(dataSet.get(listPosition).getPhotoUrl())).transform(new CircleTransform()).into(imageView);
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                context.startActivity(new Intent(context, UserProfileActivity.class)
+                        .putExtra("action", "getPage")
+                        .putExtra("uniqueId", dataSet.get(listPosition).getUniqueId()));
+            }
+        });
     }
 
     @Override

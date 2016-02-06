@@ -80,6 +80,10 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 drawerResult.setSelection(Activities.LectorsListActivity.ordinal());
                 break;
             }
+            case "UserProfileActivity": {
+                drawerResult.setSelection(Activities.UserProfileActivity.ordinal());
+                break;
+            }
             default: {
                 drawerResult.setSelection(-1);
                 break;
@@ -87,17 +91,21 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         }
     }
 
-    public void getDrawer(String ACCOUNT_NAME, String ACCOUNT_EMAIL) {
-// Инициализируем Toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+    public void setToolbarTitle(Toolbar toolbar){
         String text = getSupportActionBar().getTitle().toString();
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         TextView title = (TextView) findViewById(R.id.toolbar_title);
         title.setText(text);
+    }
+
+    public void getDrawer(String ACCOUNT_NAME, String ACCOUNT_EMAIL) {
+// Инициализируем Toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setToolbarTitle(toolbar);
+
 
         final PrimaryDrawerItem home = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_home)
@@ -227,6 +235,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                             String SEARCH_CLASS = "SearchActivity";
                             String MAP_CLASS = "MapsActivity";
                             String LECTORS_CLASS = "LectorsListActivity";
+                            String USER_CLASS = "UserProfileActivity";
 
                             Activities activities = Activities.values()[drawerItem.getIdentifier()];
 
@@ -256,6 +265,17 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                         break;
                                     } else {
                                         startActivity(new Intent(BaseNavigationDrawerActivity.this, LectorsListActivity.class)
+                                                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                        finish();
+                                        break;
+                                    }
+                                }
+                                case UserProfileActivity: {
+                                    if (CURRENT_CLASS.equals(USER_CLASS)) {
+                                        break;
+                                    } else {
+                                        startActivity(new Intent(BaseNavigationDrawerActivity.this, UserProfileActivity.class)
+                                                .putExtra("action", "getMyPage")
                                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                         finish();
                                         break;

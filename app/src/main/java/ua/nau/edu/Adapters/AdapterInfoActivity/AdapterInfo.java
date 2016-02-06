@@ -1,11 +1,11 @@
-package ua.nau.edu.AdapterInfoActivity;
+package ua.nau.edu.Adapters.AdapterInfoActivity;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import ua.nau.edu.AdapterInfoActivity.Fragments.FragmentInfo;
-import ua.nau.edu.AdapterInfoActivity.Fragments.FragmentVectors;
+import ua.nau.edu.Adapters.AdapterInfoActivity.Fragments.FragmentInfo;
+import ua.nau.edu.Adapters.AdapterInfoActivity.Fragments.FragmentVectors;
 
 /**
  * Created by Roman on 27.11.2015.

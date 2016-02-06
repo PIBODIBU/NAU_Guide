@@ -18,16 +18,14 @@
     <string name="drawer_item_home">Домой</string>
     <string name="drawer_item_mypage">Моя страница</string>
     <string name="drawer_item_map">Карта</string>
-    <string name="drawer_item_lectors">Заметки</string>
+    <string name="drawer_item_lectors">Преподаватели</string>
     <string name="drawer_item_download">Загрузки</string>
     <string name="drawer_item_settings">Настройки</string>
     <string name="drawer_item_search">Поиск</string>
     <string name="drawer_item_exit">Выход</string>
     <string name="drawer_item_chat">Чат</string>
 
-    <string name="plus_signed_id">Вы ввошли как: </string>
     <string name="close_app">Закрыть</string>
-    <string name="sign_out_button_name">Sign out</string>
 
     <string name="corp">Корпус</string>
     <string name="ckm">ЦКИ</string>
@@ -45,24 +43,8 @@
 
     <string name="Text_copied">Текст скопирован в буфер обмена</string>
     <string name="maps_dialog_fetching">Получение маршрута, подождите&#8230;</string> <!-- &#8230; == "..." -->
-
-    <string name="activity_info_6_vectors">
-        <b>0501 Інформатика та обчислювальна техніка\n</b>
-            \t6.050101 Компютерні науки
-            \n\t6.050102 Компютерна інженерія
-            \n\t6.050103 Програмна інженерія
-
-        <b>\n\n1701 Інформаційна безпека</b>
-            \n\t6.170101 Безпека інформаційних і комунікаційних систем
-            \n\t6.170103 Управління інформаційною безпекою
-
-        <b>\n\n0515 Видавничо-поліграфічна справа</b>
-            \n\t6.051201 Видавничо-поліграфічна справа
-    </string>
-    <string name="title_activity_timetable">TimetableActivity</string>
-
-    <string name="hello_world">Hello world!</string>
-    <string name="input_group">Введите свою группу</string>
-    <string name="timetable">Расписание</string>
+    
+    <string name="login_error_message_login">Введите логин</string>
+    <string name="login_error_message_password">Введите пароль</string>
 
 </resources>

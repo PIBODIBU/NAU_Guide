@@ -268,7 +268,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
                     @Override
                     protected Void doInBackground(Void... params) {
-                        try {
+                        if (!currentMarkerLabel.equals("") && currentMarkerID != 0 && currentMarkerID > 0 && currentMarkerID <= university.getHashMapSize()) {
                             if (isInternetAvailable()) {
                                 runOnUiThread(new Runnable() {
                                     @Override
@@ -291,8 +291,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                                     }
                                 });
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
                         return null;
                     }
@@ -303,7 +301,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         fab_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //try {
                 if (!currentMarkerLabel.equals("") && currentMarkerID != 0 && currentMarkerID > 0 && currentMarkerID <= university.getHashMapSize()) {
                     settings.edit().putInt(CORP_ID_KEY, currentMarkerID).apply();
 
@@ -313,9 +310,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                     //.putExtra(CURRENT_LATITUDE, mMap.getMyLocation().getLatitude())
                     //.putExtra(CURRENT_LONGTITUDE, mMap.getMyLocation().getLongitude()));
                 }
-                /*} catch (Exception e) {
-                    e.printStackTrace();
-                }*/
             }
         });
 

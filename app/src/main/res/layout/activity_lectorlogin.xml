@@ -1,0 +1,58 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".LoginLector.LoginLectorActivity"
+    android:background="@color/grey_bg">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+
+
+    <EditText
+            android:id="@+id/username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Логин"
+            android:inputType="text"
+            android:lines="1"
+            android:textColor="@color/black"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:textColorHint="@color/grey"
+            android:layout_below="@+id/toolbar"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/colorAppPrimary" />
+
+
+    <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Пароль"
+            android:inputType="textPassword"
+            android:textColor="@color/black"
+            android:layout_marginRight="16dp"
+            android:layout_marginLeft="16dp"
+            android:textColorHint="@color/grey"
+            android:layout_below="@+id/username"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/colorAppPrimary" />
+
+
+    <com.gc.materialdesign.views.ButtonRectangle
+        android:id="@+id/buttonUserLogin"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/password"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="16dp"
+        android:text="Login"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/colorAppPrimary" />
+
+
+</RelativeLayout>

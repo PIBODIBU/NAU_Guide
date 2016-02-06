@@ -89,20 +89,14 @@
             android:name=".InfoActivity"
             android:label="@string/InfoActivity_label" />
         <activity
-            android:name=".TimetableActivity"
-            android:label="@string/title_activity_timetable" />
-        <activity
             android:name=".FloorActivity"
             android:label="@string/FloorActivity_label" />
-
         <activity
             android:name=".LoginLector.LoginLectorActivity"
             android:label="Login" />
-
         <activity
             android:name=".UserProfileActivity"
-            android:label="Profile" />
-
+            android:label="Профиль" />
         <activity
             android:name=".LectorsListActivity"
             android:label="List" />

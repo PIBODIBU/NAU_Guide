@@ -1,4 +1,4 @@
-package ua.nau.edu.AdapterInfoActivity.Fragments;
+package ua.nau.edu.Adapters.AdapterInfoActivity.Fragments;
 
 import android.app.Activity;
 import android.content.ClipData;

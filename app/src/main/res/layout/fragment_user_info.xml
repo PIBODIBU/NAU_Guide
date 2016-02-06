@@ -1,0 +1,88 @@
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/scrollableview"
+        android:layout_width="match_parent"
+        android:layout_height="1000dp"
+        android:background="@color/grey_bg"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/bio_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RelativeLayout
+                    android:id="@+id/bio_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/block_gerb"
+                    android:background="@drawable/rounded_corner"
+                    android:paddingBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/bio_text_head"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginTop="24dp"
+                        android:text="Биография"
+                        android:textColor="@color/black"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:id="@+id/bio_text_subhead"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignLeft="@+id/bio_text_head"
+                        android:layout_alignStart="@+id/bio_text_head"
+                        android:layout_below="@+id/bio_text_head"
+                        android:layout_marginTop="0dp"
+                        android:text="Краткая биография"
+                        android:textColor="@color/text_grey"
+                        android:textSize="14sp" />
+
+                    <com.ms.square.android.expandabletextview.ExpandableTextView xmlns:android="http://schemas.android.com/apk/res/android"
+                        xmlns:expandableTextView="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/bio_text_expand"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignLeft="@+id/bio_text_head"
+                        android:layout_below="@+id/bio_text_subhead"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginTop="16dp"
+                        expandableTextView:animDuration="200"
+                        expandableTextView:maxCollapsedLines="4">
+
+                        <TextView
+                            android:id="@+id/expandable_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:textSize="14sp" />
+
+                        <ImageButton
+                            android:id="@id/expand_collapse"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right|bottom"
+                            android:background="@android:color/transparent"
+                            android:padding="16dp" />
+                    </com.ms.square.android.expandabletextview.ExpandableTextView>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+    </RelativeLayout>
+
+</android.support.v4.widget.NestedScrollView>

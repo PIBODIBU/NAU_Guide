@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsAdapter;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsDataModel;
 import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
+import ua.nau.edu.Systems.LectorsDialogs;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 /**
@@ -25,11 +26,12 @@ import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 public class LectorsListActivity extends BaseNavigationDrawerActivity {
 
     private static final String REQUEST_URL = "http://nauguide.esy.es/include/getLectors.php";
+    private static final String TAG = "LectorsListActivity";
 
     private static RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private static RecyclerView recyclerView;
-    private ArrayList<LectorsDataModel> data;
+    private ArrayList<LectorsDataModel> data = new ArrayList<LectorsDataModel>();
 
     private SharedPrefUtils sharedPrefUtils;
     private SharedPreferences settings = null;
@@ -51,10 +53,13 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview_user_data);
         recyclerView.setHasFixedSize(true);
+        //recyclerView.addItemDecoration(new DividerItemDecoration(this));
 
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        adapter = new LectorsAdapter(data, LectorsListActivity.this);
 
         new AsyncTask<Void, Void, Void>() {
             ProgressDialog loading;
@@ -71,26 +76,47 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
 
             @Override
             protected Void doInBackground(Void... params) {
-                try {
-                    LoginLectorUtils httpUtils = new LoginLectorUtils();
-                    String name, uniqueId, photoUrl, institute;
-                    JSONArray array = new JSONArray(httpUtils.sendPostRequest(REQUEST_URL));
-                    data = new ArrayList<LectorsDataModel>();
+                LoginLectorUtils httpUtils = new LoginLectorUtils();
+                String response = httpUtils.sendPostRequest(REQUEST_URL);
 
-                    for (int i = 0; i < array.length(); i++) {
-                        JSONObject jsonObject = array.getJSONObject(i);
-
-                        name = jsonObject.getString("name");
-                        uniqueId = jsonObject.getString("unique_id");
-                        photoUrl = jsonObject.getString("photo_url");
-                        institute = jsonObject.getString("institute") + ", " + jsonObject.getString("department");
-
-                        if (!name.equals("") && !uniqueId.equals("") && !photoUrl.equals("")) {
-                            data.add(new LectorsDataModel(name, uniqueId, photoUrl, institute));
+                if (response.equalsIgnoreCase("error_connection")) {
+                    Log.e(TAG, "No Internet avalible");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            LectorsDialogs.InternetConnectionErrorWithExit(LectorsListActivity.this);
                         }
+                    });
+                } else if (response.equalsIgnoreCase("error_server")) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            LectorsDialogs.serverConnectionErrorWithExit(LectorsListActivity.this);
+                        }
+                    });
+                    Log.e(TAG, "Server error. Response code != 200");
+                    return null;
+                } else {
+                    try {
+                        String name, uniqueId, photoUrl, institute;
+
+                        JSONArray array = new JSONArray(response);
+
+                        for (int i = 0; i < array.length(); i++) {
+                            JSONObject jsonObject = array.getJSONObject(i);
+
+                            name = jsonObject.getString("name");
+                            uniqueId = jsonObject.getString("unique_id");
+                            photoUrl = jsonObject.getString("photo_url");
+                            institute = jsonObject.getString("institute") + ", " + jsonObject.getString("department");
+
+                            if (!name.equals("") && !uniqueId.equals("") && !photoUrl.equals("")) {
+                                data.add(new LectorsDataModel(name, uniqueId, photoUrl, institute));
+                            }
+                        }
+                    } catch (Exception e) {
+                        Log.e("LectorsListActivity", "Can't create JSONArray");
                     }
-                } catch (Exception e) {
-                    Log.e("LectorsListActivity", "Can't create JSONArray");
                 }
 
                 return null;
@@ -100,11 +126,11 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
             protected void onPostExecute(final Void str) {
                 super.onPostExecute(str);
                 loading.dismiss();
-                adapter = new LectorsAdapter(data, LectorsListActivity.this);
-                recyclerView.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
             }
         }.execute();
 
-
+        recyclerView.setAdapter(adapter);
     }
+
 }
