@@ -61,6 +61,12 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
 
         adapter = new NewsAdapter(data, NewsActivity.this);
 
+        loadPosts(0, 30);
+
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void loadPosts(final int startPosition, final int loadNumber) {
         new AsyncTask<String, Void, String>() {
             ProgressDialog loading = new ProgressDialog(NewsActivity.this);
 
@@ -77,8 +83,10 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
             protected String doInBackground(String... params) {
                 LoginLectorUtils httpUtils = new LoginLectorUtils();
                 HashMap<String, String> postData = new HashMap<String, String>();
-                postData.put("limit_from", "0");
-                postData.put("limit_to", "30");
+                postData.put("start_post", Integer.toString(startPosition));
+                postData.put("number_of_posts", Integer.toString(loadNumber));
+
+                Log.i("NewsActivity", "StartPos: " + Integer.toString(startPosition));
 
                 final String response = httpUtils.sendPostRequestWithParams(REQUEST_URL, postData);
 
@@ -121,11 +129,11 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                             message = jsonObject.getString("message");
                             createTime = jsonObject.getString("created_at");
 
-                            Log.e("NewsActivity", "Added:" + author);
+                            Log.i("NewsActivity", "Added: [" + i + "] " + author);
 
-                            //if (!author.equals("") && !authorUniqueId.equals("") && !authorPhotoUrl.equals("") && !message.equals("") && !createTime.equals("")) {
+                            if (!author.equals("") && !authorUniqueId.equals("") && !authorPhotoUrl.equals("") && !message.equals("") && !createTime.equals("")) {
                                 data.add(new NewsDataModel(id, author, authorUniqueId, authorPhotoUrl, message, createTime));
-                            //}
+                            }
                         }
                     } catch (Exception e) {
                         Log.e("NewsActivity", "Can't create JSONArray");
@@ -139,11 +147,10 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
             protected void onPostExecute(final String str) {
                 super.onPostExecute(str);
                 loading.dismiss();
-                adapter.notifyDataSetChanged();
+                //adapter.notifyDataSetChanged();
+                adapter.notifyItemInserted(data.size());
             }
         }.execute();
-
-        recyclerView.setAdapter(adapter);
     }
 
 }
