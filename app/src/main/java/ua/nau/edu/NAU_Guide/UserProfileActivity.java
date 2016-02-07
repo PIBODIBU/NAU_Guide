@@ -7,9 +7,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import ua.nau.edu.Enum.Activities;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorActivity;
@@ -22,6 +25,7 @@ import ua.nau.edu.Adapters.UserProfileAdapter.UserAdapter;
 public class UserProfileActivity extends BaseNavigationDrawerActivity {
 
     private static final String REQUEST_URL = "http://nauguide.esy.es/include/getMyPage.php";
+    private static final String TAG = "UserProfile";
 
     private SharedPrefUtils sharedPrefUtils;
 
@@ -58,8 +62,8 @@ public class UserProfileActivity extends BaseNavigationDrawerActivity {
         pager.setOffscreenPageLimit(5); // Лимит хранения Фрагментов в памяти
         tabs.setupWithViewPager(pager);
 
-        //getMyPage();
-
+        if (getIntent().getStringExtra("action").equals("getMyPage"))
+            this.drawerResult.setSelection(Activities.UserProfileActivity.ordinal());
     }
 
     private void showDialogConnectionError() {

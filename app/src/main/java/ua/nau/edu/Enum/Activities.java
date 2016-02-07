@@ -9,6 +9,7 @@ public enum Activities {
     MapsActivity,
     UserProfileActivity,
     LectorsListActivity,
+    NewsActivity,
     ChatActivity,
     SettingsActivity,
     TimetableActivity,

@@ -15,7 +15,7 @@
     <string name="search_hint">Поиск</string>
     <string name="action_settings">Settings</string>
 
-    <string name="drawer_item_home">Домой</string>
+    <string name="drawer_item_home">Корпуса</string>
     <string name="drawer_item_mypage">Моя страница</string>
     <string name="drawer_item_map">Карта</string>
     <string name="drawer_item_lectors">Преподаватели</string>
@@ -23,7 +23,7 @@
     <string name="drawer_item_settings">Настройки</string>
     <string name="drawer_item_search">Поиск</string>
     <string name="drawer_item_exit">Выход</string>
-    <string name="drawer_item_chat">Чат</string>
+    <string name="drawer_item_posts">Лента</string>
 
     <string name="close_app">Закрыть</string>
 

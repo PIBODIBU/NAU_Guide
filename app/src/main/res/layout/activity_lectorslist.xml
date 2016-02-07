@@ -11,6 +11,12 @@
         android:id="@+id/toolbar"
         layout="@layout/toolbar" />
 
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
+
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview_user_data"
         android:layout_width="match_parent"

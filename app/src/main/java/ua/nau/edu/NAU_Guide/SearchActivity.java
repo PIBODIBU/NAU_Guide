@@ -26,23 +26,21 @@ public class SearchActivity extends BaseNavigationDrawerActivity {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-
-        SharedPreferences settings_vk = getSharedPreferences(VK_PREFERENCES, MODE_PRIVATE);
-
-        getDrawer(
-                settings_vk.getString(VK_INFO_KEY, ""),
-                settings_vk.getString(VK_EMAIL_KEY, "")
-        );
-
         handleIntent(getIntent());
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_lector_list, menu);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        return true;
     }
 
     @Override
@@ -52,29 +50,9 @@ public class SearchActivity extends BaseNavigationDrawerActivity {
 
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            TextView text = (TextView) findViewById(R.id.textView);
-
-            String query = text.getText() + intent.getStringExtra(SearchManager.QUERY);
-            text.setText(query);
-        } else {
-            TextView text = (TextView) findViewById(R.id.textView);
-            text.setVisibility(View.GONE);
-
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            //use the query to search
         }
-    }
-
-    public void toastShowLong(String TEXT) {
-        Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
-    }
-
-    public void toastShowShort(String TEXT) {
-        Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    protected void onResume() {
-        getCurrentSelection();
-        super.onResume();
     }
 
 }

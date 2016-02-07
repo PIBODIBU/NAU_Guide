@@ -14,9 +14,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsAdapter;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsDataModel;
-import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
 import ua.nau.edu.Systems.LectorsDialogs;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
@@ -32,13 +32,13 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
     private ArrayList<LectorsDataModel> data = new ArrayList<LectorsDataModel>();
 
     private SharedPrefUtils sharedPrefUtils;
-    private SharedPreferences settings = null;
-    private SharedPreferences settingsVK = null;
+    private SharedPreferences settings;
+    private SharedPreferences settingsVK;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lectors);
+        setContentView(R.layout.activity_lectorslist);
 
         settings = getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, MODE_PRIVATE);
         settingsVK = getSharedPreferences(sharedPrefUtils.VK_PREFERENCES, LectorsListActivity.MODE_PRIVATE);
@@ -129,5 +129,4 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
 
         recyclerView.setAdapter(adapter);
     }
-
 }

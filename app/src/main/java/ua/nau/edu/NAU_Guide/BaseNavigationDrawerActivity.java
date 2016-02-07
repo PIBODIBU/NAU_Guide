@@ -82,8 +82,12 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 drawerResult.setSelection(Activities.LectorsListActivity.ordinal());
                 break;
             }
+            case "NewsActivity": {
+                drawerResult.setSelection(Activities.NewsActivity.ordinal());
+                break;
+            }
             case "UserProfileActivity": {
-                drawerResult.setSelection(Activities.UserProfileActivity.ordinal());
+                drawerResult.setSelection(-1);
                 break;
             }
             default: {
@@ -108,15 +112,19 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setToolbarTitle(toolbar);
 
-
         final PrimaryDrawerItem home = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_home)
-                .withIcon(GoogleMaterial.Icon.gmd_home)
+                .withIcon(GoogleMaterial.Icon.gmd_domain)
                 .withIdentifier(Activities.MainActivity.ordinal());
+
+        final PrimaryDrawerItem posts = new PrimaryDrawerItem()
+                .withName(R.string.drawer_item_posts)
+                .withIcon(GoogleMaterial.Icon.gmd_reorder)
+                .withIdentifier(Activities.NewsActivity.ordinal());
 
         final PrimaryDrawerItem myPage = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_mypage)
-                .withIcon(GoogleMaterial.Icon.gmd_pageview)
+                .withIcon(GoogleMaterial.Icon.gmd_grade)
                 .withIdentifier(Activities.UserProfileActivity.ordinal());
 
         final PrimaryDrawerItem map = new PrimaryDrawerItem()
@@ -126,7 +134,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 
         final PrimaryDrawerItem lectors = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_lectors)
-                .withIcon(GoogleMaterial.Icon.gmd_account_circle)
+                .withIcon(GoogleMaterial.Icon.gmd_perm_identity)
                 .withIdentifier(Activities.LectorsListActivity.ordinal());
 
         final PrimaryDrawerItem download = new PrimaryDrawerItem()
@@ -174,7 +182,10 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                         } else {
                             if (!sharedPrefs.getString(sharedPrefUtils.TOKEN_KEY, "").equals("")) {
-                                startActivity(new Intent(BaseNavigationDrawerActivity.this, UserProfileActivity.class));
+                                startActivity(new Intent(BaseNavigationDrawerActivity.this, UserProfileActivity.class)
+                                        .putExtra("action", "getMyPage")
+                                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                finish();
                             }
                         }
                         return false;
@@ -197,6 +208,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withHeaderDivider(false)
                 .addDrawerItems(
                         home,
+                        posts,
                         map,
                         lectors,
                         download,
@@ -241,6 +253,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                             String MAP_CLASS = "MapsActivity";
                             String LECTORS_CLASS = "LectorsListActivity";
                             String USER_CLASS = "UserProfileActivity";
+                            String POSTS_CLASS = "NewsActivity";
 
                             Activities activities = Activities.values()[drawerItem.getIdentifier()];
 
@@ -281,6 +294,16 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                     } else {
                                         startActivity(new Intent(BaseNavigationDrawerActivity.this, UserProfileActivity.class)
                                                 .putExtra("action", "getMyPage")
+                                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                        finish();
+                                        break;
+                                    }
+                                }
+                                case NewsActivity: {
+                                    if (CURRENT_CLASS.equals(POSTS_CLASS)) {
+                                        break;
+                                    } else {
+                                        startActivity(new Intent(BaseNavigationDrawerActivity.this, NewsActivity.class)
                                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                         finish();
                                         break;

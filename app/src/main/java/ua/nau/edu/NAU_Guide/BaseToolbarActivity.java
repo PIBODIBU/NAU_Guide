@@ -40,11 +40,13 @@ import java.io.FileOutputStream;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
+import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class BaseToolbarActivity extends AppCompatActivity {
-    private InputMethodManager MethodManager = null;
-    private SharedPreferences sharedPrefs = null;
-    private SharedPreferences sharedPrefsVK = null;
+    private InputMethodManager MethodManager;
+    private SharedPreferences sharedPrefs;
+    private SharedPreferences sharedPrefsVK;
+    private SharedPrefUtils sharedPrefUtils;
 
     BaseToolbarActivity() {
     }
@@ -85,7 +87,7 @@ public class BaseToolbarActivity extends AppCompatActivity {
     }
 
     public void toastShowLong(String TEXT) {
-        Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
+        Toast.makeText(BaseToolbarActivity.this, TEXT, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -94,7 +96,8 @@ public class BaseToolbarActivity extends AppCompatActivity {
 
         MethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
 
-        /*sharedPrefs = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
-        sharedPrefsVK = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);*/
+        sharedPrefs = getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, MODE_PRIVATE);
+        sharedPrefsVK = getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, MainActivity.MODE_PRIVATE);
+        sharedPrefUtils = new SharedPrefUtils(sharedPrefs, sharedPrefsVK);
     }
 }
