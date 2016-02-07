@@ -7,7 +7,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
 
 import com.gc.materialdesign.views.ProgressBarIndeterminate;
 
@@ -18,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ua.nau.edu.APIBuilders.PostsLoaderBuilder;
+import ua.nau.edu.APIBuilders.PostsRefreshBuilder;
 import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
@@ -37,6 +37,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
     private ArrayList<NewsDataModel> data = new ArrayList<NewsDataModel>();
     private PostsLoaderBuilder postsLoaderWithoutDialog;
     private PostsLoaderBuilder postsLoaderWithDialog;
+    private PostsRefreshBuilder postsRefreshBuilder;
 
     private SharedPrefUtils sharedPrefUtils;
 
@@ -59,9 +60,10 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                 sharedPrefUtils.getEmail()
         );
 
-        setUpSwipeRefreshLayout();
         setUpRecyclerView();
         setUpPostsLoaders();
+        setUpPostsRefreshers();
+        setUpSwipeRefreshLayout();
 
         Log.i(TAG, "onCreate: Loading first " + loadNumber + " posts...");
 
@@ -70,7 +72,6 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
     }
 
     private void setUpPostsLoaders() {
-
         postsLoaderWithDialog = new PostsLoaderBuilder()
                 .withContext(NewsActivity.this)
                 .withAdapter(adapter)
@@ -92,8 +93,32 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                 .withDataSet(data);
     }
 
-    private void setUpSwipeRefreshLayout() {
+    private void setUpPostsRefreshers() {
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeLayoutContainer);
+        postsRefreshBuilder = new PostsRefreshBuilder()
+                .withContext(NewsActivity.this)
+                .withAdapter(adapter)
+                .withTag(TAG)
+                .withRecycler(recyclerView)
+                .withActivity(this)
+                .withDataSet(data)
+                .withSwipeRefreshLayout(mSwipeRefreshLayout)
+                .withStartLoadPosition(startLoadPosition)
+                .withPostsLoaderBuilder(postsLoaderWithoutDialog)
+                .withLinearLayoutManager(layoutManager);
+
+        /*recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int current_page) {
+                Log.i(TAG, "From PostsRefreshBuilder / Loading new data... (" + Integer.toString(loadNumber) + ") posts");
+                postsLoaderWithoutDialog.loadPosts(startLoadPosition, loadNumber, REQUEST_URL);
+                startLoadPosition = postsLoaderWithoutDialog.incStartPosition(startLoadPosition, loadNumber);
+            }
+        });*/
+
+    }
+
+    private void setUpSwipeRefreshLayout() {
         mSwipeRefreshLayout.setColorSchemeResources(
                 R.color.colorAppPrimary
                 /*R.color.flashy_blue,
@@ -102,8 +127,9 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Refresh items
-                refreshItems();
+                // Refreshing items
+                postsRefreshBuilder.refreshItems(REQUEST_URL, loadNumber);
+
             }
         });
     }
@@ -127,29 +153,6 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
         });
 
         recyclerView.setAdapter(adapter);
-
-        /*adapter.setOnLoadMoreListener(new NewsAdapterTest.OnLoadMoreListener() {
-            @Override
-            public void onLoadMore() {
-                Log.i(TAG, "onLoadMore called");
-                //add progress item
-                data.add(null);
-                adapter.notifyItemInserted(data.size() - 1);
-
-                Log.i(TAG, "Loading new data... (" + Integer.toString(loadNumber) + ") posts");
-                loadPosts(startLoadPosition, loadNumber);
-                startLoadPosition += loadNumber;
-
-                //remove progress item
-                data.remove(data.size() - 1);
-                adapter.notifyItemRemoved(data.size());
-                //add items one by one
-
-                adapter.setLoaded();
-                //or you can add all at once but do not forget to call mAdapter.notifyDataSetChanged();
-            }
-        });*/
-
     }
 
     private void refreshItems() {

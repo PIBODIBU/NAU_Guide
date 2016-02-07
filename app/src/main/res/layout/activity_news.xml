@@ -29,13 +29,14 @@
                 android:clipToPadding="false"
                 android:paddingBottom="8dp" />
 
-            <com.gc.materialdesign.views.ProgressBarIndeterminate xmlns:android="http://schemas.android.com/apk/res/android"
+            <com.gc.materialdesign.views.ProgressBarIndeterminate
                 android:id="@+id/progressBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
+                android:layout_alignParentTop="false"
                 android:background="@color/colorAppPrimary"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:layout_alignParentBottom="true"/>
 
         </RelativeLayout>
     </android.support.v4.widget.SwipeRefreshLayout>

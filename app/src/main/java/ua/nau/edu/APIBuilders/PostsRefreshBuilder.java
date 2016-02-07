@@ -1,117 +1,123 @@
 package ua.nau.edu.APIBuilders;
 
+
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
 
 import com.gc.materialdesign.views.ProgressBarIndeterminate;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.net.Inet4Address;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
-import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
+import ua.nau.edu.Systems.EndlessRecyclerOnScrollListener;
 import ua.nau.edu.Systems.LectorsDialogs;
 
-public class PostsLoaderBuilder {
-    private static final String BUILDER_TAG = "PostsLoaderBuilder/ ";
+public class PostsRefreshBuilder {
+    private static final String BUILDER_TAG = "PostsRefreshBuilder/ ";
+    private Activity activity;
     private String TAG;
     private Context context;
-    private Activity activity;
-    private boolean withDialog = false;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private ArrayList<NewsDataModel> data;
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
-    private ProgressBarIndeterminate progressBar;
+    private int startLoadPosition;
+    private PostsLoaderBuilder postsLoader;
+    private LinearLayoutManager linearLayoutManager;
 
-    public PostsLoaderBuilder withContext(Context context) {
-        this.context = context;
-
-        return this;
-    }
-
-    public PostsLoaderBuilder withDataSet(ArrayList<NewsDataModel> data) {
-        this.data = data;
-
-        return this;
-    }
-
-    public PostsLoaderBuilder withActivity(Activity activity) {
+    public PostsRefreshBuilder withActivity(Activity activity) {
         this.activity = activity;
 
         return this;
     }
 
-    public PostsLoaderBuilder withLoadingDialog(boolean withDialog) {
-        this.withDialog = withDialog;
+    public PostsRefreshBuilder withContext(Context context) {
+        this.context = context;
 
         return this;
     }
 
-    public PostsLoaderBuilder withRecycler(RecyclerView recyclerView) {
+    public PostsRefreshBuilder withDataSet(ArrayList<NewsDataModel> data) {
+        this.data = data;
+
+        return this;
+    }
+
+    public PostsRefreshBuilder withSwipeRefreshLayout(SwipeRefreshLayout swipeRefreshLayout) {
+        this.swipeRefreshLayout = swipeRefreshLayout;
+
+        return this;
+    }
+
+    public PostsRefreshBuilder withRecycler(RecyclerView recyclerView) {
         this.recyclerView = recyclerView;
 
         return this;
     }
 
-    public PostsLoaderBuilder withAdapter(RecyclerView.Adapter adapter) {
+    public PostsRefreshBuilder withAdapter(RecyclerView.Adapter adapter) {
         this.adapter = adapter;
 
         return this;
     }
 
-    public PostsLoaderBuilder withProgressBar(ProgressBarIndeterminate progressBar) {
-        this.progressBar = progressBar;
-
-        return this;
-    }
-
-    public PostsLoaderBuilder withTag(String TAG) {
+    public PostsRefreshBuilder withTag(String TAG) {
         this.TAG = TAG;
 
         return this;
     }
 
-    public void loadPosts(final int startLoadPosition, final int loadNumber, final String REQUEST_URL) {
-        new AsyncTask<String, Void, String>() {
-            ProgressDialog loadingDialog = null;
+    public PostsRefreshBuilder withStartLoadPosition(int startLoadPosition) {
+        this.startLoadPosition = startLoadPosition;
 
+        return this;
+    }
+
+    public PostsRefreshBuilder withPostsLoaderBuilder(PostsLoaderBuilder postsLoader) {
+        this.postsLoader = postsLoader;
+
+        return this;
+    }
+
+    public PostsRefreshBuilder withLinearLayoutManager(LinearLayoutManager linearLayoutManager) {
+        this.linearLayoutManager = linearLayoutManager;
+
+        return this;
+    }
+
+    public void refreshItems(final String REQUEST_URL, final int loadNumber) {
+        new AsyncTask<String, Void, String>() {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                if (withDialog) {
-                    loadingDialog = new ProgressDialog(context);
-                    loadingDialog.setMessage(context.getResources().getString(R.string.dialog_loading));
-                    loadingDialog.setIndeterminate(true);
-                    loadingDialog.setCancelable(false);
-                    loadingDialog.show();
-                }
-                if (progressBar != null) {
-                    progressBar.setVisibility(View.VISIBLE);
-                }
+                clearRecyclerView();
+                Log.i(TAG, BUILDER_TAG + "Refreshing items...");
             }
 
             @Override
             protected String doInBackground(String... params) {
                 LoginLectorUtils httpUtils = new LoginLectorUtils();
                 HashMap<String, String> postData = new HashMap<String, String>();
-                postData.put("start_post", Integer.toString(startLoadPosition));
+                postData.put("start_post", Integer.toString(0));
                 postData.put("number_of_posts", Integer.toString(loadNumber));
 
-                Log.i(TAG, BUILDER_TAG + "StartPos: " + Integer.toString(startLoadPosition));
+                Log.i(TAG, BUILDER_TAG + "StartPos: " + Integer.toString(0));
 
                 final String response = httpUtils.sendPostRequestWithParams(REQUEST_URL, postData);
 
                 if (response.equalsIgnoreCase("error_connection")) {
-                    Log.e(TAG, "No Internet avalible");
+                    Log.e(TAG, BUILDER_TAG + "No Internet avalible");
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -125,7 +131,7 @@ public class PostsLoaderBuilder {
                             LectorsDialogs.serverConnectionErrorWithExit(context);
                         }
                     });
-                    Log.e(TAG, BUILDER_TAG + "Server error. Response code != 200");
+                    Log.e(TAG, "Server error. Response code != 200");
                     return null;
                 } else {
                     try {
@@ -149,15 +155,17 @@ public class PostsLoaderBuilder {
                             message = jsonObject.getString("message");
                             createTime = jsonObject.getString("created_at");
 
+                            Log.i(TAG, BUILDER_TAG + "Added: [" + i + "] " + createTime);
+
                             if (!author.equals("") && !authorUniqueId.equals("") && !authorPhotoUrl.equals("") && !message.equals("") && !createTime.equals("")) {
                                 data.add(new NewsDataModel(id, author, authorUniqueId, authorPhotoUrl, message, createTime));
-                                Log.i(TAG, BUILDER_TAG + "Added: [" + id + "] " + author + "   " + createTime);
                             }
                         }
                     } catch (Exception e) {
                         Log.e(TAG, BUILDER_TAG + "Can't create JSONArray");
                     }
                 }
+
                 return null;
             }
 
@@ -167,23 +175,35 @@ public class PostsLoaderBuilder {
                 if (data != null) {
                     adapter.notifyDataSetChanged();
                 } else {
-                    Log.i(TAG, BUILDER_TAG + "onPostExecute: dataSet == null");
-                    //activity.finish();
+                    Log.e(TAG, BUILDER_TAG + "data == null");
                 }
 
-                if (loadingDialog != null) {
-                    loadingDialog.dismiss();
-                }
-                if (progressBar != null) {
-                    progressBar.setVisibility(View.GONE);
-                }
+                startLoadPosition = loadNumber;
+                Log.i(TAG, BUILDER_TAG + "startLoadPosition = " + Integer.toString(startLoadPosition));
+                recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(linearLayoutManager) {
+                    @Override
+                    public void onLoadMore(int current_page) {
+                        Log.i(TAG, "From PostsRefreshBuilder / Loading new data... (" + Integer.toString(loadNumber) + ") posts");
+                        postsLoader.loadPosts(startLoadPosition, loadNumber, REQUEST_URL);
+                        startLoadPosition = postsLoader.incStartPosition(startLoadPosition, loadNumber);
+                    }
+                });
+
+                onItemsLoadComplete();
             }
         }.execute();
     }
 
-    public int incStartPosition(int startLoadPosition, int loadNumber) {
-        return startLoadPosition += loadNumber;
+    private void onItemsLoadComplete() {
+        // Update completed
+        Log.i(TAG, BUILDER_TAG + "Refreshed");
+
+        // Stop refresh animation
+        swipeRefreshLayout.setRefreshing(false);
     }
 
-
+    private void clearRecyclerView() {
+        data.clear();
+        adapter.notifyDataSetChanged();
+    }
 }
