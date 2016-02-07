@@ -81,6 +81,9 @@ public class InfoActivity extends BaseToolbarActivity {
             case android.R.id.home:
                 finish();
                 break;
+
+            default:
+                return super.onOptionsItemSelected(item);
         }
         return true;
     }

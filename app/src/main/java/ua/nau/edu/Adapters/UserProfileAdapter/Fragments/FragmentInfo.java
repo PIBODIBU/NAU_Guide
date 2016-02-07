@@ -97,7 +97,7 @@ public class FragmentInfo extends Fragment {
                     supportActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            LectorsDialogs.InternetConnectionErrorWithExit(supportActivity);
+                            LectorsDialogs.internetConnectionErrorWithExit(supportActivity);
                         }
                     });
                 } else if (response.equalsIgnoreCase("error_server")) {
@@ -173,7 +173,7 @@ public class FragmentInfo extends Fragment {
                     supportActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            LectorsDialogs.InternetConnectionErrorWithExit(supportActivity);
+                            LectorsDialogs.internetConnectionErrorWithExit(supportActivity);
                         }
                     });
                 } else if (response.equalsIgnoreCase("error_server")) {

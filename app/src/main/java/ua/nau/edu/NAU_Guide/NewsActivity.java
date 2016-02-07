@@ -1,7 +1,5 @@
 package ua.nau.edu.NAU_Guide;
 
-import android.app.ProgressDialog;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -9,6 +7,9 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+
+import com.gc.materialdesign.views.ProgressBarIndeterminate;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,6 +17,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import ua.nau.edu.APIBuilders.PostsLoaderBuilder;
 import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
@@ -26,16 +28,17 @@ import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 public class NewsActivity extends BaseNavigationDrawerActivity {
 
     private static final String REQUEST_URL = "http://nauguide.esy.es/include/getPostAll.php";
-    private static final String TAG = "LectorsListActivity";
+    private static final String TAG = "NewsActivity";
 
     private static RecyclerView.Adapter adapter;
     private LinearLayoutManager layoutManager;
     private static RecyclerView recyclerView;
+    private ProgressBarIndeterminate progressBar;
     private ArrayList<NewsDataModel> data = new ArrayList<NewsDataModel>();
+    private PostsLoaderBuilder postsLoaderWithoutDialog;
+    private PostsLoaderBuilder postsLoaderWithDialog;
 
     private SharedPrefUtils sharedPrefUtils;
-    private SharedPreferences settings = null;
-    private SharedPreferences settingsVK = null;
 
     private int startLoadPosition = 0;
     private int loadNumber = 5;
@@ -47,15 +50,49 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news);
 
-        settings = getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, MODE_PRIVATE);
-        settingsVK = getSharedPreferences(sharedPrefUtils.VK_PREFERENCES, LectorsListActivity.MODE_PRIVATE);
-        sharedPrefUtils = new SharedPrefUtils(settings, settingsVK);
+        sharedPrefUtils = new SharedPrefUtils(
+                getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, MODE_PRIVATE),
+                getSharedPreferences(sharedPrefUtils.VK_PREFERENCES, LectorsListActivity.MODE_PRIVATE));
 
         getDrawer(
                 sharedPrefUtils.getName(),
                 sharedPrefUtils.getEmail()
         );
 
+        setUpSwipeRefreshLayout();
+        setUpRecyclerView();
+        setUpPostsLoaders();
+
+        Log.i(TAG, "onCreate: Loading first " + loadNumber + " posts...");
+
+        postsLoaderWithDialog.loadPosts(startLoadPosition, loadNumber, REQUEST_URL);
+        startLoadPosition = postsLoaderWithDialog.incStartPosition(startLoadPosition, loadNumber);
+    }
+
+    private void setUpPostsLoaders() {
+
+        postsLoaderWithDialog = new PostsLoaderBuilder()
+                .withContext(NewsActivity.this)
+                .withAdapter(adapter)
+                .withLoadingDialog(true)
+                .withTag(TAG)
+                .withRecycler(recyclerView)
+                .withActivity(this)
+                .withDataSet(data);
+
+        progressBar = (ProgressBarIndeterminate) findViewById(R.id.progressBar);
+        postsLoaderWithoutDialog = new PostsLoaderBuilder()
+                .withContext(NewsActivity.this)
+                .withAdapter(adapter)
+                .withLoadingDialog(false)
+                .withProgressBar(progressBar)
+                .withTag(TAG)
+                .withRecycler(recyclerView)
+                .withActivity(this)
+                .withDataSet(data);
+    }
+
+    private void setUpSwipeRefreshLayout() {
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeLayoutContainer);
         mSwipeRefreshLayout.setColorSchemeResources(
                 R.color.colorAppPrimary
@@ -69,127 +106,58 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                 refreshItems();
             }
         });
+    }
 
+    private void setUpRecyclerView() {
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview_news);
-        recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         adapter = new NewsAdapter(data, NewsActivity.this);
+
+        recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+
         recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int current_page) {
-                Log.i("NewsActivity", "Loading new data...");
-                loadPosts(startLoadPosition, loadNumber);
-                startLoadPosition += loadNumber;
+                Log.i(NewsActivity.TAG, "onLoadMore called: Loading new data... (" + Integer.toString(loadNumber) + ") posts");
+                postsLoaderWithoutDialog.loadPosts(startLoadPosition, loadNumber, REQUEST_URL);
+                startLoadPosition = postsLoaderWithoutDialog.incStartPosition(startLoadPosition, loadNumber);
             }
         });
 
-        loadPosts(startLoadPosition, loadNumber);
-        startLoadPosition += loadNumber;
-
         recyclerView.setAdapter(adapter);
 
-    }
-
-    private void loadPosts(final int startPosition, final int loadNumber) {
-        new AsyncTask<String, Void, String>() {
-            //ProgressDialog loading = new ProgressDialog(NewsActivity.this);
-
+        /*adapter.setOnLoadMoreListener(new NewsAdapterTest.OnLoadMoreListener() {
             @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                /*loading.setMessage(getResources().getString(R.string.dialog_loading));
-                loading.setIndeterminate(true);
-                loading.setCancelable(false);
-                loading.show();*/
+            public void onLoadMore() {
+                Log.i(TAG, "onLoadMore called");
+                //add progress item
+                data.add(null);
+                adapter.notifyItemInserted(data.size() - 1);
+
+                Log.i(TAG, "Loading new data... (" + Integer.toString(loadNumber) + ") posts");
+                loadPosts(startLoadPosition, loadNumber);
+                startLoadPosition += loadNumber;
+
+                //remove progress item
+                data.remove(data.size() - 1);
+                adapter.notifyItemRemoved(data.size());
+                //add items one by one
+
+                adapter.setLoaded();
+                //or you can add all at once but do not forget to call mAdapter.notifyDataSetChanged();
             }
+        });*/
 
-            @Override
-            protected String doInBackground(String... params) {
-                LoginLectorUtils httpUtils = new LoginLectorUtils();
-                HashMap<String, String> postData = new HashMap<String, String>();
-                postData.put("start_post", Integer.toString(startPosition));
-                postData.put("number_of_posts", Integer.toString(loadNumber));
-
-                Log.i("NewsActivity", "StartPos: " + Integer.toString(startPosition));
-
-                final String response = httpUtils.sendPostRequestWithParams(REQUEST_URL, postData);
-
-                if (response.equalsIgnoreCase("error_connection")) {
-                    Log.e(TAG, "No Internet avalible");
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            LectorsDialogs.InternetConnectionErrorWithExit(NewsActivity.this);
-                        }
-                    });
-                } else if (response.equalsIgnoreCase("error_server")) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            LectorsDialogs.serverConnectionErrorWithExit(NewsActivity.this);
-                        }
-                    });
-                    Log.e(TAG, "Server error. Response code != 200");
-                    return null;
-                } else {
-                    try {
-                        int id;
-                        String author;
-                        String authorUniqueId;
-                        String authorPhotoUrl;
-                        String message;
-                        String createTime;
-
-                        JSONObject response_object = new JSONObject(response);
-                        final JSONArray array = response_object.getJSONArray("post");
-
-                        for (int i = 0; i < array.length(); i++) {
-                            JSONObject jsonObject = array.getJSONObject(i);
-
-                            id = jsonObject.getInt("id");
-                            author = jsonObject.getString("author");
-                            authorUniqueId = jsonObject.getString("author_unique_id");
-                            authorPhotoUrl = jsonObject.getString("author_photo_url");
-                            message = jsonObject.getString("message");
-                            createTime = jsonObject.getString("created_at");
-
-                            Log.i("NewsActivity", "Added: [" + i + "] " + author);
-
-                            if (!author.equals("") && !authorUniqueId.equals("") && !authorPhotoUrl.equals("") && !message.equals("") && !createTime.equals("")) {
-                                data.add(new NewsDataModel(id, author, authorUniqueId, authorPhotoUrl, message, createTime));
-                            }
-                        }
-                    } catch (Exception e) {
-                        Log.e("NewsActivity", "Can't create JSONArray");
-                    }
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(final String str) {
-                super.onPostExecute(str);
-                //loading.dismiss();
-                adapter.notifyDataSetChanged();
-                //adapter.notifyItemInserted(data.size());
-            }
-        }.execute();
     }
 
     private void refreshItems() {
         new AsyncTask<String, Void, String>() {
-            //ProgressDialog loading = new ProgressDialog(NewsActivity.this);
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                /*loading.setMessage(getResources().getString(R.string.dialog_loading));
-                loading.setIndeterminate(true);
-                loading.setCancelable(false);
-                loading.show();*/
                 clearRecyclerView();
                 Log.i(TAG, "Refreshing items...");
             }
@@ -201,7 +169,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                 postData.put("start_post", Integer.toString(0));
                 postData.put("number_of_posts", Integer.toString(loadNumber));
 
-                Log.i("NewsActivity", "StartPos: " + Integer.toString(0));
+                Log.i(TAG, "StartPos: " + Integer.toString(0));
 
                 final String response = httpUtils.sendPostRequestWithParams(REQUEST_URL, postData);
 
@@ -210,7 +178,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            LectorsDialogs.InternetConnectionErrorWithExit(NewsActivity.this);
+                            LectorsDialogs.internetConnectionErrorWithExit(NewsActivity.this);
                         }
                     });
                 } else if (response.equalsIgnoreCase("error_server")) {
@@ -244,14 +212,14 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                             message = jsonObject.getString("message");
                             createTime = jsonObject.getString("created_at");
 
-                            Log.i("NewsActivity", "Added: [" + i + "] " + author);
+                            Log.i(TAG, "Added: [" + i + "] " + createTime);
 
                             if (!author.equals("") && !authorUniqueId.equals("") && !authorPhotoUrl.equals("") && !message.equals("") && !createTime.equals("")) {
                                 data.add(new NewsDataModel(id, author, authorUniqueId, authorPhotoUrl, message, createTime));
                             }
                         }
                     } catch (Exception e) {
-                        Log.e("NewsActivity", "Can't create JSONArray");
+                        Log.e(TAG, "Can't create JSONArray");
                     }
                 }
 
@@ -261,29 +229,27 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
             @Override
             protected void onPostExecute(final String str) {
                 super.onPostExecute(str);
-                //loading.dismiss();
                 adapter.notifyDataSetChanged();
                 startLoadPosition = loadNumber;
 
                 recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
                     @Override
                     public void onLoadMore(int current_page) {
-                        Log.i("NewsActivity", "Loading new data...");
-                        loadPosts(startLoadPosition, loadNumber);
-                        startLoadPosition += loadNumber;
+                        Log.i(TAG, "Loading new data... (" + Integer.toString(loadNumber) + ") posts");
+                        postsLoaderWithoutDialog.loadPosts(startLoadPosition, loadNumber, REQUEST_URL);
+                        startLoadPosition = postsLoaderWithoutDialog.incStartPosition(startLoadPosition, loadNumber);
                     }
                 });
 
                 // Load complete
                 onItemsLoadComplete();
-                Log.i(TAG, "Refreshed");
             }
         }.execute();
     }
 
     private void onItemsLoadComplete() {
-        // Update the adapter and notify data set changed
-        // ...
+        // Update completed
+        Log.i(TAG, "Refreshed");
 
         // Stop refresh animation
         mSwipeRefreshLayout.setRefreshing(false);

@@ -5,12 +5,11 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,7 +24,6 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.holder.ImageHolder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
@@ -33,15 +31,14 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-
 import ua.nau.edu.Enum.Activities;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class BaseNavigationDrawerActivity extends AppCompatActivity {
-    protected Drawer drawerResult = null;
+    protected DrawerBuilder drawerBuilder = null;
+    protected Drawer drawer = null;
     private InputMethodManager MethodManager = null;
     private SearchView searchView;
     private boolean wasInputActive = false;
@@ -67,31 +64,31 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
     public void getCurrentSelection() {
         switch (BaseNavigationDrawerActivity.this.getClass().getSimpleName()) {
             case "MainActivity": {
-                drawerResult.setSelection(Activities.MainActivity.ordinal());
+                drawer.setSelection(Activities.MainActivity.ordinal());
                 break;
             }
             case "MapsActivity": {
-                drawerResult.setSelection(Activities.MapsActivity.ordinal());
+                drawer.setSelection(Activities.MapsActivity.ordinal());
                 break;
             }
             case "SearchActivity": {
-                drawerResult.setSelection(Activities.SearchActivity.ordinal());
+                drawer.setSelection(Activities.SearchActivity.ordinal());
                 break;
             }
             case "LectorsListActivity": {
-                drawerResult.setSelection(Activities.LectorsListActivity.ordinal());
+                drawer.setSelection(Activities.LectorsListActivity.ordinal());
                 break;
             }
             case "NewsActivity": {
-                drawerResult.setSelection(Activities.NewsActivity.ordinal());
+                drawer.setSelection(Activities.NewsActivity.ordinal());
                 break;
             }
             case "UserProfileActivity": {
-                drawerResult.setSelection(-1);
+                drawer.setSelection(-1);
                 break;
             }
             default: {
-                drawerResult.setSelection(-1);
+                drawer.setSelection(-1);
                 break;
             }
         }
@@ -106,7 +103,47 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
     }
 
     public void getDrawer(String ACCOUNT_NAME, String ACCOUNT_EMAIL) {
-// Инициализируем Toolbar
+        setUpDrawerBuilder(ACCOUNT_NAME, ACCOUNT_EMAIL);
+
+        drawerBuilder
+                .withActionBarDrawerToggle(true)
+                .withActionBarDrawerToggleAnimated(true);
+
+        Log.i("Drawer", "getDrawer");
+
+        setUpDrawer();
+        getCurrentSelection();
+    }
+
+    public void getDrawerWithBackArrow(String ACCOUNT_NAME, String ACCOUNT_EMAIL) {
+        setUpDrawerBuilder(ACCOUNT_NAME, ACCOUNT_EMAIL);
+
+        drawerBuilder
+                .withActionBarDrawerToggle(false);
+
+        Log.i("Drawer", "getDrawerWithBackArrow");
+
+        setUpDrawer();
+        getCurrentSelection();
+    }
+
+    public void setUpDrawer() {
+        if (drawerBuilder != null) {
+            final PrimaryDrawerItem myPage = new PrimaryDrawerItem()
+                    .withName(R.string.drawer_item_mypage)
+                    .withIcon(GoogleMaterial.Icon.gmd_grade)
+                    .withIdentifier(Activities.UserProfileActivity.ordinal());
+
+            drawer = drawerBuilder.build();
+
+            if (!sharedPrefUtils.getToken().equals("")) {
+                drawer.addItemAtPosition(myPage, 2);
+            }
+        }
+    }
+
+    public void setUpDrawerBuilder(String ACCOUNT_NAME, String ACCOUNT_EMAIL) {
+        // Инициализируем Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -121,11 +158,6 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withName(R.string.drawer_item_posts)
                 .withIcon(GoogleMaterial.Icon.gmd_reorder)
                 .withIdentifier(Activities.NewsActivity.ordinal());
-
-        final PrimaryDrawerItem myPage = new PrimaryDrawerItem()
-                .withName(R.string.drawer_item_mypage)
-                .withIcon(GoogleMaterial.Icon.gmd_grade)
-                .withIdentifier(Activities.UserProfileActivity.ordinal());
 
         final PrimaryDrawerItem map = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_map)
@@ -199,11 +231,9 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         Picasso.with(BaseNavigationDrawerActivity.this).load(R.drawable.header_png).into(accountHeaderBackground);
 
 // Инициализируем Navigation Drawer
-        drawerResult = new DrawerBuilder()
+        drawerBuilder = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
-                .withActionBarDrawerToggle(true)
-                .withActionBarDrawerToggleAnimated(true)
                 .withAccountHeader(accountHeader)
                 .withHeaderDivider(false)
                 .addDrawerItems(
@@ -333,43 +363,10 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        //getCurrentSelection();
 
-                        /*if (drawerItem instanceof Nameable) {
-                            Toast.makeText(MainActivity.this, MainActivity.this.getString(((Nameable) drawerItem).getNameRes()), Toast.LENGTH_SHORT).show();
-                        }
-                        if (drawerItem instanceof Badgeable) {
-                            Badgeable badgeable = (Badgeable) drawerItem;
-                            if (badgeable.getBadge() != null) {
-                                // учтите, не делайте так, если ваш бейдж содержит символ "+"
-                                try {
-                                    int badge = Integer.valueOf(badgeable.getBadge());
-                                    if (badge > 0) {
-                                        drawerResult.updateBadge(String.valueOf(badge - 1), position);
-                                    }
-                                } catch (Exception e) {
-                                    Log.d("test", "Не нажимайте на бейдж, содержащий плюс! :)");
-                                }
-                            }
-                        }*/
                         return false;
                     }
-                })
-                /*.withOnDrawerItemLongClickListener(new Drawer.OnDrawerItemLongClickListener() {
-                    @Override
-                    // Обработка длинного клика, например, только для SecondaryDrawerItem
-                    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
-                        if (drawerItem instanceof SecondaryDrawerItem) {
-                            //Toast.makeText(BaseNavigationDrawerActivity.this, BaseNavigationDrawerActivity.this.getString(((SecondaryDrawerItem) drawerItem).getNameRes()), Toast.LENGTH_SHORT).show();
-                        }
-                        return false;
-                    }
-                })*/
-                .build();
-        if (!sharedPrefUtils.getToken().equals("")) {
-            drawerResult.addItemAtPosition(myPage, 2);
-        }
-        getCurrentSelection();
+                });
     }
 
     @Override
@@ -377,15 +374,15 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         try {
             switch (keyCode) {
                 case KeyEvent.KEYCODE_MENU: {
-                    if (drawerResult.isDrawerOpen())
-                        drawerResult.closeDrawer();
+                    if (drawer.isDrawerOpen())
+                        drawer.closeDrawer();
                     else
-                        drawerResult.openDrawer();
+                        drawer.openDrawer();
                     break;
                 }
                 case KeyEvent.KEYCODE_BACK: {
-                    if (drawerResult.isDrawerOpen())
-                        drawerResult.closeDrawer();
+                    if (drawer.isDrawerOpen())
+                        drawer.closeDrawer();
                     else if (!searchView.isIconified())
                         searchView.onActionViewCollapsed();
                     else

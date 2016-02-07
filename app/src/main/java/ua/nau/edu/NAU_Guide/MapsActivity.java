@@ -50,6 +50,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     public MapsActivity() {
     }
 
+    private static final String TAG = "MainActivity";
+
     private int currentMarkerID = -1;
     private String currentMarkerLabel = "";
     private Marker mainActivityMarker = null;
@@ -79,7 +81,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        //setFragment(R.id.fragment_maps);
 
         university = new NAU(this);
         university.init();
@@ -97,33 +98,13 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         setMenuId(R.menu.menu_maps);
         setUpMapIfNeeded();
         initFloatingActionMenu();
-
-//Запустили активити не из дровера
-        if (mainActivityMarker != null) {
-            //Записываем id текущего маркера в глобальную переменную
-            currentMarkerID = getMarkerId(mainActivityMarker);
-
-            //Записываем label текущего маркера в глобальную переменную
-            currentMarkerLabel = university.getCorpsLabel().get(getMarkerId(mainActivityMarker));
-
-            //Открываем FabMenu
-            fab_menu.open(true);
-
-            //Manually open the window
-            mainActivityMarker.showInfoWindow();
-
-            //Animate to center
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(mainActivityMarker.getPosition()));
-        }
-
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        setUpMapIfNeeded();
+        //setUpMapIfNeeded();
     }
 
     @Override
@@ -139,18 +120,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         }
     }
 
-    private void setFragment(int fragmentId) {
-        /*FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(fragmentId, new MainFragment());
-        fragmentTransaction.commit();*/
-
-        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(fragmentId, new MapsFragment()).commit();
-
-    }
-
     private void setUpMapIfNeeded() {
+        Log.i(TAG, "setUpMapIfNeeded called");
 
         final ProgressDialog dialog = new ProgressDialog(MapsActivity.this);
 
@@ -189,6 +160,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
             @Override
             protected void onPostExecute(Void result) {
                 super.onPostExecute(result);
+                openMarkerFromIntent();
                 dialog.dismiss();
             }
         }.execute();
@@ -200,9 +172,29 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                 .title(title));
 
         mMapMarker.setIcon(BitmapDescriptorFactory.fromResource(icon));
-
         if (getIntent().getIntExtra("MAINACTIVITY_CORP_ID", -1) == i)
             mainActivityMarker = mMapMarker;
+    }
+
+    private void openMarkerFromIntent() {
+//Запустили активити не из дровера
+        if (mainActivityMarker != null) {
+            //Записываем id текущего маркера в глобальную переменную
+            currentMarkerID = getMarkerId(mainActivityMarker);
+            Log.i("MainActivity", "currentMarkerID =  " + Integer.toString(currentMarkerID));
+
+            //Записываем label текущего маркера в глобальную переменную
+            currentMarkerLabel = university.getCorpsLabel().get(getMarkerId(mainActivityMarker));
+
+            //Открываем FabMenu
+            fab_menu.open(true);
+
+            //Manually open the window
+            mainActivityMarker.showInfoWindow();
+
+            //Animate to center
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(mainActivityMarker.getPosition()));
+        }
     }
 
     private void setUpMap() {

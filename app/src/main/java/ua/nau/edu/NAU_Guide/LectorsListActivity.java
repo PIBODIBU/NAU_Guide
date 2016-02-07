@@ -81,7 +81,7 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            LectorsDialogs.InternetConnectionErrorWithExit(LectorsListActivity.this);
+                            LectorsDialogs.internetConnectionErrorWithExit(LectorsListActivity.this);
                         }
                     });
                 } else if (response.equalsIgnoreCase("error_server")) {

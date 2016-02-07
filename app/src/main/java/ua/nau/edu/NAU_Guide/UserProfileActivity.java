@@ -8,9 +8,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import ua.nau.edu.Enum.Activities;
 import ua.nau.edu.Enum.EnumSharedPreferences;
@@ -48,7 +48,7 @@ public class UserProfileActivity extends BaseNavigationDrawerActivity {
 
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         //collapsingToolbarLayout.setTitle("Профиль");
-        collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
+        collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(this, android.R.color.transparent));
 
         TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
         ViewPager pager = (ViewPager) findViewById(R.id.viewpager);
@@ -63,30 +63,25 @@ public class UserProfileActivity extends BaseNavigationDrawerActivity {
         tabs.setupWithViewPager(pager);
 
         if (getIntent().getStringExtra("action").equals("getMyPage"))
-            this.drawerResult.setSelection(Activities.UserProfileActivity.ordinal());
-    }
-
-    private void showDialogConnectionError() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder
-                .setMessage("Ошибка соединения с Интернетом")
-                .setPositiveButton("Ок", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        final AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface arg) {
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(UserProfileActivity.this, R.color.colorAppPrimary));
-            }
-        });
+            this.drawer.setSelection(Activities.UserProfileActivity.ordinal());
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home: {
+                Log.i(TAG, "Back arrow pressed");
+                finish();
+                return true;
+            }
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

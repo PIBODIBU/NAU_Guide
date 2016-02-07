@@ -83,7 +83,6 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
 
         textViewName.setText(dataSet.get(listPosition).getName());
         textViewVersion.setText(dataSet.get(listPosition).getVersion());
-        //imageView.setImageResource(dataSet.get(listPosition).getImage());
         Picasso.with(context).load(dataSet.get(listPosition).getImage()).into(imageView);
 
         buttonToMap.setOnClickListener(new View.OnClickListener() {

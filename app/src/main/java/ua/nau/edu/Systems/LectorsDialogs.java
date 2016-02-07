@@ -12,7 +12,7 @@ import ua.nau.edu.NAU_Guide.MainActivity;
 import ua.nau.edu.NAU_Guide.R;
 
 public class LectorsDialogs {
-    public static void InternetConnectionErrorWithExit(final Context context) {
+    public static void internetConnectionErrorWithExit(final Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder
                 .setTitle("Ошибка")
