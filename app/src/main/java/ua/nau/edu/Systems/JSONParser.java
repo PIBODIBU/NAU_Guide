@@ -48,15 +48,11 @@ public class JSONParser {
     }
 
     public String getJSONFromUrl(String url) {
-
         // Making HTTP request
         try {
-
             URL urlnew = new URL(url);
             HttpURLConnection urlConnection = (HttpURLConnection) urlnew.openConnection();
             is = new BufferedInputStream(urlConnection.getInputStream());
-
-
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (ClientProtocolException e) {

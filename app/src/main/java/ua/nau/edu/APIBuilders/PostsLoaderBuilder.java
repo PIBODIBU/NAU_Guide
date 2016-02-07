@@ -22,7 +22,7 @@ import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
 import ua.nau.edu.Systems.LectorsDialogs;
 
 public class PostsLoaderBuilder {
-    private static final String BUILDER_TAG = "PostsLoaderBuilder/ ";
+    private static final String BUILDER_TAG = "LoaderBuilder/ ";
     private String TAG;
     private Context context;
     private Activity activity;
@@ -180,10 +180,4 @@ public class PostsLoaderBuilder {
             }
         }.execute();
     }
-
-    public int incStartPosition(int startLoadPosition, int loadNumber) {
-        return startLoadPosition += loadNumber;
-    }
-
-
 }

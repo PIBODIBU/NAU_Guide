@@ -9,12 +9,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import com.gc.materialdesign.views.ProgressBarIndeterminate;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.net.Inet4Address;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -24,7 +21,7 @@ import ua.nau.edu.Systems.EndlessRecyclerOnScrollListener;
 import ua.nau.edu.Systems.LectorsDialogs;
 
 public class PostsRefreshBuilder {
-    private static final String BUILDER_TAG = "PostsRefreshBuilder/ ";
+    private static final String BUILDER_TAG = "RefreshBuilder/ ";
     private Activity activity;
     private String TAG;
     private Context context;
@@ -155,10 +152,9 @@ public class PostsRefreshBuilder {
                             message = jsonObject.getString("message");
                             createTime = jsonObject.getString("created_at");
 
-                            Log.i(TAG, BUILDER_TAG + "Added: [" + i + "] " + createTime);
-
                             if (!author.equals("") && !authorUniqueId.equals("") && !authorPhotoUrl.equals("") && !message.equals("") && !createTime.equals("")) {
                                 data.add(new NewsDataModel(id, author, authorUniqueId, authorPhotoUrl, message, createTime));
+                                Log.i(TAG, BUILDER_TAG + "Added: [" + id + "] " + author + "   " + createTime);
                             }
                         }
                     } catch (Exception e) {
@@ -180,18 +176,20 @@ public class PostsRefreshBuilder {
 
                 startLoadPosition = loadNumber;
                 Log.i(TAG, BUILDER_TAG + "startLoadPosition = " + Integer.toString(startLoadPosition));
-                recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(linearLayoutManager) {
-                    @Override
-                    public void onLoadMore(int current_page) {
-                        Log.i(TAG, "From PostsRefreshBuilder / Loading new data... (" + Integer.toString(loadNumber) + ") posts");
-                        postsLoader.loadPosts(startLoadPosition, loadNumber, REQUEST_URL);
-                        startLoadPosition = postsLoader.incStartPosition(startLoadPosition, loadNumber);
-                    }
-                });
 
                 onItemsLoadComplete();
             }
         }.execute();
+
+        recyclerView.clearOnScrollListeners();
+        recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int current_page) {
+                Log.i(TAG, "From PostsRefreshBuilder / Loading new data... (" + Integer.toString(loadNumber) + ") posts");
+                postsLoader.loadPosts(startLoadPosition, loadNumber, REQUEST_URL);
+                startLoadPosition += loadNumber;
+            }
+        });
     }
 
     private void onItemsLoadComplete() {
@@ -203,7 +201,10 @@ public class PostsRefreshBuilder {
     }
 
     private void clearRecyclerView() {
+        Log.i(TAG, BUILDER_TAG + "Deleting items...");
         data.clear();
+        if (data.size() == 0)
+            Log.i(TAG, BUILDER_TAG + "Deleted");
         adapter.notifyDataSetChanged();
     }
 }
