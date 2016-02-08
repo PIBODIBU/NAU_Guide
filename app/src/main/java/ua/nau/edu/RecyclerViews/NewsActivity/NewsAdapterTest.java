@@ -20,6 +20,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 import ua.nau.edu.NAU_Guide.R;
+import ua.nau.edu.NAU_Guide.UserProfileActivity;
 import ua.nau.edu.Systems.CircleTransform;
 
 public class NewsAdapterTest extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -40,34 +41,34 @@ public class NewsAdapterTest extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.dataSet = data;
         this.context = context;
 
-        if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
+        final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
 
-            final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
 
-                    totalItemCount = linearLayoutManager.getItemCount();
-                    lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                totalItemCount = linearLayoutManager.getItemCount();
+                lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
 
-                    Log.i("NewsAdapterTest", "totalItemCount = "
-                                    + Integer.toString(totalItemCount)
-                                    + "    lastVisibleItem= " + Integer.toString(lastVisibleItem)
-                                    + "  loading: " + loading
-                    );
+                Log.i("NewsAdapterTest", "totalItemCount = "
+                                + Integer.toString(totalItemCount)
+                                + "    lastVisibleItem= " + Integer.toString(lastVisibleItem)
+                                + "  loading: " + loading
+                );
 
-                    if (!loading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
-                        // End has been reached
-                        Log.i("NewsAdapterTest", "onScrolled: End reached");
-                        if (onLoadMoreListener != null) {
-                            loading = true;
-                            onLoadMoreListener.onLoadMore();
-                        }
+                if (!loading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                    loading = true;
+
+                    // End has been reached
+                    Log.i("NewsAdapterTest", "onScrolled: End reached");
+
+                    if (onLoadMoreListener != null) {
+                        onLoadMoreListener.onLoadMore();
                     }
                 }
-            });
-        }
+            }
+        });
     }
 
     public void setData(ArrayList<NewsDataModel> data) {
@@ -93,7 +94,6 @@ public class NewsAdapterTest extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public int getItemCount() {
         return dataSet.size();
     }
-
 
     @Override
     public int getItemViewType(int position) {
@@ -122,7 +122,7 @@ public class NewsAdapterTest extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int listPosition) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int listPosition) {
         if (holder instanceof MyViewHolder) {
 
             ExpandableTextView postMessage = ((MyViewHolder) holder).postMessage;
@@ -134,13 +134,26 @@ public class NewsAdapterTest extends RecyclerView.Adapter<RecyclerView.ViewHolde
             postSubTitle.setText(dataSet.get(listPosition).getCreateTime());
             postMessage.setText(dataSet.get(listPosition).getMessage());
             Picasso.with(context).load(Uri.parse(dataSet.get(listPosition).getAuthorPhotoUrl())).transform(new CircleTransform()).into(authorImage);
+
+            authorImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    context.startActivity(new Intent(context, UserProfileActivity.class)
+                            .putExtra("action", "getPage")
+                            .putExtra("uniqueId", dataSet.get(listPosition).getAuthorUniqueId()));
+                }
+            });
         } else {
-            ((ProgressViewHolder) holder).progressBar.setIndeterminate(true);
+            //((ProgressViewHolder) holder).progressBar.setIndeterminate(true);
         }
     }
 
     public void setLoaded() {
         this.loading = false;
+    }
+
+    public void setLoading() {
+        this.loading = true;
     }
 
     public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
@@ -154,9 +167,9 @@ public class NewsAdapterTest extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public static class ProgressViewHolder extends RecyclerView.ViewHolder {
         public ProgressBar progressBar;
 
-        public ProgressViewHolder(View v) {
-            super(v);
-            progressBar = (ProgressBar) v.findViewById(R.id.progressBar);
+        public ProgressViewHolder(View itemView) {
+            super(itemView);
+            this.progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
         }
     }
 

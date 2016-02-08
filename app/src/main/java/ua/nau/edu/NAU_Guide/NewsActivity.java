@@ -20,6 +20,7 @@ import ua.nau.edu.APIBuilders.PostsLoaderBuilder;
 import ua.nau.edu.APIBuilders.PostsRefreshBuilder;
 import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
+import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapterTest;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
 import ua.nau.edu.Systems.EndlessRecyclerOnScrollListener;
 import ua.nau.edu.Systems.LectorsDialogs;
@@ -30,7 +31,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
     private static final String REQUEST_URL = "http://nauguide.esy.es/include/getPostAll.php";
     private static final String TAG = "NewsActivity";
 
-    private static RecyclerView.Adapter adapter;
+    private static NewsAdapterTest adapter;
     private LinearLayoutManager layoutManager;
     private static RecyclerView recyclerView;
     private ProgressBarIndeterminate progressBar;
@@ -86,7 +87,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                 .withContext(NewsActivity.this)
                 .withAdapter(adapter)
                 .withLoadingDialog(false)
-                .withProgressBar(progressBar)
+                        //.withProgressBar(progressBar)
                 .withTag(TAG)
                 .withRecycler(recyclerView)
                 .withActivity(this)
@@ -127,13 +128,15 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
     private void setUpRecyclerView() {
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview_news);
         layoutManager = new LinearLayoutManager(this);
-        adapter = new NewsAdapter(data, NewsActivity.this);
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        recyclerView.clearOnScrollListeners();
+        adapter = new NewsAdapterTest(data, NewsActivity.this, recyclerView);
+        recyclerView.setAdapter(adapter);
+
+        /*recyclerView.clearOnScrollListeners();
         recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int current_page) {
@@ -141,9 +144,42 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                 postsLoaderWithoutDialog.loadPosts(startLoadPosition, loadNumber, REQUEST_URL);
                 startLoadPosition += loadNumber;
             }
-        });
+        });*/
 
-        recyclerView.setAdapter(adapter);
+        /*adapter.setOnLoadMoreListener(new NewsAdapterTest.OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                Log.i(TAG, "onLoadMore/ Adding null item...");
+
+                data.add(null);
+
+                if (data.get(data.size()) == null)
+                    Log.i(TAG, "onLoadMore/ Added with position = " + Integer.toString(data.size()));
+                else
+                    Log.i(TAG, "onLoadMore/ item " + Integer.toString(data.size()) + " != null");
+
+                adapter.notifyDataSetChanged();
+
+                Log.i(NewsActivity.TAG, "onLoadMore/ calling postsLoaderWithoutDialog: Loading new data... (" + Integer.toString(loadNumber) + ") posts");
+
+                postsLoaderWithoutDialog.loadPosts(startLoadPosition, loadNumber, REQUEST_URL);
+                startLoadPosition += loadNumber;
+            }
+        });*/
+
+        adapter.setOnLoadMoreListener(new NewsAdapterTest.OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                Log.i(TAG, "onLoadMore called");
+                data.add(null);
+                adapter.notifyItemInserted(data.size() - 1);
+
+                Log.i(NewsActivity.TAG, "onLoadMore/ Loading new data... (" + Integer.toString(loadNumber) + ") posts");
+                postsLoaderWithoutDialog.setProgressItemIndex(data.size() - 1);
+                postsLoaderWithoutDialog.loadPosts(startLoadPosition, loadNumber, REQUEST_URL);
+                startLoadPosition += loadNumber;
+            }
+        });
     }
 
 }

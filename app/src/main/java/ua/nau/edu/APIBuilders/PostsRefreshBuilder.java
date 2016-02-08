@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
+import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapterTest;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
 import ua.nau.edu.Systems.EndlessRecyclerOnScrollListener;
 import ua.nau.edu.Systems.LectorsDialogs;
@@ -28,7 +29,7 @@ public class PostsRefreshBuilder {
     private SwipeRefreshLayout swipeRefreshLayout;
     private ArrayList<NewsDataModel> data;
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
+    private NewsAdapterTest adapter;
     private int startLoadPosition;
     private PostsLoaderBuilder postsLoader;
     private LinearLayoutManager linearLayoutManager;
@@ -63,7 +64,7 @@ public class PostsRefreshBuilder {
         return this;
     }
 
-    public PostsRefreshBuilder withAdapter(RecyclerView.Adapter adapter) {
+    public PostsRefreshBuilder withAdapter(NewsAdapterTest adapter) {
         this.adapter = adapter;
 
         return this;
@@ -98,6 +99,7 @@ public class PostsRefreshBuilder {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
+                adapter.setLoading();
                 clearRecyclerView();
                 Log.i(TAG, BUILDER_TAG + "Refreshing items...");
             }
@@ -170,6 +172,7 @@ public class PostsRefreshBuilder {
                 super.onPostExecute(str);
                 if (data != null) {
                     adapter.notifyDataSetChanged();
+                    adapter.setLoaded();
                 } else {
                     Log.e(TAG, BUILDER_TAG + "data == null");
                 }
@@ -181,11 +184,25 @@ public class PostsRefreshBuilder {
             }
         }.execute();
 
-        recyclerView.clearOnScrollListeners();
+        /*recyclerView.clearOnScrollListeners();
         recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int current_page) {
                 Log.i(TAG, "From PostsRefreshBuilder / Loading new data... (" + Integer.toString(loadNumber) + ") posts");
+                postsLoader.loadPosts(startLoadPosition, loadNumber, REQUEST_URL);
+                startLoadPosition += loadNumber;
+            }
+        });*/
+
+        adapter.setOnLoadMoreListener(new NewsAdapterTest.OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                Log.i(TAG, BUILDER_TAG + "onLoadMore called");
+                data.add(null);
+                adapter.notifyItemInserted(data.size() - 1);
+
+                Log.i(TAG, "From PostsRefreshBuilder / Loading new data... (" + Integer.toString(loadNumber) + ") posts");
+                postsLoader.setProgressItemIndex(data.size() - 1);
                 postsLoader.loadPosts(startLoadPosition, loadNumber, REQUEST_URL);
                 startLoadPosition += loadNumber;
             }

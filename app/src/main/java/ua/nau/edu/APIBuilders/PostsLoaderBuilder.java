@@ -18,6 +18,7 @@ import java.util.HashMap;
 
 import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
 import ua.nau.edu.NAU_Guide.R;
+import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapterTest;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
 import ua.nau.edu.Systems.LectorsDialogs;
 
@@ -29,8 +30,9 @@ public class PostsLoaderBuilder {
     private boolean withDialog = false;
     private ArrayList<NewsDataModel> data;
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
+    private NewsAdapterTest adapter;
     private ProgressBarIndeterminate progressBar;
+    private int progressItemIndex = -1;
 
     public PostsLoaderBuilder withContext(Context context) {
         this.context = context;
@@ -62,7 +64,7 @@ public class PostsLoaderBuilder {
         return this;
     }
 
-    public PostsLoaderBuilder withAdapter(RecyclerView.Adapter adapter) {
+    public PostsLoaderBuilder withAdapter(NewsAdapterTest adapter) {
         this.adapter = adapter;
 
         return this;
@@ -80,9 +82,14 @@ public class PostsLoaderBuilder {
         return this;
     }
 
+    public void setProgressItemIndex(int progressItemIndex) {
+        this.progressItemIndex = progressItemIndex;
+    }
+
     public void loadPosts(final int startLoadPosition, final int loadNumber, final String REQUEST_URL) {
         new AsyncTask<String, Void, String>() {
             ProgressDialog loadingDialog = null;
+            int addedItems = 0;
 
             @Override
             protected void onPreExecute() {
@@ -151,6 +158,7 @@ public class PostsLoaderBuilder {
 
                             if (!author.equals("") && !authorUniqueId.equals("") && !authorPhotoUrl.equals("") && !message.equals("") && !createTime.equals("")) {
                                 data.add(new NewsDataModel(id, author, authorUniqueId, authorPhotoUrl, message, createTime));
+                                addedItems++;
                                 Log.i(TAG, BUILDER_TAG + "Added: [" + id + "] " + author + "   " + createTime);
                             }
                         }
@@ -164,13 +172,17 @@ public class PostsLoaderBuilder {
             @Override
             protected void onPostExecute(final String str) {
                 super.onPostExecute(str);
-                if (data != null) {
+                if (progressItemIndex != -1) {
+                    data.remove(progressItemIndex);
+                    adapter.notifyItemRemoved(progressItemIndex + 1);
+                }
+                if (data != null && addedItems != 0) {
                     adapter.notifyDataSetChanged();
+                    adapter.setLoaded();
                 } else {
                     Log.i(TAG, BUILDER_TAG + "onPostExecute: dataSet == null");
                     //activity.finish();
                 }
-
                 if (loadingDialog != null) {
                     loadingDialog.dismiss();
                 }
