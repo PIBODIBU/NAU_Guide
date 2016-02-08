@@ -16,9 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
-import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapterTest;
+import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
-import ua.nau.edu.Systems.EndlessRecyclerOnScrollListener;
 import ua.nau.edu.Systems.LectorsDialogs;
 
 public class PostsRefreshBuilder {
@@ -29,7 +28,7 @@ public class PostsRefreshBuilder {
     private SwipeRefreshLayout swipeRefreshLayout;
     private ArrayList<NewsDataModel> data;
     private RecyclerView recyclerView;
-    private NewsAdapterTest adapter;
+    private NewsAdapter adapter;
     private int startLoadPosition;
     private PostsLoaderBuilder postsLoader;
     private LinearLayoutManager linearLayoutManager;
@@ -64,7 +63,7 @@ public class PostsRefreshBuilder {
         return this;
     }
 
-    public PostsRefreshBuilder withAdapter(NewsAdapterTest adapter) {
+    public PostsRefreshBuilder withAdapter(NewsAdapter adapter) {
         this.adapter = adapter;
 
         return this;
@@ -194,7 +193,7 @@ public class PostsRefreshBuilder {
             }
         });*/
 
-        adapter.setOnLoadMoreListener(new NewsAdapterTest.OnLoadMoreListener() {
+        adapter.setOnLoadMoreListener(new NewsAdapter.OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
                 Log.i(TAG, BUILDER_TAG + "onLoadMore called");

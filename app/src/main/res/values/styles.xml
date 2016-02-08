@@ -22,7 +22,13 @@
     <style name="AppTheme.ActionMode">
         <item name="background">@color/colorAppPrimary</item>
         <item name="android:background">@color/colorAppPrimary</item>
+        <item name="android:titleTextStyle">@style/AppTheme.ActionMode.Title</item>
+    </style>
 
+    <style name="AppTheme.ActionMode.Title">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:shadowRadius">0</item>
     </style>
 
     <style name="DarkText">

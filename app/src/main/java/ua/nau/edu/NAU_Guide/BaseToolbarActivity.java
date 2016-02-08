@@ -48,7 +48,7 @@ public class BaseToolbarActivity extends AppCompatActivity {
     private SharedPreferences sharedPrefsVK;
     private SharedPrefUtils sharedPrefUtils;
 
-    BaseToolbarActivity() {
+    public BaseToolbarActivity() {
     }
 
     public void getToolbar() {

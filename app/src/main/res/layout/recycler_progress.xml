@@ -1,5 +1,9 @@
-<ProgressBar xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/progressBar"
+<me.zhanghai.android.materialprogressbar.MaterialProgressBar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.MaterialProgressBar.ProgressBar"
     android:layout_width="match_parent"
-    android:layout_height="56dp"
-    android:background="@color/grey_bg" />
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:indeterminate="true"
+    android:tint="@color/colorAppPrimary"
+    app:mpb_progressStyle="circular" />

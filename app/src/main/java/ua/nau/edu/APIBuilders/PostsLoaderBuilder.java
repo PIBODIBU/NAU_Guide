@@ -18,7 +18,7 @@ import java.util.HashMap;
 
 import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
 import ua.nau.edu.NAU_Guide.R;
-import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapterTest;
+import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
 import ua.nau.edu.Systems.LectorsDialogs;
 
@@ -30,7 +30,7 @@ public class PostsLoaderBuilder {
     private boolean withDialog = false;
     private ArrayList<NewsDataModel> data;
     private RecyclerView recyclerView;
-    private NewsAdapterTest adapter;
+    private NewsAdapter adapter;
     private ProgressBarIndeterminate progressBar;
     private int progressItemIndex = -1;
 
@@ -64,7 +64,7 @@ public class PostsLoaderBuilder {
         return this;
     }
 
-    public PostsLoaderBuilder withAdapter(NewsAdapterTest adapter) {
+    public PostsLoaderBuilder withAdapter(NewsAdapter adapter) {
         this.adapter = adapter;
 
         return this;

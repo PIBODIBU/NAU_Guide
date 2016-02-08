@@ -14,6 +14,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -30,12 +31,13 @@ import java.util.HashMap;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
+import ua.nau.edu.NAU_Guide.BaseToolbarActivity;
 import ua.nau.edu.NAU_Guide.MainActivity;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.Systems.CircleTransform;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
-public class LoginLectorActivity extends AppCompatActivity implements View.OnClickListener {
+public class LoginLectorActivity extends BaseToolbarActivity implements View.OnClickListener {
     public static final String USER_NAME = "USER_NAME";
     public static final String PASSWORD = "PASSWORD";
     private static final String LOGIN_URL = "http://nauguide.esy.es/include/log.php";
@@ -70,6 +72,8 @@ public class LoginLectorActivity extends AppCompatActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lectorlogin);
+
+        getToolbar();
 
         editTextUserName = (EditText) findViewById(R.id.username);
         editTextPassword = (EditText) findViewById(R.id.password);
@@ -222,5 +226,19 @@ public class LoginLectorActivity extends AppCompatActivity implements View.OnCli
 
         Picasso.with(this).load(Uri).transform(new CircleTransform()).into(loadtarget);
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
 
 }

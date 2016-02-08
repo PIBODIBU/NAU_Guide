@@ -41,7 +41,6 @@ public class InfoActivity extends BaseToolbarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-        /*** SUPPORT METHODS ***/
         setActivityLabel();
         getToolbar();
 

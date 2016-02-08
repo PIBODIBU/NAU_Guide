@@ -1,6 +1,5 @@
 package ua.nau.edu.NAU_Guide;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -10,20 +9,12 @@ import android.util.Log;
 
 import com.gc.materialdesign.views.ProgressBarIndeterminate;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import ua.nau.edu.APIBuilders.PostsLoaderBuilder;
 import ua.nau.edu.APIBuilders.PostsRefreshBuilder;
-import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
-import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapterTest;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
-import ua.nau.edu.Systems.EndlessRecyclerOnScrollListener;
-import ua.nau.edu.Systems.LectorsDialogs;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class NewsActivity extends BaseNavigationDrawerActivity {
@@ -31,7 +22,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
     private static final String REQUEST_URL = "http://nauguide.esy.es/include/getPostAll.php";
     private static final String TAG = "NewsActivity";
 
-    private static NewsAdapterTest adapter;
+    private static NewsAdapter adapter;
     private LinearLayoutManager layoutManager;
     private static RecyclerView recyclerView;
     private ProgressBarIndeterminate progressBar;
@@ -133,7 +124,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        adapter = new NewsAdapterTest(data, NewsActivity.this, recyclerView);
+        adapter = new NewsAdapter(data, NewsActivity.this, recyclerView);
         recyclerView.setAdapter(adapter);
 
         /*recyclerView.clearOnScrollListeners();
@@ -167,7 +158,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
             }
         });*/
 
-        adapter.setOnLoadMoreListener(new NewsAdapterTest.OnLoadMoreListener() {
+        adapter.setOnLoadMoreListener(new NewsAdapter.OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
                 Log.i(TAG, "onLoadMore called");

@@ -88,7 +88,7 @@
             android:label="@string/FloorActivity_label" />
         <activity
             android:name=".LoginLector.LoginLectorActivity"
-            android:label="Login" />
+            android:label="Вход" />
         <activity
             android:name=".UserProfileActivity"
             android:label="Профиль" />
