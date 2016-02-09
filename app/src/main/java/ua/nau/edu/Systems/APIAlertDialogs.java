@@ -11,7 +11,7 @@ import android.support.v7.app.AlertDialog;
 import ua.nau.edu.NAU_Guide.MainActivity;
 import ua.nau.edu.NAU_Guide.R;
 
-public class LectorsDialogs {
+public class APIAlertDialogs {
     public static void internetConnectionErrorWithExit(final Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder
@@ -57,4 +57,25 @@ public class LectorsDialogs {
         });
         dialog.show();
     }
+
+    public static void badLoginOrUsername(final Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder
+                .setMessage("Неправильный логин или пароль. Пожалуйста, попробуйте еще раз.")
+                .setPositiveButton("Ок", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        final AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface arg) {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(context, R.color.colorAppPrimary));
+            }
+        });
+        dialog.show();
+    }
+
 }

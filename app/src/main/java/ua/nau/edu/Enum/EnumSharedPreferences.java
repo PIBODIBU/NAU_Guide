@@ -12,6 +12,7 @@ public enum EnumSharedPreferences {
     CORP_ID_KEY,
     CORP_LABEL_KEY,
     TOKEN_KEY,
+    UNIQUE_ID,
     EXIT,
 
 }

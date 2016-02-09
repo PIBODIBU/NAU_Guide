@@ -82,6 +82,8 @@ public class BaseToolbarActivity extends AppCompatActivity {
         return true;
     }
 
+
+
     public void toastShowShort(String TEXT) {
         Toast.makeText(BaseToolbarActivity.this, TEXT, Toast.LENGTH_SHORT).show();
     }

@@ -1,6 +1,5 @@
 package ua.nau.edu.NAU_Guide;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -8,13 +7,18 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gc.materialdesign.views.CustomView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+import com.squareup.picasso.Transformation;
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKAccessTokenTracker;
 import com.vk.sdk.VKCallback;
@@ -29,23 +33,31 @@ import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiUserFull;
 import com.vk.sdk.api.model.VKList;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.HashMap;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
-import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorActivity;
+import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
+import ua.nau.edu.Systems.APIAlertDialogs;
+import ua.nau.edu.Systems.CircleTransform;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
-public class LoginActivity extends Activity {
+public class LoginActivity extends BaseToolbarActivity {
+
+    private static final String LOGIN_URL = "http://nauguide.esy.es/include/log.php";
+
     /***
      * VIEWS
      ***/
-
     private CustomView vk_log_in;
-    private CustomView gg_log_in;
-    private CustomView fb_log_in;
     private CustomView login_skip;
+    private CustomView login_lector;
+    private TextInputLayout editTextUserName;
+    private TextInputLayout editTextPassword;
     /*****/
 
     private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
@@ -83,44 +95,18 @@ public class LoginActivity extends Activity {
 
         setContentView(R.layout.activity_login);
 
+        getToolbar();
+
         settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
         settingsVK = getSharedPreferences(VK_PREFERENCES, LoginActivity.MODE_PRIVATE);
         sharedPrefUtils = new SharedPrefUtils(settings, settingsVK);
 
-        vk_log_in = (CustomView) findViewById(R.id.vk_sign_in);
-        gg_log_in = (CustomView) findViewById(R.id.gg_sign_in);
-        fb_log_in = (CustomView) findViewById(R.id.fb_sign_in);
+        /*vk_log_in = (CustomView) findViewById(R.id.login_vk);
         login_skip = (CustomView) findViewById(R.id.login_skip);
+        login_lector = (CustomView) findViewById(R.id.login_lector);*/
 
-        vk_log_in.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // VK login execute
-                VKSdk.login(LoginActivity.this, VKScope.EMAIL, VKScope.PHOTOS, VKScope.WALL);
-            }
-        });
-
-        gg_log_in.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toastShowLong("Google+ sign in");
-            }
-        });
-
-        fb_log_in.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toastShowLong("Facebook sign in");
-            }
-        });
-
-        CustomView login_lector = (CustomView) findViewById(R.id.login_lector);
-        login_lector.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, LoginLectorActivity.class));
-            }
-        });
+        editTextUserName = (TextInputLayout) findViewById(R.id.username);
+        editTextPassword = (TextInputLayout) findViewById(R.id.password);
     }
 
     @Override
@@ -218,7 +204,111 @@ public class LoginActivity extends Activity {
                 finish();
                 break;
             }
+            case R.id.login_vk: {
+                VKSdk.login(LoginActivity.this, VKScope.EMAIL, VKScope.PHOTOS, VKScope.WALL);
+                break;
+            }
+            case R.id.login_lector: {
+                login();
+                break;
+            }
         }
+    }
+
+    private void login() {
+        String username = editTextUserName.getEditText().getText().toString().trim();
+        String password = editTextPassword.getEditText().getText().toString().trim();
+        userLogin(username, password);
+    }
+
+    private void userLogin(final String username, final String password) {
+        new AsyncTask<String, Void, String>() {
+
+            //ProgressDialog loading;
+            MaterialDialog loadingDialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                /*loading = new ProgressDialog(LoginLectorActivity.this);
+                loading.setMessage(LoginLectorActivity.this.getResources().getString(R.string.dialog_loading));
+                loading.setIndeterminate(true);
+                loading.setCancelable(false);
+                loading.show();*/
+
+                loadingDialog = new MaterialDialog.Builder(LoginActivity.this)
+                        .content(LoginActivity.this.getResources().getString(R.string.dialog_loading))
+                        .progress(true, 0)
+                        .cancelable(false)
+                        .widgetColor(ContextCompat.getColor(LoginActivity.this, R.color.colorAppPrimary))
+                        .contentColor(ContextCompat.getColor(LoginActivity.this, R.color.black))
+                        .backgroundColor(ContextCompat.getColor(LoginActivity.this, R.color.white))
+                        .build();
+                loadingDialog.show();
+            }
+
+            @Override
+            protected String doInBackground(String... params) {
+                HashMap<String, String> data = new HashMap<>();
+
+                data.put("username", params[0]);
+                data.put("password", params[1]);
+
+                LoginLectorUtils httpUtils = new LoginLectorUtils();
+                return httpUtils.sendPostRequestWithParams(LOGIN_URL, data);
+            }
+
+            @Override
+            protected void onPostExecute(String response) {
+                super.onPostExecute(response);
+                if (!response.equalsIgnoreCase("error")) {
+                    try {
+                        final JSONObject jsonObject = new JSONObject(response);
+
+                        if (jsonObject.getString("error").equals("true")) {
+                            APIAlertDialogs.badLoginOrUsername(LoginActivity.this);
+                        } else if (jsonObject.getString("error").equalsIgnoreCase("false")) {
+                            doLoginStuff(
+                                    jsonObject.getString("name"),
+                                    jsonObject.getString("unique_id"),
+                                    jsonObject.getString("email"),
+                                    jsonObject.getString("photo_url"),
+                                    jsonObject.getString("token"));
+                        }
+
+                    } catch (Throwable t) {
+                        Log.e("LoginLectorActivty", "Could not parse malformed JSON: \"" + response + "\"");
+                    }
+                } else {
+                    Toast.makeText(LoginActivity.this, "Connection error", Toast.LENGTH_LONG).show();
+                }
+
+                loadingDialog.dismiss();
+            }
+        }.execute(username, password);
+    }
+
+    private void doLoginStuff(String name, String uniqueId, String email, String photoUrl, String token) {
+        FilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/NAU Guide";
+        FileName = "profilePhoto_200.png";
+        PROFILE_PHOTO_LOCATION = FilePath + "/" + FileName;
+
+        settings
+                .edit()
+                .putBoolean(SIGNED_IN_KEY, true) /*** Important! Add this after each success login ***/
+                .putString(PROFILE_PHOTO_LOCATION_KEY, PROFILE_PHOTO_LOCATION)
+                .putString(sharedPrefUtils.TOKEN_KEY, token)
+                .apply();
+
+        loadAvatar(photoUrl, FilePath, FileName, new CircleTransform());
+
+        sharedPrefUtils.setName(name);
+        sharedPrefUtils.setEmail(email);
+        sharedPrefUtils.setUniqueId(uniqueId);
+
+        startActivity(new Intent(LoginActivity.this, MainActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+        finish();
     }
 
     @Override
@@ -262,15 +352,39 @@ public class LoginActivity extends Activity {
         Picasso.with(this).load(Uri).into(loadtarget);
     }
 
-    private void initDialog_loading() {
-        new MaterialDialog.Builder(LoginActivity.this)
-                .content("Подождите")
-                .progress(true, 0)
-                .progressIndeterminateStyle(true)
-                .backgroundColor(getResources().getColor(R.color.white))
-                .dividerColor(getResources().getColor(R.color.colorAppPrimary))
-                .contentColor(getResources().getColor(R.color.colorAppPrimary))
-                .show();
+    public void loadAvatar(String Uri, final String FilePath, final String FileName, Transformation transformation) {
+        if (loadtarget == null) loadtarget = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                // do something with the Bitmap
+                try {
+                    File dir = new File(FilePath);
+                    if (!dir.exists())
+                        dir.mkdirs();
+
+                    File file = new File(dir, FileName);
+                    FileOutputStream fOut = new FileOutputStream(file);
+
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                    fOut.flush();
+                    fOut.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        };
+
+        Picasso.with(this).load(Uri).transform(transformation).into(loadtarget);
     }
 
 }

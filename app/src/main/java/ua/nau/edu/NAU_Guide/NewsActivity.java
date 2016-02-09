@@ -6,13 +6,15 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 
+import com.gc.materialdesign.views.ButtonFloat;
 import com.gc.materialdesign.views.ProgressBarIndeterminate;
 
 import java.util.ArrayList;
 
-import ua.nau.edu.APIBuilders.PostsLoaderBuilder;
-import ua.nau.edu.APIBuilders.PostsRefreshBuilder;
+import ua.nau.edu.APIBuilders.APILoaderBuilder;
+import ua.nau.edu.APIBuilders.APIRefreshBuilder;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
@@ -27,22 +29,20 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
     private static RecyclerView recyclerView;
     private ProgressBarIndeterminate progressBar;
     private ArrayList<NewsDataModel> data = new ArrayList<NewsDataModel>();
-    private PostsLoaderBuilder postsLoaderWithoutDialog;
-    private PostsLoaderBuilder postsLoaderWithDialog;
-    private PostsRefreshBuilder postsRefreshBuilder;
+    private APILoaderBuilder postsLoaderWithoutDialog;
+    private APILoaderBuilder postsLoaderWithDialog;
+    private APIRefreshBuilder APIRefreshBuilder;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private SharedPrefUtils sharedPrefUtils;
 
     private int startLoadPosition = 0;
     private int loadNumber = 10;
 
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news);
-
         sharedPrefUtils = new SharedPrefUtils(
                 getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, MODE_PRIVATE),
                 getSharedPreferences(sharedPrefUtils.VK_PREFERENCES, LectorsListActivity.MODE_PRIVATE));
@@ -52,19 +52,39 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                 sharedPrefUtils.getEmail()
         );
 
+        setUpViews();
         setUpRecyclerView();
         setUpPostsLoaders();
         setUpPostsRefreshers();
         setUpSwipeRefreshLayout();
 
         Log.i(TAG, "onCreate: Loading first " + loadNumber + " posts...");
-
-        postsLoaderWithDialog.loadPosts(startLoadPosition, loadNumber, REQUEST_URL);
+        postsLoaderWithDialog.loadPostsAll(startLoadPosition, loadNumber, REQUEST_URL);
         startLoadPosition += loadNumber;
     }
 
+    private boolean isLoggedAsLector() {
+        if (!sharedPrefUtils.getToken().equals(""))
+            return true;
+        else
+            return false;
+    }
+
+    private void setUpViews() {
+        if (isLoggedAsLector()) {
+            ButtonFloat FABCreatePost = (ButtonFloat) findViewById(R.id.fab_create_post);
+            FABCreatePost.setVisibility(View.VISIBLE);
+            FABCreatePost.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TODO CreatePostActivity
+                }
+            });
+        }
+    }
+
     private void setUpPostsLoaders() {
-        postsLoaderWithDialog = new PostsLoaderBuilder()
+        postsLoaderWithDialog = new APILoaderBuilder()
                 .withContext(NewsActivity.this)
                 .withAdapter(adapter)
                 .withLoadingDialog(true)
@@ -74,7 +94,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                 .withDataSet(data);
 
         progressBar = (ProgressBarIndeterminate) findViewById(R.id.progressBar);
-        postsLoaderWithoutDialog = new PostsLoaderBuilder()
+        postsLoaderWithoutDialog = new APILoaderBuilder()
                 .withContext(NewsActivity.this)
                 .withAdapter(adapter)
                 .withLoadingDialog(false)
@@ -87,7 +107,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
 
     private void setUpPostsRefreshers() {
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeLayoutContainer);
-        postsRefreshBuilder = new PostsRefreshBuilder()
+        APIRefreshBuilder = new APIRefreshBuilder()
                 .withContext(NewsActivity.this)
                 .withAdapter(adapter)
                 .withTag(TAG)
@@ -95,9 +115,30 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                 .withActivity(this)
                 .withDataSet(data)
                 .withSwipeRefreshLayout(mSwipeRefreshLayout)
-                .withStartLoadPosition(startLoadPosition)
                 .withPostsLoaderBuilder(postsLoaderWithoutDialog)
                 .withLinearLayoutManager(layoutManager);
+
+        APIRefreshBuilder.setOnRefreshedAllListener(new APIRefreshBuilder.OnRefreshedAllListener() {
+            @Override
+            public void onRefreshedAction() {
+                startLoadPosition = loadNumber;
+                Log.i(TAG, "From onRefreshedAction/ startLoadPosition = " + Integer.toString(startLoadPosition));
+
+                adapter.setOnLoadMoreListener(new NewsAdapter.OnLoadMoreListener() {
+                    @Override
+                    public void onLoadMore() {
+                        Log.i(TAG, "From onRefreshedAction/ onLoadMore called");
+                        data.add(null);
+                        adapter.notifyItemInserted(data.size() - 1);
+
+                        Log.i(TAG, "From onRefreshedAction / Loading new data... (" + Integer.toString(loadNumber) + ") posts");
+                        postsLoaderWithoutDialog.setProgressItemIndex(data.size() - 1);
+                        postsLoaderWithoutDialog.loadPostsAll(startLoadPosition, loadNumber, REQUEST_URL);
+                        startLoadPosition += loadNumber;
+                    }
+                });
+            }
+        });
     }
 
     private void setUpSwipeRefreshLayout() {
@@ -110,7 +151,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
             @Override
             public void onRefresh() {
                 // Refreshing items
-                postsRefreshBuilder.refreshItems(REQUEST_URL, loadNumber);
+                APIRefreshBuilder.refreshItemsAll(REQUEST_URL, loadNumber);
 
             }
         });
@@ -127,33 +168,13 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
         adapter = new NewsAdapter(data, NewsActivity.this, recyclerView);
         recyclerView.setAdapter(adapter);
 
+        /** OLD OnScrollListener **/
         /*recyclerView.clearOnScrollListeners();
         recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int current_page) {
                 Log.i(NewsActivity.TAG, "onLoadMore called: Loading new data... (" + Integer.toString(loadNumber) + ") posts");
-                postsLoaderWithoutDialog.loadPosts(startLoadPosition, loadNumber, REQUEST_URL);
-                startLoadPosition += loadNumber;
-            }
-        });*/
-
-        /*adapter.setOnLoadMoreListener(new NewsAdapterTest.OnLoadMoreListener() {
-            @Override
-            public void onLoadMore() {
-                Log.i(TAG, "onLoadMore/ Adding null item...");
-
-                data.add(null);
-
-                if (data.get(data.size()) == null)
-                    Log.i(TAG, "onLoadMore/ Added with position = " + Integer.toString(data.size()));
-                else
-                    Log.i(TAG, "onLoadMore/ item " + Integer.toString(data.size()) + " != null");
-
-                adapter.notifyDataSetChanged();
-
-                Log.i(NewsActivity.TAG, "onLoadMore/ calling postsLoaderWithoutDialog: Loading new data... (" + Integer.toString(loadNumber) + ") posts");
-
-                postsLoaderWithoutDialog.loadPosts(startLoadPosition, loadNumber, REQUEST_URL);
+                postsLoaderWithoutDialog.loadPostsAll(startLoadPosition, loadNumber, REQUEST_URL);
                 startLoadPosition += loadNumber;
             }
         });*/
@@ -167,7 +188,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
 
                 Log.i(NewsActivity.TAG, "onLoadMore/ Loading new data... (" + Integer.toString(loadNumber) + ") posts");
                 postsLoaderWithoutDialog.setProgressItemIndex(data.size() - 1);
-                postsLoaderWithoutDialog.loadPosts(startLoadPosition, loadNumber, REQUEST_URL);
+                postsLoaderWithoutDialog.loadPostsAll(startLoadPosition, loadNumber, REQUEST_URL);
                 startLoadPosition += loadNumber;
             }
         });

@@ -79,7 +79,7 @@
             android:theme="@style/VK.Transparent" />
         <activity
             android:name=".LoginActivity"
-            android:label="@string/FirstActivity_label" />
+            android:label="@string/LoginActivity_label" />
         <activity
             android:name=".InfoActivity"
             android:label="@string/InfoActivity_label" />

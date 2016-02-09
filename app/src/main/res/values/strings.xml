@@ -8,7 +8,7 @@
     <string name="InfoActivity_label">Инфо</string>
     <string name="FloorActivity_label">План</string>
     <string name="MapsActivity_label">Карта</string>
-    <string name="FirstActivity_label">FirstActivity</string>
+    <string name="LoginActivity_label">Вход</string>
 
     <string name="settings_toolbar_title">Настройки</string>
     <string name="search_title">Поиск</string>

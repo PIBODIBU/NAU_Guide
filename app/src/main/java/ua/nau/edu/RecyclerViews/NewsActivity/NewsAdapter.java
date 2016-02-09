@@ -7,9 +7,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.ms.square.android.expandabletextview.ExpandableTextView;
@@ -109,7 +113,7 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int listPosition) {
         if (holder instanceof BaseViewHolder) {
 
-            ExpandableTextView postMessage = ((BaseViewHolder) holder).postMessage;
+            final ExpandableTextView postMessage = ((BaseViewHolder) holder).postMessage;
             TextView postTitle = ((BaseViewHolder) holder).postTitle;
             TextView postSubTitle = ((BaseViewHolder) holder).postSubTitle;
             ImageView authorImage = ((BaseViewHolder) holder).authorImage;
@@ -117,7 +121,11 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             postTitle.setText(dataSet.get(listPosition).getAuthor());
             postSubTitle.setText(dataSet.get(listPosition).getCreateTime());
             postMessage.setText(dataSet.get(listPosition).getMessage());
-            Picasso.with(context).load(Uri.parse(dataSet.get(listPosition).getAuthorPhotoUrl())).transform(new CircleTransform()).into(authorImage);
+
+            Picasso.with(context).load(Uri.parse(dataSet.get(listPosition).
+                    getAuthorPhotoUrl()))
+                    .transform(new CircleTransform())
+                    .into(authorImage);
 
             authorImage.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -127,6 +135,12 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             .putExtra("uniqueId", dataSet.get(listPosition).getAuthorUniqueId()));
                 }
             });
+            /*postMessage.setOnExpandStateChangeListener(new ExpandableTextView.OnExpandStateChangeListener() {
+                @Override
+                public void onExpandStateChanged(TextView textView, boolean isExpanded) {
+                    NewsAdapter.this.notifyItemChanged(listPosition);
+                }
+            });*/
         } else {
             //((ProgressViewHolder) holder).progressBar.setIndeterminate(true);
         }

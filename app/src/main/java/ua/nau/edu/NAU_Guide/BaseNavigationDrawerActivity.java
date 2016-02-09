@@ -324,7 +324,8 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                     } else {
                                         startActivity(new Intent(BaseNavigationDrawerActivity.this, UserProfileActivity.class)
                                                 .putExtra("action", "getMyPage")
-                                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                                .putExtra("uniqueId", sharedPrefUtils.getUniqueId())
+                                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                         finish();
                                         break;
                                     }

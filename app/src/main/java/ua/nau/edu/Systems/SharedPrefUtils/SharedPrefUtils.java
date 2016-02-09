@@ -25,6 +25,7 @@ public class SharedPrefUtils {
     public static final String JUST_SIGNED_KEY = EnumSharedPreferences.JUST_SIGNED_KEY.toString();
     public static final String FIRST_LAUNCH = EnumSharedPreferences.FIRST_LAUNCH.toString();
     public static final String TOKEN_KEY = EnumSharedPreferences.TOKEN_KEY.toString();
+    public static final String UNIQUE_ID = EnumSharedPreferences.UNIQUE_ID.toString();
     public static final String VK_PREFERENCES = EnumSharedPreferencesVK.VK_PREFERENCES.toString();
     public static final String VK_INFO_KEY = EnumSharedPreferencesVK.VK_INFO_KEY.toString();
     public static final String VK_PHOTO_KEY = EnumSharedPreferencesVK.VK_PHOTO_KEY.toString();
@@ -58,6 +59,14 @@ public class SharedPrefUtils {
 
     public void setToken(String token) {
         sharedPrefs.edit().putString(TOKEN_KEY, token).apply();
+    }
+
+    public String getUniqueId() {
+        return sharedPrefs.getString(UNIQUE_ID, "");
+    }
+
+    public void setUniqueId(String uniqueId) {
+        sharedPrefs.edit().putString(UNIQUE_ID, uniqueId).apply();
     }
 
 }

@@ -27,7 +27,7 @@ import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
 import ua.nau.edu.Systems.CircleTransform;
-import ua.nau.edu.Systems.LectorsDialogs;
+import ua.nau.edu.Systems.APIAlertDialogs;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class FragmentInfo extends Fragment {
@@ -97,14 +97,14 @@ public class FragmentInfo extends Fragment {
                     supportActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            LectorsDialogs.internetConnectionErrorWithExit(supportActivity);
+                            APIAlertDialogs.internetConnectionErrorWithExit(supportActivity);
                         }
                     });
                 } else if (response.equalsIgnoreCase("error_server")) {
                     supportActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            LectorsDialogs.serverConnectionErrorWithExit(supportActivity);
+                            APIAlertDialogs.serverConnectionErrorWithExit(supportActivity);
                         }
                     });
                     Log.e(TAG, "Server error. Response code != 200");
@@ -173,7 +173,7 @@ public class FragmentInfo extends Fragment {
                     supportActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            LectorsDialogs.internetConnectionErrorWithExit(supportActivity);
+                            APIAlertDialogs.internetConnectionErrorWithExit(supportActivity);
                         }
                     });
                 } else if (response.equalsIgnoreCase("error_server")) {
@@ -181,7 +181,7 @@ public class FragmentInfo extends Fragment {
                     supportActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            LectorsDialogs.serverConnectionErrorWithExit(supportActivity);
+                            APIAlertDialogs.serverConnectionErrorWithExit(supportActivity);
                         }
                     });
                     return null;

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsAdapter;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsDataModel;
-import ua.nau.edu.Systems.LectorsDialogs;
+import ua.nau.edu.Systems.APIAlertDialogs;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 
@@ -81,14 +81,14 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            LectorsDialogs.internetConnectionErrorWithExit(LectorsListActivity.this);
+                            APIAlertDialogs.internetConnectionErrorWithExit(LectorsListActivity.this);
                         }
                     });
                 } else if (response.equalsIgnoreCase("error_server")) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            LectorsDialogs.serverConnectionErrorWithExit(LectorsListActivity.this);
+                            APIAlertDialogs.serverConnectionErrorWithExit(LectorsListActivity.this);
                         }
                     });
                     Log.e(TAG, "Server error. Response code != 200");

@@ -1,65 +1,97 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:orientation="vertical"
     tools:context=".LoginActivity">
 
-    <ImageView
-        android:id="@+id/head"
-        android:layout_width="match_parent"
-        android:layout_height="320dp"
-        android:background="@drawable/bg_firstlaunch" />
-
     <include
-        android:id="@+id/shadow"
-        layout="@layout/toolbar_shadow"
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
-        android:layout_below="@+id/head" />
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
 
-    <com.gc.materialdesign.views.CustomView
-        android:id="@+id/vk_sign_in"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_alignBottom="@+id/gg_sign_in"
-        android:layout_alignParentBottom="false"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="8dp"
-        android:background="@drawable/button_vk" />
-
-    <com.gc.materialdesign.views.CustomView
-        android:id="@+id/gg_sign_in"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_alignBottom="@+id/fb_sign_in"
-        android:layout_alignParentBottom="false"
+    <ImageView
+        android:id="@+id/nau_logo"
+        android:layout_width="189dp"
+        android:layout_height="150dp"
+        android:layout_below="@+id/toolbar"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/button_gg" />
+        android:layout_margin="8dp"
+        android:background="@drawable/nau_logo" />
 
-    <com.gc.materialdesign.views.CustomView
-        android:id="@+id/fb_sign_in"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_above="@+id/login_skip"
-        android:layout_alignParentBottom="false"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="50dp"
-        android:layout_marginRight="8dp"
-        android:background="@drawable/button_fb" />
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/nau_logo"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:inputType="text"
+        android:lines="1"
+        android:textColor="@color/black"
+        android:textColorHint="@color/grey"
+        app:errorEnabled="true">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Логин"
+            android:maxLines="1"
+            android:textColor="@color/black" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/username"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/colorAppPrimary"
+        android:hint="Пароль"
+        android:textColor="@color/black"
+        android:textColorHint="@color/grey"
+        app:errorEnabled="true">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Пароль"
+            android:inputType="textPassword"
+            android:maxLines="1"
+            android:textColor="@color/black" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <com.gc.materialdesign.views.ButtonFlat
+        android:id="@+id/login_vk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="false"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="48dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/colorAppPrimary"
+        android:onClick="onClick"
+        android:text="Войти через ВК" />
 
     <com.gc.materialdesign.views.ButtonFlat
         android:id="@+id/login_skip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentEnd="false"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="10dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="48dp"
+        android:layout_marginTop="16dp"
         android:background="@color/colorAppPrimary"
         android:onClick="onClick"
         android:text="Пропустить"
@@ -69,14 +101,11 @@
         android:id="@+id/login_lector"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="20dp"
+        android:layout_alignRight="@+id/password"
+        android:layout_below="@+id/password"
+        android:layout_marginTop="8dp"
         android:background="@color/colorAppPrimary"
         android:onClick="onClick"
-        android:text="Войти как\nпреподаватель"
-        android:textAlignment="gravity" />
+        android:text="Войти" />
 
 </RelativeLayout>

@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.ColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.gc.materialdesign.views.CustomView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -29,11 +31,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.HashMap;
 
+import me.zhanghai.android.materialprogressbar.IndeterminateProgressDrawable;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 import ua.nau.edu.NAU_Guide.BaseToolbarActivity;
 import ua.nau.edu.NAU_Guide.MainActivity;
 import ua.nau.edu.NAU_Guide.R;
+import ua.nau.edu.Systems.APIAlertDialogs;
 import ua.nau.edu.Systems.CircleTransform;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
@@ -96,38 +100,27 @@ public class LoginLectorActivity extends BaseToolbarActivity implements View.OnC
     private void userLogin(final String username, final String password) {
         new AsyncTask<String, Void, String>() {
 
-            ProgressDialog loading;
+            //ProgressDialog loading;
+            MaterialDialog loadingDialog;
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                loading = ProgressDialog.show(LoginLectorActivity.this, null, getResources().getString(R.string.dialog_loading), true, true);
-            }
+                /*loading = new ProgressDialog(LoginLectorActivity.this);
+                loading.setMessage(LoginLectorActivity.this.getResources().getString(R.string.dialog_loading));
+                loading.setIndeterminate(true);
+                loading.setCancelable(false);
+                loading.show();*/
 
-            @Override
-            protected void onPostExecute(String response) {
-                super.onPostExecute(response);
-                loading.dismiss();
-                if (!response.equalsIgnoreCase("error")) {
-                    try {
-                        final JSONObject jsonObject = new JSONObject(response);
-
-                        if (jsonObject.getString("error").equals("true")) {
-                            showDialogBadUsername();
-                        } else if (jsonObject.getString("error").equalsIgnoreCase("false")) {
-                            doLoginStuff(
-                                    jsonObject.getString("name"),
-                                    jsonObject.getString("email"),
-                                    jsonObject.getString("photo_url"),
-                                    jsonObject.getString("token"));
-                        }
-
-                    } catch (Throwable t) {
-                        Log.e("ActivityLogin", "Could not parse malformed JSON: \"" + response + "\"");
-                    }
-                } else {
-                    Toast.makeText(LoginLectorActivity.this, "Connection error", Toast.LENGTH_LONG).show();
-                }
+                loadingDialog = new MaterialDialog.Builder(LoginLectorActivity.this)
+                        .content(LoginLectorActivity.this.getResources().getString(R.string.dialog_loading))
+                        .progress(true, 0)
+                        .cancelable(false)
+                        .widgetColor(ContextCompat.getColor(LoginLectorActivity.this, R.color.colorAppPrimary))
+                        .contentColor(ContextCompat.getColor(LoginLectorActivity.this, R.color.black))
+                        .backgroundColor(ContextCompat.getColor(LoginLectorActivity.this, R.color.white))
+                        .build();
+                loadingDialog.show();
             }
 
             @Override
@@ -140,6 +133,34 @@ public class LoginLectorActivity extends BaseToolbarActivity implements View.OnC
                 LoginLectorUtils httpUtils = new LoginLectorUtils();
                 return httpUtils.sendPostRequestWithParams(LOGIN_URL, data);
             }
+
+            @Override
+            protected void onPostExecute(String response) {
+                super.onPostExecute(response);
+                if (!response.equalsIgnoreCase("error")) {
+                    try {
+                        final JSONObject jsonObject = new JSONObject(response);
+
+                        if (jsonObject.getString("error").equals("true")) {
+                            APIAlertDialogs.badLoginOrUsername(LoginLectorActivity.this);
+                        } else if (jsonObject.getString("error").equalsIgnoreCase("false")) {
+                            doLoginStuff(
+                                    jsonObject.getString("name"),
+                                    jsonObject.getString("unique_id"),
+                                    jsonObject.getString("email"),
+                                    jsonObject.getString("photo_url"),
+                                    jsonObject.getString("token"));
+                        }
+
+                    } catch (Throwable t) {
+                        Log.e("LoginLectorActivty", "Could not parse malformed JSON: \"" + response + "\"");
+                    }
+                } else {
+                    Toast.makeText(LoginLectorActivity.this, "Connection error", Toast.LENGTH_LONG).show();
+                }
+
+                loadingDialog.dismiss();
+            }
         }.execute(username, password);
     }
 
@@ -150,27 +171,7 @@ public class LoginLectorActivity extends BaseToolbarActivity implements View.OnC
         }
     }
 
-    private void showDialogBadUsername() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder
-                .setMessage("Неправильный логин или пароль. Пожалуйста, попробуйте еще раз.")
-                .setPositiveButton("Ок", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        final AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface arg) {
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(LoginLectorActivity.this, R.color.colorAppPrimary));
-            }
-        });
-        dialog.show();
-    }
-
-    private void doLoginStuff(String name, String email, String photoUrl, String token) {
+    private void doLoginStuff(String name, String uniqueId, String email, String photoUrl, String token) {
         FilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/NAU Guide";
         FileName = "profilePhoto_200.png";
         PROFILE_PHOTO_LOCATION = FilePath + "/" + FileName;
@@ -186,6 +187,7 @@ public class LoginLectorActivity extends BaseToolbarActivity implements View.OnC
 
         sharedPrefUtils.setName(name);
         sharedPrefUtils.setEmail(email);
+        sharedPrefUtils.setUniqueId(uniqueId);
 
         startActivity(new Intent(LoginLectorActivity.this, MainActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
