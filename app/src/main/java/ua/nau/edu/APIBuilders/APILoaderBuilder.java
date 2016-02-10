@@ -5,10 +5,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.gc.materialdesign.views.ProgressBarIndeterminate;
 
 import org.json.JSONArray;
@@ -89,24 +91,28 @@ public class APILoaderBuilder {
 
     public void loadPostsAll(final int startLoadPosition, final int loadNumber, final String REQUEST_URL) {
         new AsyncTask<String, Void, String>() {
-            ProgressDialog loadingDialog = null;
+            //ProgressDialog loadingDialog = null;
+            MaterialDialog loadingDialog;
             int addedItems = 0;
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
                 if (withDialog) {
-                    loadingDialog = new ProgressDialog(context);
+                    /*loadingDialog = new ProgressDialog(context);
                     loadingDialog.setMessage(context.getResources().getString(R.string.dialog_loading));
                     loadingDialog.setIndeterminate(true);
-                    loadingDialog.setCancelable(true);
-                    loadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            dialog.dismiss();
-                            activity.finish();
-                        }
-                    });
+                    loadingDialog.setCancelable(false);
+                    loadingDialog.show();*/
+
+                    loadingDialog = new MaterialDialog.Builder(context)
+                            .content(context.getResources().getString(R.string.dialog_loading))
+                            .progress(true, 0)
+                            .cancelable(false)
+                            .widgetColor(ContextCompat.getColor(context, R.color.colorAppPrimary))
+                            .contentColor(ContextCompat.getColor(context, R.color.black))
+                            .backgroundColor(ContextCompat.getColor(context, R.color.white))
+                            .build();
                     loadingDialog.show();
                 }
                 if (progressBar != null) {
@@ -203,24 +209,28 @@ public class APILoaderBuilder {
 
     public void loadPostsTargeted(final String REQUEST_URL, final String authorUniqueId, final int startLoadPosition, final int loadNumber) {
         new AsyncTask<String, Void, String>() {
-            ProgressDialog loadingDialog = null;
+            //ProgressDialog loadingDialog = null;
+            MaterialDialog loadingDialog;
             int addedItems = 0;
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
                 if (withDialog) {
-                    loadingDialog = new ProgressDialog(context);
+                    /*loadingDialog = new ProgressDialog(context);
                     loadingDialog.setMessage(context.getResources().getString(R.string.dialog_loading));
                     loadingDialog.setIndeterminate(true);
-                    loadingDialog.setCancelable(true);
-                    loadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            dialog.dismiss();
-                            activity.finish();
-                        }
-                    });
+                    loadingDialog.setCancelable(false);
+                    loadingDialog.show();*/
+
+                    loadingDialog = new MaterialDialog.Builder(context)
+                            .content(context.getResources().getString(R.string.dialog_loading))
+                            .progress(true, 0)
+                            .cancelable(false)
+                            .widgetColor(ContextCompat.getColor(context, R.color.colorAppPrimary))
+                            .contentColor(ContextCompat.getColor(context, R.color.black))
+                            .backgroundColor(ContextCompat.getColor(context, R.color.white))
+                            .build();
                     loadingDialog.show();
                 }
                 if (progressBar != null) {

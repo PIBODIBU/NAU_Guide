@@ -72,6 +72,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
 
     private void setUpViews() {
         if (isLoggedAsLector()) {
+            Log.i(TAG, "setUpViews/ is logged in as lector");
             ButtonFloat FABCreatePost = (ButtonFloat) findViewById(R.id.fab_create_post);
             FABCreatePost.setVisibility(View.VISIBLE);
             FABCreatePost.setOnClickListener(new View.OnClickListener() {
@@ -80,6 +81,8 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                     // TODO CreatePostActivity
                 }
             });
+        } else {
+            Log.i(TAG, "setUpViews/ is NOT logged in as lector");
         }
     }
 

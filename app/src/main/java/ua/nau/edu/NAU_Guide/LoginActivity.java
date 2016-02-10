@@ -1,8 +1,11 @@
 package ua.nau.edu.NAU_Guide;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,7 +13,9 @@ import android.os.Environment;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -107,6 +112,7 @@ public class LoginActivity extends BaseToolbarActivity {
 
         editTextUserName = (TextInputLayout) findViewById(R.id.username);
         editTextPassword = (TextInputLayout) findViewById(R.id.password);
+
     }
 
     @Override
@@ -209,6 +215,7 @@ public class LoginActivity extends BaseToolbarActivity {
                 break;
             }
             case R.id.login_lector: {
+                hideKeyboard();
                 login();
                 break;
             }
@@ -218,7 +225,16 @@ public class LoginActivity extends BaseToolbarActivity {
     private void login() {
         String username = editTextUserName.getEditText().getText().toString().trim();
         String password = editTextPassword.getEditText().getText().toString().trim();
-        userLogin(username, password);
+
+        if (username.equals("")) {
+            editTextUserName.setError("Введите логин");
+        } else if (password.equals("")) {
+            editTextPassword.setError("Введите пароль");
+        } else {
+            editTextUserName.setError("");
+            editTextPassword.setError("");
+            userLogin(username, password);
+        }
     }
 
     private void userLogin(final String username, final String password) {
@@ -385,6 +401,14 @@ public class LoginActivity extends BaseToolbarActivity {
         };
 
         Picasso.with(this).load(Uri).transform(transformation).into(loadtarget);
+    }
+
+    private void hideKeyboard() {
+        View view = getCurrentFocus();
+        if (view != null) {
+            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
+                    hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
 }

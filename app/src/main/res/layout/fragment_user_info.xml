@@ -47,7 +47,7 @@
                         android:layout_below="@+id/bio_text_head"
                         android:layout_marginTop="0dp"
                         android:text="Краткая биография"
-                        android:textColor="@color/text_grey"
+                        android:textColor="@color/grey_text"
                         android:textSize="14sp" />
 
                     <com.ms.square.android.expandabletextview.ExpandableTextView xmlns:android="http://schemas.android.com/apk/res/android"
