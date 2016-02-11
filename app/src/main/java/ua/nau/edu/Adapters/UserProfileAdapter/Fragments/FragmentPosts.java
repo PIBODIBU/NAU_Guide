@@ -16,8 +16,8 @@ import com.gc.materialdesign.views.ProgressBarIndeterminate;
 
 import java.util.ArrayList;
 
-import ua.nau.edu.APIBuilders.APILoaderBuilder;
-import ua.nau.edu.APIBuilders.APIRefreshBuilder;
+import ua.nau.edu.API.APILoaderBuilder;
+import ua.nau.edu.API.APIRefreshBuilder;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;

@@ -119,6 +119,13 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         setUpDrawerBuilder(ACCOUNT_NAME, ACCOUNT_EMAIL);
 
         drawerBuilder
+                .withOnDrawerNavigationListener(new Drawer.OnDrawerNavigationListener() {
+                    @Override
+                    public boolean onNavigationClickListener(View clickedView) {
+                        Log.i("BaseDrawer", "onNavigationClickListener called");
+                        return true;
+                    }
+                })
                 .withActionBarDrawerToggle(false);
 
         Log.i("Drawer", "getDrawerWithBackArrow");
@@ -325,7 +332,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                         startActivity(new Intent(BaseNavigationDrawerActivity.this, UserProfileActivity.class)
                                                 .putExtra("action", "getMyPage")
                                                 .putExtra("uniqueId", sharedPrefUtils.getUniqueId())
-                                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                         finish();
                                         break;
                                     }

@@ -1,5 +1,6 @@
 package ua.nau.edu.NAU_Guide;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -13,8 +14,8 @@ import com.gc.materialdesign.views.ProgressBarIndeterminate;
 
 import java.util.ArrayList;
 
-import ua.nau.edu.APIBuilders.APILoaderBuilder;
-import ua.nau.edu.APIBuilders.APIRefreshBuilder;
+import ua.nau.edu.API.APILoaderBuilder;
+import ua.nau.edu.API.APIRefreshBuilder;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
@@ -78,7 +79,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
             FABCreatePost.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO CreatePostActivity
+                    startActivity(new Intent(NewsActivity.this, CreatePostActivity.class));
                 }
             });
         } else {

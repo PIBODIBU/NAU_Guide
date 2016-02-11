@@ -34,8 +34,7 @@
             android:name=".SplashActivity"
             android:label="@string/SplashActivity_label"
             android:noHistory="true"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".MainActivity"
             android:label="@string/MainActivity_label">
@@ -98,6 +97,9 @@
         <activity
             android:name=".NewsActivity"
             android:label="Лента" />
+        <activity
+            android:name=".CreatePostActivity"
+            android:label="Новая запись" />
     </application>
 
 </manifest>

@@ -1,11 +1,9 @@
 package ua.nau.edu.NAU_Guide;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,10 +11,8 @@ import android.os.Environment;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -47,7 +43,7 @@ import java.util.HashMap;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
-import ua.nau.edu.Systems.APIAlertDialogs;
+import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.Systems.CircleTransform;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
@@ -282,7 +278,7 @@ public class LoginActivity extends BaseToolbarActivity {
                         final JSONObject jsonObject = new JSONObject(response);
 
                         if (jsonObject.getString("error").equals("true")) {
-                            APIAlertDialogs.badLoginOrUsername(LoginActivity.this);
+                            APIDialogs.AlertDialogs.badLoginOrUsername(LoginActivity.this);
                         } else if (jsonObject.getString("error").equalsIgnoreCase("false")) {
                             doLoginStuff(
                                     jsonObject.getString("name"),

@@ -1,18 +1,12 @@
 package ua.nau.edu.NAU_Guide.LoginLector;
 
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.ColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -31,13 +25,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.HashMap;
 
-import me.zhanghai.android.materialprogressbar.IndeterminateProgressDrawable;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 import ua.nau.edu.NAU_Guide.BaseToolbarActivity;
 import ua.nau.edu.NAU_Guide.MainActivity;
 import ua.nau.edu.NAU_Guide.R;
-import ua.nau.edu.Systems.APIAlertDialogs;
+import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.Systems.CircleTransform;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
@@ -142,7 +135,7 @@ public class LoginLectorActivity extends BaseToolbarActivity implements View.OnC
                         final JSONObject jsonObject = new JSONObject(response);
 
                         if (jsonObject.getString("error").equals("true")) {
-                            APIAlertDialogs.badLoginOrUsername(LoginLectorActivity.this);
+                            APIDialogs.AlertDialogs.badLoginOrUsername(LoginLectorActivity.this);
                         } else if (jsonObject.getString("error").equalsIgnoreCase("false")) {
                             doLoginStuff(
                                     jsonObject.getString("name"),

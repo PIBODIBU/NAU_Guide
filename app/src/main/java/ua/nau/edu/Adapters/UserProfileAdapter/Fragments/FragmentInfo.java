@@ -27,7 +27,7 @@ import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
 import ua.nau.edu.Systems.CircleTransform;
-import ua.nau.edu.Systems.APIAlertDialogs;
+import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class FragmentInfo extends Fragment {
@@ -74,15 +74,15 @@ public class FragmentInfo extends Fragment {
     private void getMyPage() {
         new AsyncTask<String, Void, JSONObject>() {
 
-            ProgressDialog dialog = new ProgressDialog(supportActivity);
+            //ProgressDialog dialog = new ProgressDialog(supportActivity);
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                dialog.setMessage("Loading...");
+                /*dialog.setMessage("Loading...");
                 dialog.setIndeterminate(true);
                 dialog.setCancelable(false);
-                dialog.show();
+                dialog.show();*/
             }
 
             @Override
@@ -97,14 +97,14 @@ public class FragmentInfo extends Fragment {
                     supportActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            APIAlertDialogs.internetConnectionErrorWithExit(supportActivity);
+                            APIDialogs.AlertDialogs.internetConnectionErrorWithExit(supportActivity);
                         }
                     });
                 } else if (response.equalsIgnoreCase("error_server")) {
                     supportActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            APIAlertDialogs.serverConnectionErrorWithExit(supportActivity);
+                            APIDialogs.AlertDialogs.serverConnectionErrorWithExit(supportActivity);
                         }
                     });
                     Log.e(TAG, "Server error. Response code != 200");
@@ -127,7 +127,7 @@ public class FragmentInfo extends Fragment {
             @Override
             protected void onPostExecute(JSONObject result) {
                 super.onPostExecute(result);
-                dialog.dismiss();
+                //dialog.dismiss();
 
                 if (result != null) {
                     try {
@@ -173,7 +173,7 @@ public class FragmentInfo extends Fragment {
                     supportActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            APIAlertDialogs.internetConnectionErrorWithExit(supportActivity);
+                            APIDialogs.AlertDialogs.internetConnectionErrorWithExit(supportActivity);
                         }
                     });
                 } else if (response.equalsIgnoreCase("error_server")) {
@@ -181,7 +181,7 @@ public class FragmentInfo extends Fragment {
                     supportActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            APIAlertDialogs.serverConnectionErrorWithExit(supportActivity);
+                            APIDialogs.AlertDialogs.serverConnectionErrorWithExit(supportActivity);
                         }
                     });
                     return null;

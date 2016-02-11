@@ -9,8 +9,12 @@ import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import ua.nau.edu.Enum.Activities;
 import ua.nau.edu.Enum.EnumSharedPreferences;
@@ -25,7 +29,7 @@ import ua.nau.edu.Adapters.UserProfileAdapter.UserAdapter;
 public class UserProfileActivity extends BaseNavigationDrawerActivity {
 
     private static final String REQUEST_URL = "http://nauguide.esy.es/include/getMyPage.php";
-    private static final String TAG = "UserProfile";
+    private static final String TAG = "UserProfileActivity";
 
     private SharedPrefUtils sharedPrefUtils;
 
@@ -76,7 +80,7 @@ public class UserProfileActivity extends BaseNavigationDrawerActivity {
         switch (item.getItemId()) {
             case android.R.id.home: {
                 Log.i(TAG, "Back arrow pressed");
-                finish();
+                onBackPressed();
                 return true;
             }
 

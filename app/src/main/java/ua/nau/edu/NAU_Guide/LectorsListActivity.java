@@ -1,6 +1,5 @@
 package ua.nau.edu.NAU_Guide;
 
-import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,6 +7,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+
+import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsAdapter;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsDataModel;
-import ua.nau.edu.Systems.APIAlertDialogs;
+import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 
@@ -60,15 +61,13 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
         adapter = new LectorsAdapter(data, LectorsListActivity.this);
 
         new AsyncTask<Void, Void, Void>() {
-            ProgressDialog loading = new ProgressDialog(LectorsListActivity.this);
+            MaterialDialog loadingDialog;
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                loading.setMessage(getResources().getString(R.string.dialog_loading));
-                loading.setIndeterminate(true);
-                loading.setCancelable(false);
-                loading.show();
+                loadingDialog = APIDialogs.ProgressDialogs.loading(LectorsListActivity.this);
+                loadingDialog.show();
             }
 
             @Override
@@ -81,14 +80,14 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            APIAlertDialogs.internetConnectionErrorWithExit(LectorsListActivity.this);
+                            APIDialogs.AlertDialogs.internetConnectionErrorWithExit(LectorsListActivity.this);
                         }
                     });
                 } else if (response.equalsIgnoreCase("error_server")) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            APIAlertDialogs.serverConnectionErrorWithExit(LectorsListActivity.this);
+                            APIDialogs.AlertDialogs.serverConnectionErrorWithExit(LectorsListActivity.this);
                         }
                     });
                     Log.e(TAG, "Server error. Response code != 200");
@@ -122,7 +121,7 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
             @Override
             protected void onPostExecute(final Void str) {
                 super.onPostExecute(str);
-                loading.dismiss();
+                loadingDialog.dismiss();
                 adapter.notifyDataSetChanged();
             }
         }.execute();

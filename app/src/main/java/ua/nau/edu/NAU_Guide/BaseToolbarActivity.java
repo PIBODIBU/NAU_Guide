@@ -48,6 +48,8 @@ public class BaseToolbarActivity extends AppCompatActivity {
     private SharedPreferences sharedPrefsVK;
     private SharedPrefUtils sharedPrefUtils;
 
+    private int menuId = -1;
+
     public BaseToolbarActivity() {
     }
 
@@ -82,14 +84,26 @@ public class BaseToolbarActivity extends AppCompatActivity {
         return true;
     }
 
-
-
     public void toastShowShort(String TEXT) {
         Toast.makeText(BaseToolbarActivity.this, TEXT, Toast.LENGTH_SHORT).show();
     }
 
     public void toastShowLong(String TEXT) {
         Toast.makeText(BaseToolbarActivity.this, TEXT, Toast.LENGTH_LONG).show();
+    }
+
+    void setMenuId(int menu) {
+        this.menuId = menu;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+
+        if (menuId != -1)
+            inflater.inflate(menuId, menu);
+
+        return true;
     }
 
     @Override
