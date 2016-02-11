@@ -14,26 +14,29 @@ import com.gc.materialdesign.views.ProgressBarIndeterminate;
 
 import java.util.ArrayList;
 
+import ua.nau.edu.API.APIDeleteBuilder;
 import ua.nau.edu.API.APILoaderBuilder;
 import ua.nau.edu.API.APIRefreshBuilder;
+import ua.nau.edu.API.APIStrings;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class NewsActivity extends BaseNavigationDrawerActivity {
 
-    private static final String REQUEST_URL = "http://nauguide.esy.es/include/getPostAll.php";
     private static final String TAG = "NewsActivity";
 
     private static NewsAdapter adapter;
     private LinearLayoutManager layoutManager;
     private static RecyclerView recyclerView;
-    private ProgressBarIndeterminate progressBar;
     private ArrayList<NewsDataModel> data = new ArrayList<NewsDataModel>();
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+
     private APILoaderBuilder postsLoaderWithoutDialog;
     private APILoaderBuilder postsLoaderWithDialog;
-    private APIRefreshBuilder APIRefreshBuilder;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private APIRefreshBuilder apiRefreshBuilder;
+    private APIDeleteBuilder apiDeleteBuilder;
+
 
     private SharedPrefUtils sharedPrefUtils;
 
@@ -55,12 +58,11 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
 
         setUpViews();
         setUpRecyclerView();
-        setUpPostsLoaders();
-        setUpPostsRefreshers();
+        setUpAPI();
         setUpSwipeRefreshLayout();
 
         Log.i(TAG, "onCreate: Loading first " + loadNumber + " posts...");
-        postsLoaderWithDialog.loadPostsAll(startLoadPosition, loadNumber, REQUEST_URL);
+        postsLoaderWithDialog.loadPostsAll(startLoadPosition, loadNumber, APIStrings.RequestUrl.GET_POST_ALL);
         startLoadPosition += loadNumber;
     }
 
@@ -87,6 +89,12 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
         }
     }
 
+    private void setUpAPI() {
+        setUpPostsDelete();
+        setUpPostsLoaders();
+        setUpPostsRefreshers();
+    }
+
     private void setUpPostsLoaders() {
         postsLoaderWithDialog = new APILoaderBuilder()
                 .withContext(NewsActivity.this)
@@ -97,21 +105,30 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                 .withActivity(this)
                 .withDataSet(data);
 
-        progressBar = (ProgressBarIndeterminate) findViewById(R.id.progressBar);
         postsLoaderWithoutDialog = new APILoaderBuilder()
                 .withContext(NewsActivity.this)
                 .withAdapter(adapter)
                 .withLoadingDialog(false)
-                        //.withProgressBar(progressBar)
                 .withTag(TAG)
                 .withRecycler(recyclerView)
                 .withActivity(this)
                 .withDataSet(data);
     }
 
+    private void setUpPostsDelete() {
+        apiDeleteBuilder = new APIDeleteBuilder()
+                .withActivity(this)
+                .withContext(this)
+                .withLoadingDialog(true)
+                .withTag(TAG)
+                .withRecyclerView(recyclerView)
+                .withDataSet(data)
+                .withAdapter(adapter);
+    }
+
     private void setUpPostsRefreshers() {
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeLayoutContainer);
-        APIRefreshBuilder = new APIRefreshBuilder()
+        apiRefreshBuilder = new APIRefreshBuilder()
                 .withContext(NewsActivity.this)
                 .withAdapter(adapter)
                 .withTag(TAG)
@@ -122,7 +139,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                 .withPostsLoaderBuilder(postsLoaderWithoutDialog)
                 .withLinearLayoutManager(layoutManager);
 
-        APIRefreshBuilder.setOnRefreshedAllListener(new APIRefreshBuilder.OnRefreshedAllListener() {
+        apiRefreshBuilder.setOnRefreshedAllListener(new APIRefreshBuilder.OnRefreshedAllListener() {
             @Override
             public void onRefreshedAction() {
                 startLoadPosition = loadNumber;
@@ -137,7 +154,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
 
                         Log.i(TAG, "From onRefreshedAction / Loading new data... (" + Integer.toString(loadNumber) + ") posts");
                         postsLoaderWithoutDialog.setProgressItemIndex(data.size() - 1);
-                        postsLoaderWithoutDialog.loadPostsAll(startLoadPosition, loadNumber, REQUEST_URL);
+                        postsLoaderWithoutDialog.loadPostsAll(startLoadPosition, loadNumber, APIStrings.RequestUrl.GET_POST_ALL);
                         startLoadPosition += loadNumber;
                     }
                 });
@@ -155,7 +172,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
             @Override
             public void onRefresh() {
                 // Refreshing items
-                APIRefreshBuilder.refreshItemsAll(REQUEST_URL, loadNumber);
+                apiRefreshBuilder.refreshItemsAll(APIStrings.RequestUrl.GET_POST_ALL, loadNumber);
 
             }
         });
@@ -169,7 +186,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        adapter = new NewsAdapter(data, NewsActivity.this, recyclerView);
+        adapter = new NewsAdapter(data, NewsActivity.this, recyclerView, sharedPrefUtils);
         recyclerView.setAdapter(adapter);
 
         /** OLD OnScrollListener **/
@@ -178,7 +195,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
             @Override
             public void onLoadMore(int current_page) {
                 Log.i(NewsActivity.TAG, "onLoadMore called: Loading new data... (" + Integer.toString(loadNumber) + ") posts");
-                postsLoaderWithoutDialog.loadPostsAll(startLoadPosition, loadNumber, REQUEST_URL);
+                postsLoaderWithoutDialog.loadPostsAll(startLoadPosition, loadNumber, APIStrings.RequestUrl.GET_POST_ALL);
                 startLoadPosition += loadNumber;
             }
         });*/
@@ -192,8 +209,15 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
 
                 Log.i(NewsActivity.TAG, "onLoadMore/ Loading new data... (" + Integer.toString(loadNumber) + ") posts");
                 postsLoaderWithoutDialog.setProgressItemIndex(data.size() - 1);
-                postsLoaderWithoutDialog.loadPostsAll(startLoadPosition, loadNumber, REQUEST_URL);
+                postsLoaderWithoutDialog.loadPostsAll(startLoadPosition, loadNumber, APIStrings.RequestUrl.GET_POST_ALL);
                 startLoadPosition += loadNumber;
+            }
+        });
+
+        adapter.setOnDeleteMessageAction(new NewsAdapter.OnDeleteMessageAction() {
+            @Override
+            public void onDeleteCalled(int postId, int deletePosition) {
+                apiDeleteBuilder.deletePost(APIStrings.RequestUrl.DELETE_POST, sharedPrefUtils.getToken(), postId, deletePosition);
             }
         });
     }

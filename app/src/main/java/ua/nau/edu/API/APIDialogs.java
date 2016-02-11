@@ -100,6 +100,26 @@ public class APIDialogs {
             dialog.show();
         }
 
+        public static void errorWhileDeletingPost(final Context context) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder
+                    .setMessage("Ошибка при удалении записи.")
+                    .setPositiveButton("Ок", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            final AlertDialog dialog = builder.create();
+            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                @Override
+                public void onShow(DialogInterface arg) {
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(context, R.color.colorAppPrimary));
+                }
+            });
+            dialog.show();
+        }
+
         public static void emptyString(final Context context) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder

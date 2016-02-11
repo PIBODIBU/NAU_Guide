@@ -18,6 +18,8 @@ import java.util.ArrayList;
 
 import ua.nau.edu.API.APILoaderBuilder;
 import ua.nau.edu.API.APIRefreshBuilder;
+import ua.nau.edu.API.APIStrings;
+import ua.nau.edu.NAU_Guide.LectorsListActivity;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
@@ -27,7 +29,6 @@ import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 public class FragmentPosts extends Fragment {
 
     private static final String TAG = "UserFragmentPosts";
-    private static final String REQUEST_URL = "http://nauguide.esy.es/include/getPostTargeted.php";
     private String authorUniqueId;
 
     private View FragmentView;
@@ -54,6 +55,10 @@ public class FragmentPosts extends Fragment {
         FragmentView = inflater.inflate(R.layout.fragment_user_posts, container, false);
         authorUniqueId = getActivity().getIntent().getExtras().getString("uniqueId");
 
+        sharedPrefUtils = new SharedPrefUtils(
+                supportActivity.getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, supportActivity.MODE_PRIVATE),
+                supportActivity.getSharedPreferences(sharedPrefUtils.VK_PREFERENCES, LectorsListActivity.MODE_PRIVATE));
+
         setUpRecyclerView();
         setUpPostsLoaders();
         setUpPostsRefreshers();
@@ -61,7 +66,7 @@ public class FragmentPosts extends Fragment {
 
         Log.i(TAG, "onCreateView: Loading first " + loadNumber + " posts...");
         Log.i(TAG, "onCreateView: Loading first unique id: " + getActivity().getIntent().getExtras().getString("uniqueId"));
-        postsLoaderWithDialog.loadPostsTargeted(REQUEST_URL,
+        postsLoaderWithDialog.loadPostsTargeted(APIStrings.RequestUrl.GET_POST_TARGETED,
                 authorUniqueId,
                 startLoadPosition,
                 loadNumber);
@@ -119,7 +124,7 @@ public class FragmentPosts extends Fragment {
 
                         Log.i(TAG, "From onRefreshedAction / Loading new data... (" + Integer.toString(loadNumber) + ") posts");
                         postsLoaderWithoutDialog.setProgressItemIndex(data.size() - 1);
-                        postsLoaderWithoutDialog.loadPostsTargeted(REQUEST_URL,
+                        postsLoaderWithoutDialog.loadPostsTargeted(APIStrings.RequestUrl.GET_POST_TARGETED,
                                 authorUniqueId,
                                 startLoadPosition,
                                 loadNumber);
@@ -140,7 +145,7 @@ public class FragmentPosts extends Fragment {
             @Override
             public void onRefresh() {
                 // Refreshing items
-                APIRefreshBuilder.refreshItemsTargeted(REQUEST_URL, authorUniqueId, loadNumber);
+                APIRefreshBuilder.refreshItemsTargeted(APIStrings.RequestUrl.GET_POST_TARGETED, authorUniqueId, loadNumber);
 
             }
         });
@@ -154,7 +159,7 @@ public class FragmentPosts extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        adapter = new NewsAdapter(data, supportActivity, recyclerView);
+        adapter = new NewsAdapter(data, supportActivity, recyclerView, sharedPrefUtils);
         recyclerView.setAdapter(adapter);
 
         /** OLD OnScrollListener **/
@@ -163,7 +168,7 @@ public class FragmentPosts extends Fragment {
             @Override
             public void onLoadMore(int current_page) {
                 Log.i(NewsActivity.TAG, "onLoadMore called: Loading new data... (" + Integer.toString(loadNumber) + ") posts");
-                postsLoaderWithoutDialog.loadPostsAll(startLoadPosition, loadNumber, REQUEST_URL);
+                postsLoaderWithoutDialog.loadPostsAll(startLoadPosition, loadNumber, APIStrings.RequestUrl.GET_POST_TARGETED);
                 startLoadPosition += loadNumber;
             }
         });*/
@@ -177,7 +182,7 @@ public class FragmentPosts extends Fragment {
 
                 Log.i(TAG, "onLoadMore/ Loading new data... (" + Integer.toString(loadNumber) + ") posts");
                 postsLoaderWithoutDialog.setProgressItemIndex(data.size() - 1);
-                postsLoaderWithoutDialog.loadPostsTargeted(REQUEST_URL,
+                postsLoaderWithoutDialog.loadPostsTargeted(APIStrings.RequestUrl.GET_POST_TARGETED,
                         authorUniqueId,
                         startLoadPosition,
                         loadNumber);

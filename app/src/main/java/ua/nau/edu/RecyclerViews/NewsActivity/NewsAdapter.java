@@ -15,7 +15,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.gc.materialdesign.views.CustomView;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Picasso;
 
@@ -25,6 +27,7 @@ import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
 import ua.nau.edu.Systems.CircleTransform;
+import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -38,11 +41,49 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private int visibleThreshold = 2;
     private int lastVisibleItem, totalItemCount;
     private boolean loading;
+    private SharedPrefUtils sharedPrefUtils;
+
     private OnLoadMoreListener onLoadMoreListener;
+    private OnDeleteMessageAction onDeleteMessageAction;
 
     public NewsAdapter(ArrayList<NewsDataModel> data, Context context, RecyclerView recyclerView) {
         this.dataSet = data;
         this.context = context;
+
+        final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                totalItemCount = linearLayoutManager.getItemCount();
+                lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+
+                Log.i("NewsAdapterTest", "totalItemCount = "
+                                + Integer.toString(totalItemCount)
+                                + "    lastVisibleItem= " + Integer.toString(lastVisibleItem)
+                                + "  loading: " + loading
+                );
+
+                if (!loading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                    loading = true;
+
+                    // End has been reached
+                    Log.i("NewsAdapterTest", "onScrolled: End reached");
+
+                    if (onLoadMoreListener != null) {
+                        onLoadMoreListener.onLoadMore();
+                    }
+                }
+            }
+        });
+    }
+
+    public NewsAdapter(ArrayList<NewsDataModel> data, Context context, RecyclerView recyclerView, SharedPrefUtils sharedPrefUtils) {
+        this.dataSet = data;
+        this.context = context;
+        this.sharedPrefUtils = sharedPrefUtils;
 
         final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
 
@@ -112,11 +153,11 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int listPosition) {
         if (holder instanceof BaseViewHolder) {
-
             final ExpandableTextView postMessage = ((BaseViewHolder) holder).postMessage;
             TextView postTitle = ((BaseViewHolder) holder).postTitle;
             TextView postSubTitle = ((BaseViewHolder) holder).postSubTitle;
             ImageView authorImage = ((BaseViewHolder) holder).authorImage;
+            CustomView deletePost = ((BaseViewHolder) holder).deletePost;
 
             postTitle.setText(dataSet.get(listPosition).getAuthor());
             postSubTitle.setText(dataSet.get(listPosition).getCreateTime());
@@ -135,6 +176,27 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             .putExtra("uniqueId", dataSet.get(listPosition).getAuthorUniqueId()));
                 }
             });
+
+            if (sharedPrefUtils != null) {
+                if (!sharedPrefUtils.getToken().equals("")) {
+                    if (dataSet.get(listPosition).getAuthorUniqueId().equals(sharedPrefUtils.getUniqueId())) {
+                        deletePost.setVisibility(View.VISIBLE);
+                        deletePost.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                onDeleteMessageAction.onDeleteCalled(dataSet.get(listPosition).getId(), listPosition);
+                            }
+                        });
+                    } else {
+                        deletePost.setVisibility(View.GONE);
+                    }
+                } else {
+                    Log.e("NewsAdapter", "Token == \"\"");
+                }
+            } else {
+                Log.e("NewsAdapter", "sharedPrefUtils == null");
+            }
+
             /*postMessage.setOnExpandStateChangeListener(new ExpandableTextView.OnExpandStateChangeListener() {
                 @Override
                 public void onExpandStateChanged(TextView textView, boolean isExpanded) {
@@ -154,14 +216,6 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.loading = true;
     }
 
-    public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
-        this.onLoadMoreListener = onLoadMoreListener;
-    }
-
-    public interface OnLoadMoreListener {
-        void onLoadMore();
-    }
-
     public static class ProgressViewHolder extends RecyclerView.ViewHolder {
         public MaterialProgressBar progressBar;
 
@@ -176,6 +230,7 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         TextView postTitle;
         TextView postSubTitle;
         ImageView authorImage;
+        CustomView deletePost;
 
         public BaseViewHolder(View itemView) {
             super(itemView);
@@ -183,7 +238,43 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.postTitle = (TextView) itemView.findViewById(R.id.header_title);
             this.postSubTitle = (TextView) itemView.findViewById(R.id.header_subtitle);
             this.postMessage = (ExpandableTextView) itemView.findViewById(R.id.post_text_expand);
+            this.deletePost = (CustomView) itemView.findViewById(R.id.button_delete_post);
         }
+    }
+
+    /**
+     * Setting new onLoadMoreListener
+     *
+     * @param onLoadMoreListener new OnLoadMoreListener
+     */
+    public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
+        this.onLoadMoreListener = onLoadMoreListener;
+    }
+
+    public interface OnLoadMoreListener {
+        /**
+         * Called when user reached end of RecyclerView. Is used for loading new data to RecyclerView.Adapter
+         **/
+        void onLoadMore();
+    }
+
+    /**
+     * Setting new onLoadMoreListener
+     *
+     * @param onDeleteMessageAction new OnDeleteMessageAction
+     */
+    public void setOnDeleteMessageAction(OnDeleteMessageAction onDeleteMessageAction) {
+        this.onDeleteMessageAction = onDeleteMessageAction;
+    }
+
+    public interface OnDeleteMessageAction {
+        /**
+         * Called when user pushes delete button.
+         *
+         * @param postId         id of post to delete.
+         * @param deletePosition position of RecyclerView.ViewHolder to delete.
+         */
+        void onDeleteCalled(int postId, int deletePosition);
     }
 
 }

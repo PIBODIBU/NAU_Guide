@@ -8,11 +8,11 @@ import android.widget.Toast;
 
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.API.APIPostBuilder;
+import ua.nau.edu.API.APIStrings;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class CreatePostActivity extends BaseToolbarActivity {
 
-    private static final String REQUEST_URL = "http://nauguide.esy.es/include/makePost.php";
     private static final String TAG = "CreatePostActivity";
     private static int maxMessageLength = 300;
 
@@ -60,7 +60,7 @@ public class CreatePostActivity extends BaseToolbarActivity {
                     if (message.length() > maxMessageLength) {
                         APIDialogs.AlertDialogs.tooLongMeassage(this);
                     } else {
-                        apiPostBuilder.postMessage(REQUEST_URL, sharedPrefUtils.getToken(), message);
+                        apiPostBuilder.postMessage(APIStrings.RequestUrl.MAKE_POST, sharedPrefUtils.getToken(), message);
                     }
                 }
                 break;

@@ -62,6 +62,7 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/expandable_text_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/head"
@@ -96,6 +97,16 @@
             </com.ms.square.android.expandabletextview.ExpandableTextView>
 
         </RelativeLayout>
+
+        <com.gc.materialdesign.views.ButtonFlat
+            android:id="@+id/button_delete_post"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/expandable_text_layout"
+            android:layout_margin="8dp"
+            android:background="@color/colorAppPrimary"
+            android:text="Удалить"
+            android:visibility="gone" />
 
     </RelativeLayout>
 
