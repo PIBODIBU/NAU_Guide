@@ -3,9 +3,11 @@ package ua.nau.edu.RecyclerViews.NewsActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v4.widget.TextViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -28,6 +30,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
+import ua.nau.edu.API.APIValues;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
 import ua.nau.edu.Systems.CircleTransform;
@@ -157,11 +160,12 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int listPosition) {
         if (holder instanceof BaseViewHolder) {
-            final ExpandableTextView postMessage = ((BaseViewHolder) holder).postMessage;
+            final TextView postMessage = ((BaseViewHolder) holder).postMessage;
             TextView postTitle = ((BaseViewHolder) holder).postTitle;
             TextView postSubTitle = ((BaseViewHolder) holder).postSubTitle;
             ImageView authorImage = ((BaseViewHolder) holder).authorImage;
             final ImageButton popUpmenu = ((BaseViewHolder) holder).popUpMenu;
+            final Button expandMessage = ((BaseViewHolder) holder).expandMessage;
 
             postTitle.setText(dataSet.get(listPosition).getAuthor());
             postSubTitle.setText(dataSet.get(listPosition).getCreateTime());
@@ -218,12 +222,27 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 Log.e("NewsAdapter", "sharedPrefUtils == null");
             }
 
-            postMessage.setOnExpandStateChangeListener(new ExpandableTextView.OnExpandStateChangeListener() {
+            postMessage.post(new Runnable() {
                 @Override
-                public void onExpandStateChanged(TextView textView, boolean isExpanded) {
-                    notifyDataSetChanged();
+                public void run() {
+                    if (postMessage.getLineCount() > APIValues.maxLinesBeforeExpand) {
+                        if (TextViewCompat.getMaxLines(postMessage) != 9999) {
+                            expandMessage.setVisibility(View.VISIBLE);
+                            expandMessage.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    postMessage.setMaxLines(9999);
+                                    expandMessage.setVisibility(View.GONE);
+                                }
+                            });
+                        }
+                    } else {
+                        postMessage.setMaxLines(APIValues.maxLinesBeforeExpand);
+                        expandMessage.setVisibility(View.GONE);
+                    }
                 }
             });
+
         } else {
             //((ProgressViewHolder) holder).progressBar.setIndeterminate(true);
         }
@@ -247,19 +266,21 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     public class BaseViewHolder extends RecyclerView.ViewHolder {
-        ExpandableTextView postMessage;
+        TextView postMessage;
         TextView postTitle;
         TextView postSubTitle;
         ImageView authorImage;
         ImageButton popUpMenu;
+        Button expandMessage;
 
         public BaseViewHolder(View itemView) {
             super(itemView);
             this.authorImage = (ImageView) itemView.findViewById(R.id.header_image);
             this.postTitle = (TextView) itemView.findViewById(R.id.header_title);
             this.postSubTitle = (TextView) itemView.findViewById(R.id.header_subtitle);
-            this.postMessage = (ExpandableTextView) itemView.findViewById(R.id.post_text_expand);
+            this.postMessage = (TextView) itemView.findViewById(R.id.post_text_expand);
             this.popUpMenu = (ImageButton) itemView.findViewById(R.id.popup_menu);
+            this.expandMessage = (Button) itemView.findViewById(R.id.expand_message);
         }
     }
 

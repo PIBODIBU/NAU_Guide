@@ -82,35 +82,34 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/head"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:paddingBottom="8dp">
 
-            <com.ms.square.android.expandabletextview.ExpandableTextView
+            <TextView
                 android:id="@+id/post_text_expand"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="8dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="16dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginTop="8dp"
-                expandableTextView:animDuration="200"
-                expandableTextView:maxCollapsedLines="4">
+                android:layout_marginStart="16dp"
+                android:maxLines="4"
+                android:textColor="@color/black"
+                android:textIsSelectable="true"
+                android:textSize="14sp" />
 
-                <TextView
-                    android:id="@+id/expandable_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
+            <Button
+                android:id="@+id/expand_message"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:layout_alignLeft="@+id/post_text_expand"
+                android:layout_below="@id/post_text_expand"
+                android:background="@android:color/transparent"
+                android:text="Показать больше..."
+                android:textColor="@color/colorAppPrimary"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
-                <ImageButton
-                    android:id="@id/expand_collapse"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end|bottom"
-                    android:background="@android:color/transparent"
-                    android:padding="16dp" />
-            </com.ms.square.android.expandabletextview.ExpandableTextView>
 
         </RelativeLayout>
 
