@@ -39,7 +39,7 @@
     <string name="VK_sign_error">Ошибка авторизации</string>
     <string name="VK_sent_success">Отправлено</string>
     <string name="VK_sent_error">Ошибка при отправке</string>
-    <string name="VK_share_text">Test String</string>
+    <string name="VK_share_text">Test Share String</string>
 
     <string name="Text_copied">Текст скопирован в буфер обмена</string>
     <string name="maps_dialog_fetching">Получение маршрута, подождите&#8230;</string> <!-- &#8230; == "..." -->

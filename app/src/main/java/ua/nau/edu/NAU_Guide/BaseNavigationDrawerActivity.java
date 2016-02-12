@@ -103,34 +103,32 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
     }
 
     public void getDrawer(String ACCOUNT_NAME, String ACCOUNT_EMAIL) {
+        // Creating DrawerBuilder
         setUpDrawerBuilder(ACCOUNT_NAME, ACCOUNT_EMAIL);
-
-        drawerBuilder
-                .withActionBarDrawerToggle(true)
-                .withActionBarDrawerToggleAnimated(true);
 
         Log.i("Drawer", "getDrawer");
 
+        // Creating Drawer from DrawerBuilder
         setUpDrawer();
+
+        // Getting current Drawer selection
         getCurrentSelection();
     }
 
     public void getDrawerWithBackArrow(String ACCOUNT_NAME, String ACCOUNT_EMAIL) {
+        // Creating DrawerBuilder
         setUpDrawerBuilder(ACCOUNT_NAME, ACCOUNT_EMAIL);
-
-        drawerBuilder
-                .withOnDrawerNavigationListener(new Drawer.OnDrawerNavigationListener() {
-                    @Override
-                    public boolean onNavigationClickListener(View clickedView) {
-                        Log.i("BaseDrawer", "onNavigationClickListener called");
-                        return true;
-                    }
-                })
-                .withActionBarDrawerToggle(false);
 
         Log.i("Drawer", "getDrawerWithBackArrow");
 
+        // Creating Drawer from DrawerBuilder
         setUpDrawer();
+
+        // Show back arrow icon
+        drawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // Getting current Drawer selection
         getCurrentSelection();
     }
 
@@ -142,6 +140,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                     .withIdentifier(Activities.UserProfileActivity.ordinal());
 
             drawer = drawerBuilder.build();
+            drawer.getRecyclerView().setVerticalScrollBarEnabled(false);
 
             if (!sharedPrefUtils.getToken().equals("")) {
                 drawer.addItemAtPosition(myPage, 2);
@@ -233,6 +232,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withProfileImagesClickable(true)
                 .withSelectionListEnabled(false)
                 .build();
+
         // Set up AccountHeader Background using Picasso
         ImageView accountHeaderBackground = accountHeader.getHeaderBackgroundView();
         Picasso.with(BaseNavigationDrawerActivity.this).load(R.drawable.header_png).into(accountHeaderBackground);
@@ -241,6 +241,8 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         drawerBuilder = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
+                .withActionBarDrawerToggle(true)
+                .withActionBarDrawerToggleAnimated(true)
                 .withAccountHeader(accountHeader)
                 .withHeaderDivider(false)
                 .addDrawerItems(
@@ -255,6 +257,20 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                         new DividerDrawerItem(),
                         exit
                 )
+                .withOnDrawerNavigationListener(new Drawer.OnDrawerNavigationListener() {
+                    /**
+                     * This method is only called if the Arrow icon is shown. The hamburger is automatically managed by the MaterialDrawer
+                     * If the back arrow is shown - close the activity
+                     *
+                     * @param clickedView
+                     * @return true if we have consumed the event
+                     */
+                    @Override
+                    public boolean onNavigationClickListener(View clickedView) {
+                        BaseNavigationDrawerActivity.this.finish();
+                        return true;
+                    }
+                })
                 .withOnDrawerListener(new Drawer.OnDrawerListener() {
                     @Override
                     public void onDrawerOpened(View drawerView) {

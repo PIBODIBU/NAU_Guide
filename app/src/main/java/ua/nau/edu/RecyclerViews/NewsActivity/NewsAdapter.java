@@ -218,12 +218,12 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 Log.e("NewsAdapter", "sharedPrefUtils == null");
             }
 
-            /*postMessage.setOnExpandStateChangeListener(new ExpandableTextView.OnExpandStateChangeListener() {
+            postMessage.setOnExpandStateChangeListener(new ExpandableTextView.OnExpandStateChangeListener() {
                 @Override
                 public void onExpandStateChanged(TextView textView, boolean isExpanded) {
-                    NewsAdapter.this.notifyItemChanged(listPosition);
+                    notifyDataSetChanged();
                 }
-            });*/
+            });
         } else {
             //((ProgressViewHolder) holder).progressBar.setIndeterminate(true);
         }

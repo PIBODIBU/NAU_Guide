@@ -93,13 +93,14 @@
             android:label="Профиль" />
         <activity
             android:name=".LectorsListActivity"
-            android:label="List" />
+            android:label="Преподаватели" />
         <activity
             android:name=".NewsActivity"
             android:label="Лента" />
         <activity
             android:name=".CreatePostActivity"
-            android:label="Новая запись" />
+            android:label="Новая запись"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
     </application>
 
 </manifest>

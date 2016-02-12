@@ -45,7 +45,7 @@ public class UserProfileActivity extends BaseNavigationDrawerActivity {
                 getSharedPreferences(EnumSharedPreferences.APP_PREFERENCES.toString(), MODE_PRIVATE),
                 getSharedPreferences(EnumSharedPreferencesVK.VK_PREFERENCES.toString(), LoginLectorActivity.MODE_PRIVATE));
 
-        getDrawer(
+        getDrawerWithBackArrow(
                 sharedPrefUtils.getName(),
                 sharedPrefUtils.getEmail()
         );
