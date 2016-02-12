@@ -1,4 +1,4 @@
-package ua.nau.edu.NAU_Guide.LoginLector;
+package ua.nau.edu.API;
 
 import android.util.Log;
 
@@ -32,7 +32,7 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class LoginLectorUtils {
+public class APIHTTPUtils {
 
     public String sendPostRequestWithParams(String requestURL, HashMap<String, String> postDataParams) {
 

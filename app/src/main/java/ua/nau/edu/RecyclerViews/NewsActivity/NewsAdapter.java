@@ -4,13 +4,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -157,7 +161,7 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             TextView postTitle = ((BaseViewHolder) holder).postTitle;
             TextView postSubTitle = ((BaseViewHolder) holder).postSubTitle;
             ImageView authorImage = ((BaseViewHolder) holder).authorImage;
-            CustomView deletePost = ((BaseViewHolder) holder).deletePost;
+            final ImageButton popUpmenu = ((BaseViewHolder) holder).popUpMenu;
 
             postTitle.setText(dataSet.get(listPosition).getAuthor());
             postSubTitle.setText(dataSet.get(listPosition).getCreateTime());
@@ -180,15 +184,32 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (sharedPrefUtils != null) {
                 if (!sharedPrefUtils.getToken().equals("")) {
                     if (dataSet.get(listPosition).getAuthorUniqueId().equals(sharedPrefUtils.getUniqueId())) {
-                        deletePost.setVisibility(View.VISIBLE);
-                        deletePost.setOnClickListener(new View.OnClickListener() {
+                        popUpmenu.setVisibility(View.VISIBLE);
+                        popUpmenu.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                onDeleteMessageAction.onDeleteCalled(dataSet.get(listPosition).getId(), listPosition);
+                                //Creating the instance of PopupMenu
+                                PopupMenu popup = new PopupMenu(context, popUpmenu);
+                                //Inflating the Popup using xml file
+                                popup.getMenuInflater().inflate(R.menu.menu_popup_news, popup.getMenu());
+
+                                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                    public boolean onMenuItemClick(MenuItem item) {
+                                        switch (item.getItemId()) {
+                                            case R.id.item_delete: {
+                                                onDeleteMessageAction.onDeleteCalled(dataSet.get(listPosition).getId(), listPosition);
+                                                break;
+                                            }
+                                        }
+                                        return true;
+                                    }
+                                });
+
+                                popup.show();//showing popup menu
                             }
                         });
                     } else {
-                        deletePost.setVisibility(View.GONE);
+                        popUpmenu.setVisibility(View.GONE);
                     }
                 } else {
                     Log.e("NewsAdapter", "Token == \"\"");
@@ -230,7 +251,7 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         TextView postTitle;
         TextView postSubTitle;
         ImageView authorImage;
-        CustomView deletePost;
+        ImageButton popUpMenu;
 
         public BaseViewHolder(View itemView) {
             super(itemView);
@@ -238,7 +259,7 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.postTitle = (TextView) itemView.findViewById(R.id.header_title);
             this.postSubTitle = (TextView) itemView.findViewById(R.id.header_subtitle);
             this.postMessage = (ExpandableTextView) itemView.findViewById(R.id.post_text_expand);
-            this.deletePost = (CustomView) itemView.findViewById(R.id.button_delete_post);
+            this.popUpMenu = (ImageButton) itemView.findViewById(R.id.popup_menu);
         }
     }
 

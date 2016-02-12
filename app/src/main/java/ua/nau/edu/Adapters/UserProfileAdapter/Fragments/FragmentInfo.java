@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
-import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
+import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
 import ua.nau.edu.Systems.CircleTransform;
@@ -87,7 +87,7 @@ public class FragmentInfo extends Fragment {
 
             @Override
             protected JSONObject doInBackground(String... params) {
-                LoginLectorUtils apiUtils = new LoginLectorUtils();
+                APIHTTPUtils apiUtils = new APIHTTPUtils();
                 HashMap<String, String> data = new HashMap<>();
                 data.put("token", params[0]);
 
@@ -163,7 +163,7 @@ public class FragmentInfo extends Fragment {
 
             @Override
             protected JSONObject doInBackground(String... params) {
-                LoginLectorUtils apiUtils = new LoginLectorUtils();
+                APIHTTPUtils apiUtils = new APIHTTPUtils();
                 HashMap<String, String> data = new HashMap<>();
                 data.put("unique_id", params[0]);
 

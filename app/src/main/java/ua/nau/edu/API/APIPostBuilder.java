@@ -12,8 +12,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
-
 public class APIPostBuilder {
     private static final String BUILDER_TAG = "PostBuilder/ ";
     private String TAG;
@@ -60,7 +58,7 @@ public class APIPostBuilder {
 
             @Override
             protected String doInBackground(String... params) {
-                LoginLectorUtils httpUtils = new LoginLectorUtils();
+                APIHTTPUtils httpUtils = new APIHTTPUtils();
                 HashMap<String, String> postData = new HashMap<String, String>();
                 postData.put("token", token);
                 postData.put("message", message);

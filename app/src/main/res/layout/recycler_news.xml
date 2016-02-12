@@ -59,6 +59,22 @@
                 android:textColor="@color/grey"
                 android:textSize="14sp" />
 
+            <ImageButton
+                android:id="@+id/popup_menu"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginEnd="-10dp"
+                android:layout_marginRight="-10dp"
+                android:layout_marginTop="-10dp"
+                android:adjustViewBounds="true"
+                android:background="@android:color/transparent"
+                android:cropToPadding="false"
+                android:src="@drawable/ic_more_vert_grey_24dp"
+                android:visibility="visible" />
+
         </RelativeLayout>
 
         <RelativeLayout
@@ -91,22 +107,12 @@
                     android:id="@id/expand_collapse"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right|bottom"
+                    android:layout_gravity="end|bottom"
                     android:background="@android:color/transparent"
                     android:padding="16dp" />
             </com.ms.square.android.expandabletextview.ExpandableTextView>
 
         </RelativeLayout>
-
-        <com.gc.materialdesign.views.ButtonFlat
-            android:id="@+id/button_delete_post"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/expandable_text_layout"
-            android:layout_margin="8dp"
-            android:background="@color/colorAppPrimary"
-            android:text="Удалить"
-            android:visibility="gone" />
 
     </RelativeLayout>
 

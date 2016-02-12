@@ -15,7 +15,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
 
@@ -99,7 +98,7 @@ public class APIRefreshBuilder {
 
             @Override
             protected String doInBackground(String... params) {
-                LoginLectorUtils httpUtils = new LoginLectorUtils();
+                APIHTTPUtils httpUtils = new APIHTTPUtils();
                 HashMap<String, String> postData = new HashMap<String, String>();
                 postData.put("start_post", Integer.toString(0));
                 postData.put("number_of_posts", Integer.toString(loadNumber));
@@ -216,7 +215,7 @@ public class APIRefreshBuilder {
 
             @Override
             protected String doInBackground(String... params) {
-                LoginLectorUtils httpUtils = new LoginLectorUtils();
+                APIHTTPUtils httpUtils = new APIHTTPUtils();
                 HashMap<String, String> postData = new HashMap<String, String>();
                 postData.put("start_post", Integer.toString(0));
                 postData.put("number_of_posts", Integer.toString(loadNumber));

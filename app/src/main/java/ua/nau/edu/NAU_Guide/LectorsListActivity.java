@@ -15,7 +15,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
+import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsAdapter;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsDataModel;
 import ua.nau.edu.API.APIDialogs;
@@ -72,7 +72,7 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
 
             @Override
             protected Void doInBackground(Void... params) {
-                LoginLectorUtils httpUtils = new LoginLectorUtils();
+                APIHTTPUtils httpUtils = new APIHTTPUtils();
                 String response = httpUtils.sendPostRequest(REQUEST_URL);
 
                 if (response.equalsIgnoreCase("error_connection")) {

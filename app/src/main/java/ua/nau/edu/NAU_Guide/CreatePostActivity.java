@@ -9,17 +9,19 @@ import android.widget.Toast;
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.API.APIPostBuilder;
 import ua.nau.edu.API.APIStrings;
+import ua.nau.edu.API.APIValues;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class CreatePostActivity extends BaseToolbarActivity {
 
     private static final String TAG = "CreatePostActivity";
-    private static int maxMessageLength = 300;
 
     private EditText messageEditText;
     private APIPostBuilder apiPostBuilder;
 
     private SharedPrefUtils sharedPrefUtils;
+
+    private String message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +55,11 @@ public class CreatePostActivity extends BaseToolbarActivity {
                 break;
             }
             case R.id.create_post: {
-                String message = messageEditText.getText().toString();
-                if (message.equals("")) {
+                message = messageEditText.getText().toString().trim();
+                if (isMessageEmpty()) {
                     APIDialogs.AlertDialogs.emptyString(this);
                 } else {
-                    if (message.length() > maxMessageLength) {
+                    if (!isValidLength()) {
                         APIDialogs.AlertDialogs.tooLongMeassage(this);
                     } else {
                         apiPostBuilder.postMessage(APIStrings.RequestUrl.MAKE_POST, sharedPrefUtils.getToken(), message);
@@ -70,5 +72,13 @@ public class CreatePostActivity extends BaseToolbarActivity {
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    private boolean isMessageEmpty() {
+        return message.equals("");
+    }
+
+    private boolean isValidLength() {
+        return message.length() <= APIValues.maxMessageLength;
     }
 }

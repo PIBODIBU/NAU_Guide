@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.gc.materialdesign.views.CustomView;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
@@ -32,7 +31,7 @@ import java.util.HashMap;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
-import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
+import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.RecyclerViews.MainActivity.MainActivityAdapter;
 import ua.nau.edu.RecyclerViews.MainActivity.MainActivityDataModel;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
@@ -285,7 +284,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
         new AsyncTask<String, Void, Void>() {
             @Override
             protected Void doInBackground(String... params) {
-                LoginLectorUtils apiUtils = new LoginLectorUtils();
+                APIHTTPUtils apiUtils = new APIHTTPUtils();
                 HashMap<String, String> data = new HashMap<>();
                 data.put("token", params[0]);
 

@@ -3,18 +3,20 @@ package ua.nau.edu.API;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.gc.materialdesign.widgets.SnackBar;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
 
 public class APIDeleteBuilder {
@@ -84,7 +86,7 @@ public class APIDeleteBuilder {
 
             @Override
             protected String doInBackground(String... params) {
-                LoginLectorUtils httpUtils = new LoginLectorUtils();
+                APIHTTPUtils httpUtils = new APIHTTPUtils();
                 HashMap<String, String> postData = new HashMap<String, String>();
                 postData.put("token", token);
                 postData.put("post_id", Integer.toString(postId));
@@ -142,7 +144,8 @@ public class APIDeleteBuilder {
                 } else {
                     dataSet.remove(deletePosition);
                     adapter.notifyItemRemoved(deletePosition);
-                    adapter.notifyDataSetChanged();
+                    adapter.notifyItemRangeChanged(deletePosition, dataSet.size());
+                    //adapter.notifyDataSetChanged();
                     Toast.makeText(context, "Удалено", Toast.LENGTH_LONG).show();
                 }
             }

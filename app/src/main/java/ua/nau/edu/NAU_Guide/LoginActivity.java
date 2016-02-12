@@ -42,7 +42,7 @@ import java.util.HashMap;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
-import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorUtils;
+import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.Systems.CircleTransform;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
@@ -50,6 +50,7 @@ import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 public class LoginActivity extends BaseToolbarActivity {
 
     private static final String LOGIN_URL = "http://nauguide.esy.es/include/log.php";
+    private static final String TAG = "LoginActivity";
 
     /***
      * VIEWS
@@ -222,32 +223,41 @@ public class LoginActivity extends BaseToolbarActivity {
         String username = editTextUserName.getEditText().getText().toString().trim();
         String password = editTextPassword.getEditText().getText().toString().trim();
 
+        Log.d(TAG, "username == " + username + " password == " + password);
+
+        if (isUsernameValid(username) && isPasswordValid(password)) {
+            userLogin(username, password);
+        }
+    }
+
+    private boolean isUsernameValid(String username) {
         if (username.equals("")) {
             editTextUserName.setError("Введите логин");
-        } else if (password.equals("")) {
-            editTextPassword.setError("Введите пароль");
+            return false;
         } else {
             editTextUserName.setError("");
+            return true;
+        }
+    }
+
+    private boolean isPasswordValid(String password) {
+        if (password.equals("")) {
+            editTextPassword.setError("Введите пароль");
+            return false;
+        } else {
             editTextPassword.setError("");
-            userLogin(username, password);
+            return true;
         }
     }
 
     private void userLogin(final String username, final String password) {
         new AsyncTask<String, Void, String>() {
 
-            //ProgressDialog loading;
             MaterialDialog loadingDialog;
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                /*loading = new ProgressDialog(LoginLectorActivity.this);
-                loading.setMessage(LoginLectorActivity.this.getResources().getString(R.string.dialog_loading));
-                loading.setIndeterminate(true);
-                loading.setCancelable(false);
-                loading.show();*/
-
                 loadingDialog = new MaterialDialog.Builder(LoginActivity.this)
                         .content(LoginActivity.this.getResources().getString(R.string.dialog_loading))
                         .progress(true, 0)
@@ -266,7 +276,7 @@ public class LoginActivity extends BaseToolbarActivity {
                 data.put("username", params[0]);
                 data.put("password", params[1]);
 
-                LoginLectorUtils httpUtils = new LoginLectorUtils();
+                APIHTTPUtils httpUtils = new APIHTTPUtils();
                 return httpUtils.sendPostRequestWithParams(LOGIN_URL, data);
             }
 

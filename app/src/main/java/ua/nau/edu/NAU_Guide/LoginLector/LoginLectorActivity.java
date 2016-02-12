@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.HashMap;
 
+import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 import ua.nau.edu.NAU_Guide.BaseToolbarActivity;
@@ -123,7 +124,7 @@ public class LoginLectorActivity extends BaseToolbarActivity implements View.OnC
                 data.put("username", params[0]);
                 data.put("password", params[1]);
 
-                LoginLectorUtils httpUtils = new LoginLectorUtils();
+                APIHTTPUtils httpUtils = new APIHTTPUtils();
                 return httpUtils.sendPostRequestWithParams(LOGIN_URL, data);
             }
 
