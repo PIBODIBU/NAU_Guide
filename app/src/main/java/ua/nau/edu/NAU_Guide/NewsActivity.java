@@ -18,6 +18,7 @@ import ua.nau.edu.API.APIDeleteBuilder;
 import ua.nau.edu.API.APILoaderBuilder;
 import ua.nau.edu.API.APIRefreshBuilder;
 import ua.nau.edu.API.APIStrings;
+import ua.nau.edu.API.APIUpdateBuilder;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
@@ -36,7 +37,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
     private APILoaderBuilder postsLoaderWithDialog;
     private APIRefreshBuilder apiRefreshBuilder;
     private APIDeleteBuilder apiDeleteBuilder;
-
+    private APIUpdateBuilder apiUpdateBuilder;
 
     private SharedPrefUtils sharedPrefUtils;
 
@@ -218,6 +219,15 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
             @Override
             public void onDeleteCalled(int postId, int deletePosition) {
                 apiDeleteBuilder.deletePost(APIStrings.RequestUrl.DELETE_POST, sharedPrefUtils.getToken(), postId, deletePosition);
+            }
+        });
+
+        adapter.setOnUpdateMessageAction(new NewsAdapter.OnUpdateMessageAction() {
+            @Override
+            public void onUpdateCalled(int postId, String message) {
+                startActivity(new Intent(NewsActivity.this, UpdatePostActivity.class)
+                        .putExtra("postId", postId)
+                        .putExtra("message", message));
             }
         });
     }

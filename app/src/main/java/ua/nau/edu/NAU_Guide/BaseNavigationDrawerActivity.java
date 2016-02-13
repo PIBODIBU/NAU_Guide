@@ -222,6 +222,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                             if (!sharedPrefs.getString(sharedPrefUtils.TOKEN_KEY, "").equals("")) {
                                 startActivity(new Intent(BaseNavigationDrawerActivity.this, UserProfileActivity.class)
                                         .putExtra("action", "getMyPage")
+                                        .putExtra("uniqueId", sharedPrefUtils.getUniqueId())
                                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                 finish();
                             }

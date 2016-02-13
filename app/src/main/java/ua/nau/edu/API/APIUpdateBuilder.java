@@ -12,38 +12,38 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-public class APIPostBuilder {
-    private static final String BUILDER_TAG = "PostBuilder/ ";
+public class APIUpdateBuilder {
+    private static final String BUILDER_TAG = "APIUpdateBuilder/ ";
     private String TAG;
     private Context context;
     private Activity activity;
     private boolean withDialog = false;
 
-    public APIPostBuilder withContext(Context context) {
+    public APIUpdateBuilder withContext(Context context) {
         this.context = context;
 
         return this;
     }
 
-    public APIPostBuilder withActivity(Activity activity) {
+    public APIUpdateBuilder withActivity(Activity activity) {
         this.activity = activity;
 
         return this;
     }
 
-    public APIPostBuilder withLoadingDialog(boolean withDialog) {
+    public APIUpdateBuilder withLoadingDialog(boolean withDialog) {
         this.withDialog = withDialog;
 
         return this;
     }
 
-    public APIPostBuilder withTag(String TAG) {
+    public APIUpdateBuilder withTag(String TAG) {
         this.TAG = TAG;
 
         return this;
     }
 
-    public void postMessage(final String REQUEST_URL, final String token, final String message) {
+    public void updateMessage(final String REQUEST_URL, final String token, final String message, final int postId) {
         new AsyncTask<String, Void, String>() {
             MaterialDialog loadingDialog;
 
@@ -61,7 +61,8 @@ public class APIPostBuilder {
                 APIHTTPUtils httpUtils = new APIHTTPUtils();
                 HashMap<String, String> postData = new HashMap<String, String>();
                 postData.put("token", token);
-                postData.put("message", message);
+                postData.put("new_message", message);
+                postData.put("post_id", Integer.toString(postId));
 
                 final String response = httpUtils.sendPostRequestWithParams(REQUEST_URL, postData);
 
@@ -95,7 +96,6 @@ public class APIPostBuilder {
                             return errorStatus;
                         }
 
-
                     } catch (Exception e) {
                         Log.e(TAG, BUILDER_TAG + "Can't create JSONArray");
                     }
@@ -111,9 +111,9 @@ public class APIPostBuilder {
                 }
 
                 if (errorStatus.equals("true")) {
-                    APIDialogs.AlertDialogs.errorWhilePostingMessage(context);
+                    APIDialogs.AlertDialogs.errorWhileUpdatingMessage(context);
                 } else {
-                    Toast.makeText(context, "Отправлено", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Обновлено", Toast.LENGTH_LONG).show();
                     activity.finish();
                 }
 

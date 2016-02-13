@@ -11,10 +11,11 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <android.support.v7.widget.CardView
-            android:id="@+id/bio_card"
+            android:id="@+id/card_bio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp">
+            android:layout_margin="8dp"
+            android:visibility="gone">
 
             <RelativeLayout
                 android:layout_width="match_parent"

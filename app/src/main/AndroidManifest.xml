@@ -101,6 +101,10 @@
             android:name=".CreatePostActivity"
             android:label="Новая запись"
             android:windowSoftInputMode="stateVisible|adjustResize" />
+        <activity
+            android:name=".UpdatePostActivity"
+            android:label="Редактировать"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
     </application>
 
 </manifest>

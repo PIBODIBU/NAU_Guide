@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Picasso;
 
@@ -21,6 +23,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
+import ua.nau.edu.API.APIStrings;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 import ua.nau.edu.API.APIHTTPUtils;
@@ -74,15 +77,12 @@ public class FragmentInfo extends Fragment {
     private void getMyPage() {
         new AsyncTask<String, Void, JSONObject>() {
 
-            //ProgressDialog dialog = new ProgressDialog(supportActivity);
+            MaterialDialog dialog = APIDialogs.ProgressDialogs.loading(supportActivity);
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                /*dialog.setMessage("Loading...");
-                dialog.setIndeterminate(true);
-                dialog.setCancelable(false);
-                dialog.show();*/
+                dialog.show();
             }
 
             @Override
@@ -127,21 +127,42 @@ public class FragmentInfo extends Fragment {
             @Override
             protected void onPostExecute(JSONObject result) {
                 super.onPostExecute(result);
-                //dialog.dismiss();
-
                 if (result != null) {
                     try {
-                        ExpandableTextView expTv1 = (ExpandableTextView) supportActivity.findViewById(R.id.bio_text_expand);
                         TextView textViewName = (TextView) supportActivity.findViewById(R.id.textViewName);
                         ImageView imageViewPhoto = (ImageView) supportActivity.findViewById(R.id.imageViewPhoto);
+                        ExpandableTextView expTv1 = (ExpandableTextView) supportActivity.findViewById(R.id.bio_text_expand);
 
-                        expTv1.setText(result.getString("bio"));
-                        textViewName.setText(result.getString("name"));
-                        Picasso.with(supportActivity)
-                                .load(Uri.parse(result.getString("photo_url"))).transform(new CircleTransform()).into(imageViewPhoto);
+                        /*
+                            Setting Up NAME
+                        */
+                        textViewName.setText(result.getString(APIStrings.ResponseKeys.PageLoading.NAME));
+
+                        /*
+                            Setting Up BIOGRAPHY
+                        */
+                        CardView cardBio = (CardView) supportActivity.findViewById(R.id.card_bio);
+                        if (!result.getString(APIStrings.ResponseKeys.PageLoading.BIOGRAPHY).equals("")) {
+                            cardBio.setVisibility(View.VISIBLE);
+                            expTv1.setText(result.getString(APIStrings.ResponseKeys.PageLoading.BIOGRAPHY));
+                        }
+
+                        /*
+                            Setting Up USER_PHOTO
+                        */
+                        if (!result.getString(APIStrings.ResponseKeys.PageLoading.PHOTO_URL).equals("")) {
+                            Picasso.with(supportActivity)
+                                    .load(Uri.parse(result.getString(APIStrings.ResponseKeys.PageLoading.PHOTO_URL))).transform(new CircleTransform()).into(imageViewPhoto);
+                        } else {
+                            Picasso.with(supportActivity)
+                                    .load(Uri.parse(APIStrings.ImageUrl.DEFAULT_AVATAR)).transform(new CircleTransform()).into(imageViewPhoto);
+                        }
+
                     } catch (Throwable t) {
-                        Log.e(TAG, "Could not parse malformed JSON: \"" + result + "\"");
+                        Log.e(TAG, "Could not parse malformed JSON: " + result);
                     }
+
+                    dialog.dismiss();
                 }
             }
         }.execute(sharedPrefUtils.getToken());
@@ -150,14 +171,11 @@ public class FragmentInfo extends Fragment {
     private void getPage(String UniqueId) {
         new AsyncTask<String, Void, JSONObject>() {
 
-            ProgressDialog dialog = new ProgressDialog(supportActivity);
+            MaterialDialog dialog = APIDialogs.ProgressDialogs.loading(supportActivity);
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                dialog.setMessage("Loading...");
-                dialog.setIndeterminate(true);
-                dialog.setCancelable(false);
                 dialog.show();
             }
 
@@ -203,22 +221,42 @@ public class FragmentInfo extends Fragment {
             @Override
             protected void onPostExecute(JSONObject result) {
                 super.onPostExecute(result);
-                dialog.dismiss();
-
                 if (result != null) {
                     try {
                         TextView textViewName = (TextView) supportActivity.findViewById(R.id.textViewName);
                         ImageView imageViewPhoto = (ImageView) supportActivity.findViewById(R.id.imageViewPhoto);
                         ExpandableTextView expTv1 = (ExpandableTextView) supportActivity.findViewById(R.id.bio_text_expand);
 
-                        expTv1.setText(result.getString("bio"));
-                        textViewName.setText(result.getString("name"));
-                        Picasso.with(supportActivity).
-                                load(Uri.parse(result.getString("photo_url"))).transform(new CircleTransform()).into(imageViewPhoto);
+                        /*
+                            Setting Up NAME
+                        */
+                        textViewName.setText(result.getString(APIStrings.ResponseKeys.PageLoading.NAME));
+
+                        /*
+                            Setting Up BIOGRAPHY
+                        */
+                        CardView cardBio = (CardView) supportActivity.findViewById(R.id.card_bio);
+                        if (!result.getString(APIStrings.ResponseKeys.PageLoading.BIOGRAPHY).equals("")) {
+                            cardBio.setVisibility(View.VISIBLE);
+                            expTv1.setText(result.getString(APIStrings.ResponseKeys.PageLoading.BIOGRAPHY));
+                        }
+
+                        /*
+                            Setting Up USER_PHOTO
+                        */
+                        if (!result.getString(APIStrings.ResponseKeys.PageLoading.PHOTO_URL).equals("")) {
+                            Picasso.with(supportActivity)
+                                    .load(Uri.parse(result.getString(APIStrings.ResponseKeys.PageLoading.PHOTO_URL))).transform(new CircleTransform()).into(imageViewPhoto);
+                        } else {
+                            Picasso.with(supportActivity)
+                                    .load(Uri.parse(APIStrings.ImageUrl.DEFAULT_AVATAR)).transform(new CircleTransform()).into(imageViewPhoto);
+                        }
 
                     } catch (Throwable t) {
-                        Log.e(TAG, "Could not parse malformed JSON: \"" + result + "\"");
+                        Log.e(TAG, "Could not parse malformed JSON: " + result);
                     }
+
+                    dialog.dismiss();
                 }
             }
         }.execute(UniqueId);

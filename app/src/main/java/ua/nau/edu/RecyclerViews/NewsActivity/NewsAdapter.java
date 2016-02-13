@@ -52,6 +52,7 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private OnLoadMoreListener onLoadMoreListener;
     private OnDeleteMessageAction onDeleteMessageAction;
+    private OnUpdateMessageAction onUpdateMessageAction;
 
     public NewsAdapter(ArrayList<NewsDataModel> data, Context context, RecyclerView recyclerView) {
         this.dataSet = data;
@@ -204,6 +205,9 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                                 onDeleteMessageAction.onDeleteCalled(dataSet.get(listPosition).getId(), listPosition);
                                                 break;
                                             }
+                                            case R.id.item_update: {
+                                                onUpdateMessageAction.onUpdateCalled(dataSet.get(listPosition).getId(), dataSet.get(listPosition).getMessage());
+                                            }
                                         }
                                         return true;
                                     }
@@ -301,7 +305,7 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     /**
-     * Setting new onLoadMoreListener
+     * Setting new onDeleteMessageAction
      *
      * @param onDeleteMessageAction new OnDeleteMessageAction
      */
@@ -317,6 +321,25 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
          * @param deletePosition position of RecyclerView.ViewHolder to delete.
          */
         void onDeleteCalled(int postId, int deletePosition);
+    }
+
+    /**
+     * Setting new onUpdateMessageAction
+     *
+     * @param onUpdateMessageAction new OnUpdateMessageAction
+     */
+    public void setOnUpdateMessageAction(OnUpdateMessageAction onUpdateMessageAction) {
+        this.onUpdateMessageAction = onUpdateMessageAction;
+    }
+
+    public interface OnUpdateMessageAction {
+        /**
+         * Called when user pushes update button.
+         *
+         * @param postId  - id of post to update.
+         * @param message - text message to update.
+         */
+        void onUpdateCalled(int postId, String message);
     }
 
 }

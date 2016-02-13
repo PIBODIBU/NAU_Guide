@@ -1,20 +1,15 @@
 package ua.nau.edu.NAU_Guide;
 
-import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import ua.nau.edu.Enum.Activities;
 import ua.nau.edu.Enum.EnumSharedPreferences;
@@ -24,7 +19,7 @@ import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 import ua.nau.edu.Adapters.UserProfileAdapter.Fragments.FragmentInfo;
 import ua.nau.edu.Adapters.UserProfileAdapter.Fragments.FragmentPosts;
 import ua.nau.edu.Adapters.UserProfileAdapter.Fragments.FragmentTimetable;
-import ua.nau.edu.Adapters.UserProfileAdapter.UserAdapter;
+import ua.nau.edu.Adapters.UserProfileAdapter.UserProfileAdapter;
 
 public class UserProfileActivity extends BaseNavigationDrawerActivity {
 
@@ -50,21 +45,43 @@ public class UserProfileActivity extends BaseNavigationDrawerActivity {
                 sharedPrefUtils.getEmail()
         );
 
-        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        //collapsingToolbarLayout.setTitle("Профиль");
-        collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(this, android.R.color.transparent));
+        new AsyncTask<Void, Void, Void>() {
 
-        TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
-        ViewPager pager = (ViewPager) findViewById(R.id.viewpager);
+            TabLayout tabs;
+            ViewPager pager;
+            UserProfileAdapter adapter;
 
-        UserAdapter adapter = new UserAdapter(getSupportFragmentManager());
-        adapter.addFrag(new FragmentInfo(), "Информация");
-        adapter.addFrag(new FragmentPosts(), "Записи");
-        adapter.addFrag(new FragmentTimetable(), "Расписание");
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
 
-        pager.setAdapter(adapter);
-        pager.setOffscreenPageLimit(5); // Лимит хранения Фрагментов в памяти
-        tabs.setupWithViewPager(pager);
+                CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+                //collapsingToolbarLayout.setTitle("Профиль");
+                collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(UserProfileActivity.this, android.R.color.transparent));
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                tabs = (TabLayout) findViewById(R.id.tabs);
+                pager = (ViewPager) findViewById(R.id.viewpager);
+
+                adapter = new UserProfileAdapter(getSupportFragmentManager());
+                adapter.addFrag(new FragmentInfo(), "Информация");
+                adapter.addFrag(new FragmentPosts(), "Записи");
+                adapter.addFrag(new FragmentTimetable(), "Расписание");
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                pager.setAdapter(adapter);
+                pager.setOffscreenPageLimit(5); // Лимит хранения Фрагментов в памяти
+                tabs.setupWithViewPager(pager);
+            }
+        }.execute();
 
         if (getIntent().getStringExtra("action").equals("getMyPage"))
             this.drawer.setSelection(Activities.UserProfileActivity.ordinal());

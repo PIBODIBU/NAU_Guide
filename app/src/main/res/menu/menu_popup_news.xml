@@ -5,4 +5,8 @@
         android:id="@+id/item_delete"
         android:title="Удалить" />
 
+    <item
+        android:id="@+id/item_update"
+        android:title="Редактировать" />
+
 </menu>

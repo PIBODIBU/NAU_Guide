@@ -3,28 +3,31 @@ package ua.nau.edu.NAU_Guide;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import ua.nau.edu.API.APIDialogs;
-import ua.nau.edu.API.APICreateBuilder;
 import ua.nau.edu.API.APIStrings;
+import ua.nau.edu.API.APIUpdateBuilder;
 import ua.nau.edu.API.APIValues;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
-public class CreatePostActivity extends BaseToolbarActivity {
+public class UpdatePostActivity extends BaseToolbarActivity {
 
-    private static final String TAG = "CreatePostActivity";
+    private static final String TAG = "UpdatePostActivity";
 
     private EditText messageEditText;
-    private APICreateBuilder apiCreateBuilder;
+    private APIUpdateBuilder apiUpdateBuilder;
 
     private SharedPrefUtils sharedPrefUtils;
 
-    private String message;
+    private String messageNew; // New message
+    private String messageToEdit = ""; // Old message
+    private int postId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_post);
+        setContentView(R.layout.activity_update_post);
 
         getToolbar();
         setMenuId(R.menu.menu_create_post);
@@ -34,11 +37,18 @@ public class CreatePostActivity extends BaseToolbarActivity {
         sharedPrefUtils = new SharedPrefUtils(getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, MODE_PRIVATE),
                 getSharedPreferences(sharedPrefUtils.VK_PREFERENCES, MainActivity.MODE_PRIVATE));
 
-        messageEditText = (EditText) findViewById(R.id.post_message);
+        messageEditText = (EditText) findViewById(R.id.update_message);
+
+        messageToEdit = getIntent().getStringExtra("message");
+        postId = getIntent().getIntExtra("postId", -1);
+
+        if (!messageToEdit.equals("")) {
+            messageEditText.setText(messageToEdit);
+        }
     }
 
     private void setUpAPI() {
-        apiCreateBuilder = new APICreateBuilder()
+        apiUpdateBuilder = new APIUpdateBuilder()
                 .withActivity(this)
                 .withContext(this)
                 .withLoadingDialog(true)
@@ -53,14 +63,18 @@ public class CreatePostActivity extends BaseToolbarActivity {
                 break;
             }
             case R.id.create_post: {
-                message = messageEditText.getText().toString().trim();
+                messageNew = messageEditText.getText().toString().trim();
                 if (isMessageEmpty()) {
                     APIDialogs.AlertDialogs.emptyString(this);
                 } else {
                     if (!isValidLength()) {
                         APIDialogs.AlertDialogs.tooLongMeassage(this);
                     } else {
-                        apiCreateBuilder.postMessage(APIStrings.RequestUrl.MAKE_POST, sharedPrefUtils.getToken(), message);
+                        if (postId != -1) {
+                            apiUpdateBuilder.updateMessage(APIStrings.RequestUrl.UPDATE_POST, sharedPrefUtils.getToken(), messageNew, postId);
+                        } else {
+                            Toast.makeText(this, "Bad post ID", Toast.LENGTH_LONG).show();
+                        }
                     }
                 }
                 break;
@@ -73,10 +87,10 @@ public class CreatePostActivity extends BaseToolbarActivity {
     }
 
     private boolean isMessageEmpty() {
-        return message.equals("");
+        return messageNew.equals("");
     }
 
     private boolean isValidLength() {
-        return message.length() <= APIValues.maxMessageLength;
+        return messageNew.length() <= APIValues.maxMessageLength;
     }
 }
