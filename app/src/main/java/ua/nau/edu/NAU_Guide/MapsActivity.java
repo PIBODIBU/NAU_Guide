@@ -291,7 +291,10 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        supportRoute.drawRoute(mMap, MapsActivity.this, getMyCoordinate(), university.getCorps().get(currentMarkerID), Route.TRANSPORT_WALKING, false, Route.LANGUAGE_RUSSIAN, R.drawable.ic_place_black_24dp);
+                                        supportRoute.clearPath();
+
+                                        supportRoute.drawRoute(mMap, MapsActivity.this, getMyCoordinate(), university.getCorps().get(currentMarkerID),
+                                                Route.TRANSPORT_WALKING, false, Route.LANGUAGE_RUSSIAN, R.drawable.ic_place_black_24dp);
 
                                         CameraPosition currentPosition = new CameraPosition.Builder()
                                                 .target(getMyCoordinate())

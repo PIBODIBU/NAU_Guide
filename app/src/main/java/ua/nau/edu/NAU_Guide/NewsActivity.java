@@ -2,6 +2,7 @@ package ua.nau.edu.NAU_Guide;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
+import com.gc.materialdesign.views.AutoHideButtonFloat;
 import com.gc.materialdesign.views.ButtonFloat;
 import com.gc.materialdesign.views.ProgressBarIndeterminate;
 
@@ -65,6 +67,8 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
         Log.i(TAG, "onCreate: Loading first " + loadNumber + " posts...");
         postsLoaderWithDialog.loadPostsAll(startLoadPosition, loadNumber, APIStrings.RequestUrl.GET_POST_ALL);
         startLoadPosition += loadNumber;
+
+
     }
 
     private boolean isLoggedAsLector() {

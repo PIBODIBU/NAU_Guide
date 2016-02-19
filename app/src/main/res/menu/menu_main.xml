@@ -13,8 +13,8 @@
     <item
         android:id="@+id/logOut"
         android:gravity="center"
-        android:icon="@drawable/ic_account_circle_white_48dp"
+        android:icon="@drawable/ic_exit_to_app_white_24dp"
         android:title="Выйти"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
 
 </menu>

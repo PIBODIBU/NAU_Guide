@@ -236,7 +236,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 
         // Set up AccountHeader Background using Picasso
         ImageView accountHeaderBackground = accountHeader.getHeaderBackgroundView();
-        Picasso.with(BaseNavigationDrawerActivity.this).load(R.drawable.header_png).into(accountHeaderBackground);
+        Picasso.with(BaseNavigationDrawerActivity.this).load(R.drawable.head_bg_jpg_2).into(accountHeaderBackground);
 
 // Инициализируем Navigation Drawer
         drawerBuilder = new DrawerBuilder()
@@ -406,12 +406,16 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                     break;
                 }
                 case KeyEvent.KEYCODE_BACK: {
-                    if (drawer.isDrawerOpen())
+                    if (drawer.isDrawerOpen()) { // Check if Drawer is opened
                         drawer.closeDrawer();
-                    else if (!searchView.isIconified())
-                        searchView.onActionViewCollapsed();
-                    else
+                    } else if (searchView != null) { // Check if there is SearchView on Toolbar
+                        if (!searchView.isIconified()) {
+                            searchView.onActionViewCollapsed();
+                        }
+                    } else {
                         super.onBackPressed();
+                    }
+
                     break;
                 }
             }
@@ -440,11 +444,15 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         if (menuId != -1)
             inflater.inflate(menuId, menu);
         else
-            inflater.inflate(R.menu.menu_main, menu);
+            inflater.inflate(R.menu.menu_default, menu);
 
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        try {
+            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+            searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return true;
     }

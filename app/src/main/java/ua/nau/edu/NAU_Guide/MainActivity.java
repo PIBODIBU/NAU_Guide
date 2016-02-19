@@ -90,6 +90,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
                 settingsVK.getString(VK_INFO_KEY, ""),
                 settingsVK.getString(VK_EMAIL_KEY, "")
         );
+        setMenuId(R.menu.menu_main);
 
         if (!sharedPrefUtils.getToken().equals(""))
             checkToken(sharedPrefUtils.getToken());

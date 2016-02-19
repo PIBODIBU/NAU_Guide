@@ -62,6 +62,8 @@ public class Route {
     public static String TRANSPORT_BIKE = "bicycling";
     public static String TRANSPORT_TRANSIT = "transit";
 
+    private ArrayList<Polyline> polylines = new ArrayList<>();
+
     public boolean drawRoute(GoogleMap map, Context c, ArrayList<LatLng> points, boolean withIndications, String language, boolean optimize) {
         mMap = map;
         context = c;
@@ -309,11 +311,12 @@ public class Route {
                         .width(5) //Default = 4
                         .color(ContextCompat.getColor(context, R.color.colorAppPrimary))
                         .geodesic(true));
+                polylines.add(line);
             }
 
             if (withSteps) {
                 if (iconId == -99)
-                    iconId = R.drawable.ic_place_black_24dp; // TODO default step marker
+                    iconId = R.drawable.ic_place_black_24dp;
 
                 JSONArray arrayLegs = routes.getJSONArray("legs");
                 JSONObject legs = arrayLegs.getJSONObject(0);
@@ -361,6 +364,13 @@ public class Route {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public void clearPath() {
+        for (Polyline polyline : polylines) {
+            polyline.remove();
+        }
+        polylines.clear();
     }
 
 

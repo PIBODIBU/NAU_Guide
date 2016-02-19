@@ -105,4 +105,5 @@ public class UserProfileActivity extends BaseNavigationDrawerActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
 }

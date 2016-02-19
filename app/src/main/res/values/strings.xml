@@ -18,7 +18,7 @@
     <string name="drawer_item_home">Корпуса</string>
     <string name="drawer_item_mypage">Моя страница</string>
     <string name="drawer_item_map">Карта</string>
-    <string name="drawer_item_lectors">Преподаватели</string>
+    <string name="drawer_item_lectors">Пользователи</string>
     <string name="drawer_item_download">Загрузки</string>
     <string name="drawer_item_settings">Настройки</string>
     <string name="drawer_item_search">Поиск</string>
