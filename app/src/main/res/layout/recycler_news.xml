@@ -73,7 +73,7 @@
                 android:background="@android:color/transparent"
                 android:cropToPadding="false"
                 android:src="@drawable/ic_more_vert_grey_24dp"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
         </RelativeLayout>
 

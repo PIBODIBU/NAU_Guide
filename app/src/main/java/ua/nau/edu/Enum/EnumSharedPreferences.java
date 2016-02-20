@@ -14,5 +14,5 @@ public enum EnumSharedPreferences {
     TOKEN_KEY,
     UNIQUE_ID,
     EXIT,
-
+    ACCOUNTHEADER_BG_IMAGE
 }

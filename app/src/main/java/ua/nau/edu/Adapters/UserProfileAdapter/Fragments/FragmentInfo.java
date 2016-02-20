@@ -168,7 +168,7 @@ public class FragmentInfo extends Fragment {
         }.execute(sharedPrefUtils.getToken());
     }
 
-    private void getPage(String UniqueId) {
+    private void getPage(final String UniqueId) {
         new AsyncTask<String, Void, JSONObject>() {
 
             MaterialDialog dialog = APIDialogs.ProgressDialogs.loading(supportActivity);
@@ -250,6 +250,13 @@ public class FragmentInfo extends Fragment {
                         } else {
                             Picasso.with(supportActivity)
                                     .load(Uri.parse(APIStrings.ImageUrl.DEFAULT_AVATAR)).transform(new CircleTransform()).into(imageViewPhoto);
+                        }
+
+                        /*
+                            Checking if loading page is my page and set Drawer selection t o my page if true
+                         */
+                        if (result.getString("unique_id").equals(sharedPrefUtils.getUniqueId())) {
+                            supportActivity.setDrawerToMyPage();
                         }
 
                     } catch (Throwable t) {

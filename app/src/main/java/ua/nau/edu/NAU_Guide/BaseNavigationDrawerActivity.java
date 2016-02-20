@@ -5,7 +5,9 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -16,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,12 +34,15 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.squareup.picasso.Picasso;
 
+import ua.nau.edu.Dialogs.AccountHeaderBgPicker;
 import ua.nau.edu.Enum.Activities;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class BaseNavigationDrawerActivity extends AppCompatActivity {
+    private static final String TAG = "BaseNavigationDrawer";
+
     protected DrawerBuilder drawerBuilder = null;
     protected Drawer drawer = null;
     private InputMethodManager MethodManager = null;
@@ -212,6 +218,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .addProfiles(
                         profileMain
                 )
+                .withTypeface(Typeface.defaultFromStyle(Typeface.BOLD)) // Make text in AccountHeader BOLD
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
                     public boolean onProfileChanged(View view, IProfile iProfile, boolean b) {
@@ -234,11 +241,41 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withSelectionListEnabled(false)
                 .build();
 
-        // Set up AccountHeader Background using Picasso
-        ImageView accountHeaderBackground = accountHeader.getHeaderBackgroundView();
-        Picasso.with(BaseNavigationDrawerActivity.this).load(R.drawable.head_bg_jpg_2).into(accountHeaderBackground);
+        /**
+         * Set up AccountHeader Background using Picasso
+         */
+        final ImageView accountHeaderBackground = accountHeader.getHeaderBackgroundView();
 
-// Инициализируем Navigation Drawer
+        // Load AccountHeader background image from SharedPreferences
+        int accountHeaderBgResId = sharedPrefUtils.getAccountheaderBgImage();
+        if (accountHeaderBgResId != -1) {
+            Picasso.with(BaseNavigationDrawerActivity.this).load(accountHeaderBgResId).into(accountHeaderBackground);
+            Log.d(TAG, "Current AccountHeader image id: " + Integer.toString(accountHeaderBgResId));
+        } else {
+            Picasso.with(BaseNavigationDrawerActivity.this).load(R.drawable.header_png).into(accountHeaderBackground);
+        }
+
+        accountHeaderBackground.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /**
+                 * Set up AlertDialog for background picker
+                 */
+                AccountHeaderBgPicker dialog = new AccountHeaderBgPicker();
+                dialog.setOnBackgroundChangedListener(new AccountHeaderBgPicker.OnBackgroundChangedListener() {
+                    @Override
+                    public void onBackgroundChanged(int imageId) {
+                        // Refreshing AccountHeader background image, if new one was selected
+                        Picasso.with(BaseNavigationDrawerActivity.this).load(imageId).into(accountHeaderBackground);
+                    }
+                });
+                dialog.show(getSupportFragmentManager(), TAG);
+            }
+        });
+
+        /**
+         * Implementing DrawerBuilder
+         */
         drawerBuilder = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
@@ -396,6 +433,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        Log.d(TAG, "onKeyDown():\nkeyCode: " + Integer.toString(keyCode) + "\nkeyEvent: " + event);
         try {
             switch (keyCode) {
                 case KeyEvent.KEYCODE_MENU: {
@@ -409,9 +447,14 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                     if (drawer.isDrawerOpen()) { // Check if Drawer is opened
                         drawer.closeDrawer();
                     } else if (searchView != null) { // Check if there is SearchView on Toolbar
+
+                        // SearchView behavior handling
                         if (!searchView.isIconified()) {
                             searchView.onActionViewCollapsed();
+                        } else {
+                            super.onBackPressed();
                         }
+
                     } else {
                         super.onBackPressed();
                     }

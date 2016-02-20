@@ -1,16 +1,10 @@
 package ua.nau.edu.Systems.SharedPrefUtils;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
-import ua.nau.edu.NAU_Guide.MainActivity;
 
-/**
- * Created by Roman on 11.12.2015.
- */
 public class SharedPrefUtils {
     public SharedPrefUtils(SharedPreferences settings, SharedPreferences settingsVK) {
         sharedPrefs = settings;
@@ -35,7 +29,7 @@ public class SharedPrefUtils {
     public static final String VK_ID_KEY = EnumSharedPreferencesVK.VK_ID_KEY.toString();
     public static final String PROFILE_PHOTO_LOCATION_KEY = EnumSharedPreferences.PROFILE_PHOTO_LOCATION_KEY.toString();
     public static final String EXIT_KEY = EnumSharedPreferences.EXIT.toString();
-
+    public static final String ACCOUNTHEADER_BG_IMAGE = EnumSharedPreferences.ACCOUNTHEADER_BG_IMAGE.toString();
 
     public String getName() {
         return sharedPrefsVK.getString(VK_INFO_KEY, "");
@@ -67,6 +61,14 @@ public class SharedPrefUtils {
 
     public void setUniqueId(String uniqueId) {
         sharedPrefs.edit().putString(UNIQUE_ID, uniqueId).apply();
+    }
+
+    public int getAccountheaderBgImage() {
+        return sharedPrefs.getInt(ACCOUNTHEADER_BG_IMAGE, -1);
+    }
+
+    public void setAccountheaderBgImage(int resourceId) {
+        sharedPrefs.edit().putInt(ACCOUNTHEADER_BG_IMAGE, resourceId).apply();
     }
 
 }

@@ -60,7 +60,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     private SharedPreferences settings = null;
     private SharedPreferences settingsVK = null;
 
-
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private NAU university;
     private Route supportRoute = new Route();

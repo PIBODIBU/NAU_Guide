@@ -71,4 +71,7 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
     compile 'com.ms-square:expandableTextView:0.1.4'
     compile 'me.zhanghai.android.materialprogressbar:library:1.1.4'
+
+    compile 'com.nineoldandroids:library:2.4.0'
+    compile 'com.daimajia.slider:library:1.1.5@aar'
 }
