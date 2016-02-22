@@ -2,6 +2,7 @@ package ua.nau.edu.RecyclerViews.NewsActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.net.Uri;
 import android.support.v4.widget.TextViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -34,6 +36,7 @@ import ua.nau.edu.API.APIValues;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
 import ua.nau.edu.Systems.CircleTransform;
+import ua.nau.edu.Systems.LinkMovementMethodOverride;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -229,21 +232,91 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             postMessage.post(new Runnable() {
                 @Override
                 public void run() {
+                    /**
+                     * Code for drop-arrow instead of "Показать больше..."
+                     *
+                     * XML:
+                     <ImageButton
+                     android:id="@+id/imageButtonExpand"
+                     android:layout_width="36dp"
+                     android:layout_height="36dp"
+                     android:layout_alignParentEnd="true"
+                     android:layout_alignParentRight="true"
+                     android:layout_below="@id/expandable_text_layout"
+                     android:layout_marginEnd="16dp"
+                     android:layout_marginRight="16dp"
+                     android:background="@android:color/transparent"
+                     android:src="@drawable/ic_keyboard_arrow_down_grey_24dp"
+                     android:visibility="gone" />
+                     */
+                    /*if (postMessage.getLineCount() > APIValues.maxLinesBeforeExpand) {
+                        // Item has more, than APIValues.maxLinesBeforeExpand lines
+
+                        expandTextImgBtn.setVisibility(View.VISIBLE);
+
+                        if (!dataSet.get(listPosition).getExpandedState()) {
+                            // Item is collapsed
+
+                            postMessage.setMaxLines(APIValues.maxLinesBeforeExpand);
+                        } else {
+                            // Item is expanded
+
+                            rotateImgBtn(expandTextImgBtn, 180);
+                            postMessage.setMaxLines(9999);
+                        }
+
+                        expandTextImgBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (!dataSet.get(listPosition).getExpandedState()) {
+                                    // Expanding item
+                                    postMessage.setMaxLines(9999);
+                                    rotateImgBtn(expandTextImgBtn, 180);
+                                    dataSet.get(listPosition).setExpandedState(true);
+                                } else {
+                                    // Collapsing item
+                                    postMessage.setMaxLines(APIValues.maxLinesBeforeExpand);
+                                    rotateImgBtn(expandTextImgBtn, 0);
+                                    dataSet.get(listPosition).setExpandedState(false);
+                                }
+                            }
+                        });
+
+                    } else {
+                        expandTextImgBtn.setVisibility(View.GONE);
+                    }*/
+
+
+                    postMessage.setOnTouchListener(new LinkMovementMethodOverride());
                     if (postMessage.getLineCount() > APIValues.maxLinesBeforeExpand) {
-                        if (TextViewCompat.getMaxLines(postMessage) != 9999) {
+                        // Item has more, than APIValues.maxLinesBeforeExpand lines
+
+                        if (!dataSet.get(listPosition).getExpandedState()) {
+                            // Item isn't expanded
+
+                            postMessage.setMaxLines(APIValues.maxLinesBeforeExpand);
                             expandMessage.setVisibility(View.VISIBLE);
                             expandMessage.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     postMessage.setMaxLines(9999);
                                     expandMessage.setVisibility(View.GONE);
+                                    dataSet.get(listPosition).setExpandedState(true);
                                 }
                             });
+
+                        } else {
+                            // Item is expanded
+
+                            postMessage.setMaxLines(9999);
+                            expandMessage.setVisibility(View.GONE);
                         }
                     } else {
-                        postMessage.setMaxLines(APIValues.maxLinesBeforeExpand);
+                        // Item has less, than APIValues.maxLinesBeforeExpand lines
+
                         expandMessage.setVisibility(View.GONE);
                     }
+
                 }
             });
 
@@ -276,6 +349,7 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         ImageView authorImage;
         ImageButton popUpMenu;
         Button expandMessage;
+        ImageButton expandTextImgBtn;
 
         public BaseViewHolder(View itemView) {
             super(itemView);
@@ -285,7 +359,17 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.postMessage = (TextView) itemView.findViewById(R.id.post_text_expand);
             this.popUpMenu = (ImageButton) itemView.findViewById(R.id.popup_menu);
             this.expandMessage = (Button) itemView.findViewById(R.id.expand_message);
+
         }
+    }
+
+    private void rotateImgBtn(ImageButton imageButton, int degree) {
+        final RotateAnimation rotateAnim = new RotateAnimation(0.0f, degree,
+                RotateAnimation.RELATIVE_TO_SELF, 0.5f,
+                RotateAnimation.RELATIVE_TO_SELF, 0.5f);
+        rotateAnim.setDuration(0);
+        rotateAnim.setFillAfter(true);
+        imageButton.startAnimation(rotateAnim);
     }
 
     /**

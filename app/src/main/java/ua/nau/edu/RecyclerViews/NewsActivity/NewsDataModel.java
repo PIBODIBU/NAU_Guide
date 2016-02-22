@@ -8,6 +8,7 @@ public class NewsDataModel {
     String authorPhotoUrl;
     String message;
     String createTime;
+    boolean isExpanded;
 
     public NewsDataModel(int id, String author, String authorUniqueId, String authorPhotoUrl, String message, String createTime) {
         this.id = id;
@@ -16,6 +17,7 @@ public class NewsDataModel {
         this.authorPhotoUrl = authorPhotoUrl;
         this.message = message;
         this.createTime = createTime;
+        this.isExpanded = false;
     }
 
     public int getId() {
@@ -40,5 +42,13 @@ public class NewsDataModel {
 
     public String getCreateTime() {
         return createTime;
+    }
+
+    public boolean getExpandedState() {
+        return isExpanded;
+    }
+
+    public void setExpandedState(boolean state) {
+        isExpanded = state;
     }
 }

@@ -270,6 +270,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                     }
                 });
                 dialog.show(getSupportFragmentManager(), TAG);
+
             }
         });
 

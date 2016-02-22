@@ -29,9 +29,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
@@ -46,8 +49,8 @@ import ua.nau.edu.Fragments.MapsFragment;
 import ua.nau.edu.Systems.Route;
 import ua.nau.edu.University.NAU;
 
-public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
-    public MapsActivity() {
+public class MapsTestActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+    public MapsTestActivity() {
     }
 
     private static final String TAG = "MainActivity";
@@ -122,7 +125,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     private void setUpMapIfNeeded() {
         Log.i(TAG, "setUpMapIfNeeded called");
 
-        final ProgressDialog dialog = new ProgressDialog(MapsActivity.this);
+        final ProgressDialog dialog = new ProgressDialog(MapsTestActivity.this);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -280,7 +283,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                     @Override
                     protected void onPreExecute() {
                         super.onPreExecute();
-                        Toast.makeText(MapsActivity.this, "Получение маршрута", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapsTestActivity.this, "Получение маршрута", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -292,7 +295,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                                     public void run() {
                                         supportRoute.clearPath();
 
-                                        supportRoute.drawRoute(mMap, MapsActivity.this, getMyCoordinate(), university.getCorps().get(currentMarkerID),
+                                        supportRoute.drawRoute(mMap, MapsTestActivity.this, getMyCoordinate(), university.getCorps().get(currentMarkerID),
                                                 Route.TRANSPORT_WALKING, false, Route.LANGUAGE_RUSSIAN, R.drawable.ic_place_black_24dp);
 
                                         CameraPosition currentPosition = new CameraPosition.Builder()
@@ -324,7 +327,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                 if (!currentMarkerLabel.equals("") && currentMarkerID != 0 && currentMarkerID > 0 && currentMarkerID <= university.getHashMapSize()) {
                     settings.edit().putInt(CORP_ID_KEY, currentMarkerID).apply();
 
-                    startActivity(new Intent(MapsActivity.this, InfoActivity.class)
+                    startActivity(new Intent(MapsTestActivity.this, InfoActivity.class)
                             .putExtra(CORP_ID_KEY, currentMarkerID)
                             .putExtra(CORP_LABEL_KEY, currentMarkerLabel));
                     //.putExtra(CURRENT_LATITUDE, mMap.getMyLocation().getLatitude())

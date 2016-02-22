@@ -28,13 +28,20 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
+        <meta-data
+            android:name="com.indooratlas.android.sdk.API_KEY"
+            android:value="ac53400d-714b-4796-b1dd-7b303b22ee88" />
+        <meta-data
+            android:name="com.indooratlas.android.sdk.API_SECRET"
+            android:value="7Qu2UL)9hRtg3Af%95y!kM)J64%Yd3Y7J7)ZeLgEvJnHUyVmH7iBgZORrwrOij6jajRLTf4Hmgc8X9wZFtWdcCq8oVAVkU%k3rTpM6a(GAA8l2tn58fVeC6D2Z2epc9a" />
+
         <uses-sdk tools:node="replace" />
 
         <activity
             android:name=".SplashActivity"
             android:label="@string/SplashActivity_label"
             android:noHistory="true"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
             android:label="@string/MainActivity_label">
@@ -105,6 +112,11 @@
             android:name=".UpdatePostActivity"
             android:label="Редактировать"
             android:windowSoftInputMode="stateVisible|adjustResize" />
+
+        <activity
+            android:name=".MapsTestActivity"
+            android:label="Test Map" />
+
     </application>
 
 </manifest>

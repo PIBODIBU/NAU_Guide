@@ -2,10 +2,12 @@ package ua.nau.edu.Dialogs;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatDialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +21,7 @@ import java.util.HashMap;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
-public class AccountHeaderBgPicker extends AppCompatDialogFragment {
+public class AccountHeaderBgPicker extends DialogFragment {
 
     private static final String TAG = "AccountHeaderBgPicker";
     private HashMap<Integer, Integer> file_maps = new HashMap<>();
@@ -28,36 +30,26 @@ public class AccountHeaderBgPicker extends AppCompatDialogFragment {
 
     private OnBackgroundChangedListener onBackgroundChangedListener;
 
+    private AlertDialog.Builder dialogBuilder;
+
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public Dialog onCreateDialog(@NonNull Bundle savedInstanceState) {
         sharedPrefUtils = new SharedPrefUtils(getActivity().getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, getActivity().MODE_PRIVATE),
                 getActivity().getSharedPreferences(sharedPrefUtils.VK_PREFERENCES, getActivity().MODE_PRIVATE));
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+        dialogBuilder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View mainLayout = inflater.inflate(R.layout.accountheader_bg_picker, null);
         final SliderLayout sliderLayout = (SliderLayout) mainLayout.findViewById(R.id.slider);
 
         /**
-         * SliderLayout implementing
+         * SliderLayout setup
          */
         file_maps.put(0, R.drawable.head_bg_jpg_1);
         file_maps.put(1, R.drawable.head_bg_jpg_2);
         file_maps.put(2, R.drawable.head_bg_png_1);
         file_maps.put(3, R.drawable.header_bg_test);
 
-        /*for (Integer itemId : file_maps.keySet()) {
-            DefaultSliderView sliderView = new DefaultSliderView(getActivity());
-
-            // initialize a SliderLayout
-            sliderView
-                    .image(file_maps.get(itemId))
-                    .setScaleType(BaseSliderView.ScaleType.Fit);
-            //.setOnSliderClickListener(getActivity());
-
-            sliderLayout.addSlider(sliderView);
-            Log.d(TAG, Integer.toString(itemId));
-        }*/
         for (int i = 0; i < file_maps.size(); i++) {
             DefaultSliderView sliderView = new DefaultSliderView(getActivity());
 
@@ -73,7 +65,7 @@ public class AccountHeaderBgPicker extends AppCompatDialogFragment {
         sliderLayout.stopAutoCycle();
 
         /**
-         * AlertDialog.Builder implementing
+         * AlertDialog.Builder setup
          */
         dialogBuilder
                 //.setTitle("Выберите фон")
