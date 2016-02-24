@@ -1,6 +1,7 @@
 package ua.nau.edu.Adapters.UserProfileAdapter.Fragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -21,6 +22,7 @@ import ua.nau.edu.API.APIRefreshBuilder;
 import ua.nau.edu.API.APIStrings;
 import ua.nau.edu.NAU_Guide.LectorsListActivity;
 import ua.nau.edu.NAU_Guide.R;
+import ua.nau.edu.NAU_Guide.UpdatePostActivity;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
@@ -162,7 +164,9 @@ public class FragmentPosts extends Fragment {
         adapter = new NewsAdapter(data, supportActivity, recyclerView, sharedPrefUtils);
         recyclerView.setAdapter(adapter);
 
-        /** OLD OnScrollListener **/
+        /**
+         * OLD OnScrollListener
+         */
         /*recyclerView.clearOnScrollListeners();
         recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
             @Override
@@ -187,6 +191,15 @@ public class FragmentPosts extends Fragment {
                         startLoadPosition,
                         loadNumber);
                 startLoadPosition += loadNumber;
+            }
+        });
+
+        adapter.setOnUpdateMessageAction(new NewsAdapter.OnUpdateMessageAction() {
+            @Override
+            public void onUpdateCalled(int postId, String message) {
+                startActivity(new Intent(supportActivity, UpdatePostActivity.class)
+                        .putExtra("postId", postId)
+                        .putExtra("message", message));
             }
         });
     }

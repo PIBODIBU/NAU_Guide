@@ -19,6 +19,8 @@ public class APICreateBuilder {
     private Activity activity;
     private boolean withDialog = false;
 
+    private OnResultListener onResultListener;
+
     public APICreateBuilder withContext(Context context) {
         this.context = context;
 
@@ -111,13 +113,27 @@ public class APICreateBuilder {
                 }
 
                 if (errorStatus.equals("true")) {
-                    APIDialogs.AlertDialogs.errorWhilePostingMessage(context);
+                    if (onResultListener != null)
+                        onResultListener.onError("");
                 } else {
-                    Toast.makeText(context, "Отправлено", Toast.LENGTH_LONG).show();
-                    activity.finish();
+                    if (onResultListener != null)
+                        onResultListener.onPosted(message);
                 }
 
             }
         }.execute();
+    }
+
+    public void setOnResultListener(OnResultListener onResultListener) {
+        this.onResultListener = onResultListener;
+    }
+
+    public interface OnResultListener {
+        void onPosted(String message);
+
+        /**
+         * @param errorMessage
+         */
+        void onError(String errorMessage);
     }
 }

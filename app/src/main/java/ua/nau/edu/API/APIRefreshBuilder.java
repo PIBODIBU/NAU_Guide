@@ -92,7 +92,7 @@ public class APIRefreshBuilder {
             protected void onPreExecute() {
                 super.onPreExecute();
                 adapter.setLoading();
-                clearRecyclerView();
+                clearDataSet();
                 Log.i(TAG, BUILDER_TAG + "Refreshing items...");
             }
 
@@ -209,7 +209,7 @@ public class APIRefreshBuilder {
             protected void onPreExecute() {
                 super.onPreExecute();
                 adapter.setLoading();
-                clearRecyclerView();
+                clearDataSet();
                 Log.i(TAG, BUILDER_TAG + "Refreshing items...");
             }
 
@@ -304,16 +304,18 @@ public class APIRefreshBuilder {
         swipeRefreshLayout.setRefreshing(false);
     }
 
-    private void clearRecyclerView() {
+    private void clearDataSet() {
         Log.i(TAG, BUILDER_TAG + "Deleting items...");
         data.clear();
         if (data.size() == 0)
             Log.i(TAG, BUILDER_TAG + "Deleted");
-        adapter.notifyDataSetChanged();
+        //adapter.notifyDataSetChanged();
     }
 
     public void setOnRefreshedAllListener(OnRefreshedAllListener onRefreshedAllListener) {
-        /** Method calls after AsyncTask in PostRefreshBuilder.refreshItemsAll() **/
+        /**
+         * Method calls after AsyncTask in PostRefreshBuilder.refreshItemsAll()
+         */
         this.onRefreshedAllListener = onRefreshedAllListener;
     }
 
@@ -322,7 +324,9 @@ public class APIRefreshBuilder {
     }
 
     public void setOnRefreshedTargetedListener(OnRefreshedTargetedListener onRefreshedTargtedListener) {
-        /** Method calls after AsyncTask in PostRefreshBuilder.refreshItemsTargeted() **/
+        /**
+         * Method calls after AsyncTask in PostRefreshBuilder.refreshItemsTargeted()
+         */
         this.onRefreshedTargetedListener = onRefreshedTargtedListener;
     }
 

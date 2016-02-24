@@ -29,6 +29,8 @@ public class APIDeleteBuilder {
     private RecyclerView.Adapter adapter;
     private ArrayList<NewsDataModel> dataSet;
 
+    private OnResultListener onResultListener;
+
     public APIDeleteBuilder withContext(Context context) {
         this.context = context;
 
@@ -140,15 +142,30 @@ public class APIDeleteBuilder {
                 }
 
                 if (errorStatus.equals("true")) {
-                    APIDialogs.AlertDialogs.errorWhileDeletingPost(context);
+                    if (onResultListener != null)
+                        onResultListener.onError("");
                 } else {
                     dataSet.remove(deletePosition);
                     adapter.notifyItemRemoved(deletePosition);
                     adapter.notifyItemRangeChanged(deletePosition, dataSet.size());
-                    //adapter.notifyDataSetChanged();
-                    Toast.makeText(context, "Удалено", Toast.LENGTH_LONG).show();
+
+                    if (onResultListener != null)
+                        onResultListener.onDeleted();
                 }
             }
         }.execute();
+    }
+
+    public void setOnResultListener(OnResultListener onResultListener) {
+        this.onResultListener = onResultListener;
+    }
+
+    public interface OnResultListener {
+        void onDeleted();
+
+        /**
+         * @param errorMessage
+         */
+        void onError(String errorMessage);
     }
 }

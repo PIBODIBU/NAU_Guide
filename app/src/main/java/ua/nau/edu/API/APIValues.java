@@ -1,12 +1,22 @@
 package ua.nau.edu.API;
 
-/**
- * Created by root on 2/12/16.
- */
 public class APIValues {
     // Max string length while posting message on wall
     public static final int maxMessageLength = 300;
 
     // Max lines count before show button "Expand text..."
     public static int maxLinesBeforeExpand = 4;
+
+    /**
+     * Activity result codes
+     */
+
+    // Activity finished without errors & with job done (e.g. user successfully created message)
+    public static int RESULT_OK = 1;
+
+    // Activity finished without errors & without job done (e.g. user closed activity)
+    public static int RESULT_CANCELED = 0;
+
+    // Activity finished with errors & without job done (e.g. server/connection error)
+    public static int RESULT_ERROR = -1;
 }

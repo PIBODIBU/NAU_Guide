@@ -40,10 +40,15 @@ public class UserProfileActivity extends BaseNavigationDrawerActivity {
                 getSharedPreferences(EnumSharedPreferences.APP_PREFERENCES.toString(), MODE_PRIVATE),
                 getSharedPreferences(EnumSharedPreferencesVK.VK_PREFERENCES.toString(), LoginLectorActivity.MODE_PRIVATE));
 
-        getDrawerWithBackArrow(
-                sharedPrefUtils.getName(),
-                sharedPrefUtils.getEmail()
-        );
+        if (!getIntent().getExtras().getString("getMyPage", "").equals("")) {
+            getDrawer(
+                    sharedPrefUtils.getName(),
+                    sharedPrefUtils.getEmail());
+        } else {
+            getDrawerWithBackArrow(
+                    sharedPrefUtils.getName(),
+                    sharedPrefUtils.getEmail());
+        }
 
         new AsyncTask<Void, Void, Void>() {
 

@@ -19,6 +19,8 @@ public class APIUpdateBuilder {
     private Activity activity;
     private boolean withDialog = false;
 
+    private OnResultListener onResultListener;
+
     public APIUpdateBuilder withContext(Context context) {
         this.context = context;
 
@@ -111,13 +113,27 @@ public class APIUpdateBuilder {
                 }
 
                 if (errorStatus.equals("true")) {
-                    APIDialogs.AlertDialogs.errorWhileUpdatingMessage(context);
+                    if (onResultListener != null)
+                        onResultListener.onError("");
                 } else {
-                    Toast.makeText(context, "Обновлено", Toast.LENGTH_LONG).show();
-                    activity.finish();
+                    if (onResultListener != null)
+                        onResultListener.onPosted(message);
                 }
 
             }
         }.execute();
+    }
+
+    public void setOnResultListener(OnResultListener onResultListener) {
+        this.onResultListener = onResultListener;
+    }
+
+    public interface OnResultListener {
+        void onPosted(String message);
+
+        /**
+         * @param errorMessage
+         */
+        void onError(String errorMessage);
     }
 }

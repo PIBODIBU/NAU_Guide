@@ -1,12 +1,19 @@
 package ua.nau.edu.Adapters.UserProfileAdapter.Fragments;
 
-import android.app.ProgressDialog;
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,14 +30,15 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
+import ua.nau.edu.API.APIDialogs;
+import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.API.APIStrings;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
-import ua.nau.edu.API.APIHTTPUtils;
+import ua.nau.edu.NAU_Guide.MainActivity;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
 import ua.nau.edu.Systems.CircleTransform;
-import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class FragmentInfo extends Fragment {
@@ -38,13 +46,14 @@ public class FragmentInfo extends Fragment {
 
     private static final String URL_GETMYPAGE = "http://nauguide.esy.es/include/getMyPage.php";
     private static final String URL_GETPAGE = "http://nauguide.esy.es/include/getLector.php";
+
     private static final String TAG = "FragmentInfo";
+    private boolean isBigAvatarLoadingStarted = false;
 
     private SharedPreferences settings = null;
 
     private View FragmentView;
-    private TextView textViewName;
-    private ImageView imageViewPhoto;
+    private CoordinatorLayout coordinatorLayout;
     private UserProfileActivity supportActivity;
 
     private SharedPrefUtils sharedPrefUtils;
@@ -59,6 +68,7 @@ public class FragmentInfo extends Fragment {
         sharedPrefUtils = new SharedPrefUtils(
                 supportActivity.getSharedPreferences(EnumSharedPreferences.APP_PREFERENCES.toString(), supportActivity.MODE_PRIVATE),
                 supportActivity.getSharedPreferences(EnumSharedPreferencesVK.VK_PREFERENCES.toString(), supportActivity.MODE_PRIVATE));
+        coordinatorLayout = (CoordinatorLayout) supportActivity.findViewById(R.id.coordinatorLayout);
 
         switch (getActivity().getIntent().getExtras().getString("action", "")) {
             case "getMyPage": {
@@ -77,12 +87,32 @@ public class FragmentInfo extends Fragment {
     private void getMyPage() {
         new AsyncTask<String, Void, JSONObject>() {
 
-            MaterialDialog dialog = APIDialogs.ProgressDialogs.loading(supportActivity);
+            ImageView avatarSmall;
+            ImageView avatarBig;
+
+            MaterialDialog dialog = APIDialogs.ProgressDialogs.loadingCancelable(supportActivity, new APIDialogs.ProgressDialogs.ProgressDialogCallbackInterface() {
+                @Override
+                public void onCancel() {
+                    dialog.dismiss();
+                    startActivity(new Intent(supportActivity, MainActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    supportActivity.finish();
+                }
+            });
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
+
                 dialog.show();
+
+                // Set up Views
+                avatarSmall = (ImageView) supportActivity.findViewById(R.id.imageViewPhoto);
+                avatarBig = (ImageView) supportActivity.findViewById(R.id.reveal_image);
+
+                // Loading default avatar
+                Picasso.with(supportActivity)
+                        .load(R.drawable.avatar_default).transform(new CircleTransform()).into(avatarSmall);
             }
 
             @Override
@@ -129,8 +159,9 @@ public class FragmentInfo extends Fragment {
                 super.onPostExecute(result);
                 if (result != null) {
                     try {
+                        final String PHOTO_URL = result.getString(APIStrings.ResponseKeys.PageLoading.PHOTO_URL);
+
                         TextView textViewName = (TextView) supportActivity.findViewById(R.id.textViewName);
-                        ImageView imageViewPhoto = (ImageView) supportActivity.findViewById(R.id.imageViewPhoto);
                         ExpandableTextView expTv1 = (ExpandableTextView) supportActivity.findViewById(R.id.bio_text_expand);
 
                         /*
@@ -150,18 +181,28 @@ public class FragmentInfo extends Fragment {
                         /*
                             Setting Up USER_PHOTO
                         */
-                        if (!result.getString(APIStrings.ResponseKeys.PageLoading.PHOTO_URL).equals("")) {
+                        if (!PHOTO_URL.equals("")) {
                             Picasso.with(supportActivity)
-                                    .load(Uri.parse(result.getString(APIStrings.ResponseKeys.PageLoading.PHOTO_URL))).transform(new CircleTransform()).into(imageViewPhoto);
-                        } else {
-                            Picasso.with(supportActivity)
-                                    .load(Uri.parse(APIStrings.ImageUrl.DEFAULT_AVATAR)).transform(new CircleTransform()).into(imageViewPhoto);
+                                    .load(Uri.parse(PHOTO_URL)).transform(new CircleTransform()).into(avatarSmall);
+                            avatarSmall.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Log.d(TAG, "avatarSmall clicked");
+
+                                    AvatarDialog avatarDialog = new AvatarDialog();
+                                    avatarDialog.init(supportActivity, PHOTO_URL);
+                                    avatarDialog.show(getActivity().getSupportFragmentManager().beginTransaction(), TAG);
+                                }
+                            });
                         }
 
                     } catch (Throwable t) {
                         Log.e(TAG, "Could not parse malformed JSON: " + result);
                     }
 
+                    dialog.dismiss();
+
+                } else {
                     dialog.dismiss();
                 }
             }
@@ -171,12 +212,29 @@ public class FragmentInfo extends Fragment {
     private void getPage(final String UniqueId) {
         new AsyncTask<String, Void, JSONObject>() {
 
-            MaterialDialog dialog = APIDialogs.ProgressDialogs.loading(supportActivity);
+            ImageView avatarSmall;
+
+            MaterialDialog dialog = APIDialogs.ProgressDialogs.loadingCancelable(supportActivity, new APIDialogs.ProgressDialogs.ProgressDialogCallbackInterface() {
+                @Override
+                public void onCancel() {
+                    Log.d(TAG, "Dialog canceled");
+                    dialog.dismiss();
+                    supportActivity.finish();
+                }
+            });
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
+
                 dialog.show();
+
+                // Set up Views
+                avatarSmall = (ImageView) supportActivity.findViewById(R.id.imageViewPhoto);
+
+                // Loading default avatar
+                Picasso.with(supportActivity)
+                        .load(R.drawable.avatar_default).transform(new CircleTransform()).into(avatarSmall);
             }
 
             @Override
@@ -204,6 +262,7 @@ public class FragmentInfo extends Fragment {
                     });
                     return null;
                 } else {
+
                     try {
                         final JSONObject jsonObject = new JSONObject(response);
                         if (jsonObject.getString("error").equalsIgnoreCase("false")) {
@@ -213,6 +272,7 @@ public class FragmentInfo extends Fragment {
                         Log.e(TAG, "Could not parse malformed JSON: \"" + response + "\"");
                         return null;
                     }
+
                 }
 
                 return null;
@@ -223,8 +283,9 @@ public class FragmentInfo extends Fragment {
                 super.onPostExecute(result);
                 if (result != null) {
                     try {
+                        final String PHOTO_URL = result.getString(APIStrings.ResponseKeys.PageLoading.PHOTO_URL);
+
                         TextView textViewName = (TextView) supportActivity.findViewById(R.id.textViewName);
-                        ImageView imageViewPhoto = (ImageView) supportActivity.findViewById(R.id.imageViewPhoto);
                         ExpandableTextView expTv1 = (ExpandableTextView) supportActivity.findViewById(R.id.bio_text_expand);
 
                         /*
@@ -244,16 +305,26 @@ public class FragmentInfo extends Fragment {
                         /*
                             Setting Up USER_PHOTO
                         */
-                        if (!result.getString(APIStrings.ResponseKeys.PageLoading.PHOTO_URL).equals("")) {
+                        if (!PHOTO_URL.equals("")) {
                             Picasso.with(supportActivity)
-                                    .load(Uri.parse(result.getString(APIStrings.ResponseKeys.PageLoading.PHOTO_URL))).transform(new CircleTransform()).into(imageViewPhoto);
-                        } else {
-                            Picasso.with(supportActivity)
-                                    .load(Uri.parse(APIStrings.ImageUrl.DEFAULT_AVATAR)).transform(new CircleTransform()).into(imageViewPhoto);
+                                    .load(Uri.parse(PHOTO_URL))
+                                    .transform(new CircleTransform())
+                                    .into(avatarSmall);
+
+                            avatarSmall.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Log.d(TAG, "avatarSmall clicked");
+
+                                    AvatarDialog avatarDialog = new AvatarDialog();
+                                    avatarDialog.init(supportActivity, PHOTO_URL);
+                                    avatarDialog.show(getActivity().getSupportFragmentManager().beginTransaction(), TAG);
+                                }
+                            });
                         }
 
                         /*
-                            Checking if loading page is my page and set Drawer selection t o my page if true
+                            Checking if loading page is my page and set Drawer selection to my page if true
                          */
                         if (result.getString("unique_id").equals(sharedPrefUtils.getUniqueId())) {
                             supportActivity.setDrawerToMyPage();
@@ -264,9 +335,57 @@ public class FragmentInfo extends Fragment {
                     }
 
                     dialog.dismiss();
+
+                } else {
+                    dialog.dismiss();
                 }
+
             }
         }.execute(UniqueId);
+    }
+
+    public static class AvatarDialog extends DialogFragment {
+
+        private static final String TAG = "FragmentInfo";
+
+        private AlertDialog.Builder dialogBuilder;
+        private ImageView avatarBig;
+
+        private Activity activity;
+        private String PHOTO_URL;
+
+        public void init(Activity activity, String PHOTO_URL) {
+            this.activity = activity;
+            this.PHOTO_URL = PHOTO_URL;
+        }
+
+        @Override
+        public Dialog onCreateDialog(@NonNull Bundle savedInstanceState) {
+            dialogBuilder = new AlertDialog.Builder(getActivity());
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View mainLayout = inflater.inflate(R.layout.dialog_avatar, null);
+
+            avatarBig = (ImageView) mainLayout.findViewById(R.id.reveal_image);
+
+            dialogBuilder
+                    .setView(mainLayout);
+
+            setCancelable(true);
+
+            AlertDialog dialog = dialogBuilder.create();
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+
+            if (PHOTO_URL != null && !PHOTO_URL.equals("")) {
+                Picasso
+                        .with(activity)
+                        .load(Uri.parse(PHOTO_URL))
+                        .into(avatarBig);
+            }
+
+            Log.d("FragmentInfo", "Dialog created");
+            return dialog;
+        }
+
     }
 
 }

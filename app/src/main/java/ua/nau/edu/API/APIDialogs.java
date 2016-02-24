@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
@@ -63,6 +64,7 @@ public class APIDialogs {
         public static void badLoginOrUsername(final Context context) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder
+                    .setTitle("Ошибка")
                     .setMessage("Неправильный логин или пароль. Пожалуйста, попробуйте еще раз.")
                     .setPositiveButton("Ок", new DialogInterface.OnClickListener() {
                         @Override
@@ -83,7 +85,8 @@ public class APIDialogs {
         public static void errorWhilePostingMessage(final Context context) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder
-                    .setMessage("Ошибка при отправке записи. Пожалуйста, попробуйте еще раз.")
+                    .setTitle("Ошибка")
+                    .setMessage("Произошла ошибка при отправке записи. Пожалуйста, попробуйте еще раз.")
                     .setPositiveButton("Ок", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -103,7 +106,8 @@ public class APIDialogs {
         public static void errorWhileUpdatingMessage(final Context context) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder
-                    .setMessage("Ошибка при обновлении записи. Пожалуйста, попробуйте еще раз.")
+                    .setTitle("Ошибка")
+                    .setMessage("Произошла ошибка при обновлении записи. Пожалуйста, попробуйте еще раз.")
                     .setPositiveButton("Ок", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -123,7 +127,8 @@ public class APIDialogs {
         public static void errorWhileDeletingPost(final Context context) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder
-                    .setMessage("Ошибка при удалении записи.")
+                    .setTitle("Ошибка")
+                    .setMessage("Произошла ошибка при удалении записи.")
                     .setPositiveButton("Ок", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -143,7 +148,8 @@ public class APIDialogs {
         public static void emptyString(final Context context) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder
-                    .setMessage("Ошибка. Введите сообщение.")
+                    .setTitle("Ошибка")
+                    .setMessage("Введите сообщение.")
                     .setPositiveButton("Ок", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -163,7 +169,8 @@ public class APIDialogs {
         public static void tooLongMeassage(final Context context) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder
-                    .setMessage("Ошибка. Максимальная длина сообщения - 300 символов.")
+                    .setTitle("Ошибка")
+                    .setMessage("Максимальная длина сообщения - " + Integer.toString(APIValues.maxMessageLength) + " символов.")
                     .setPositiveButton("Ок", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -182,6 +189,31 @@ public class APIDialogs {
     }
 
     public static class ProgressDialogs {
+        public interface ProgressDialogCallbackInterface {
+            void onCancel();
+        }
+
+        public static MaterialDialog loadingCancelable(final Context context, final ProgressDialogCallbackInterface callback) {
+            MaterialDialog materialDialog = new MaterialDialog.Builder(context)
+                    .content(context.getResources().getString(R.string.dialog_loading))
+                    .progress(true, 0)
+                    .widgetColor(ContextCompat.getColor(context, R.color.colorAppPrimary))
+                    .contentColor(ContextCompat.getColor(context, R.color.black))
+                    .backgroundColor(ContextCompat.getColor(context, R.color.white))
+                    .cancelable(true)
+                    .cancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            Log.d("loadingCancelable", "onCancel()");
+                            if (callback != null) {
+                                callback.onCancel();
+                            }
+                        }
+                    })
+                    .build();
+
+            return materialDialog;
+        }
 
         public static MaterialDialog loading(final Context context) {
             return new MaterialDialog.Builder(context)
@@ -192,8 +224,9 @@ public class APIDialogs {
                     .contentColor(ContextCompat.getColor(context, R.color.black))
                     .backgroundColor(ContextCompat.getColor(context, R.color.white))
                     .build();
-
         }
+
     }
+
 
 }

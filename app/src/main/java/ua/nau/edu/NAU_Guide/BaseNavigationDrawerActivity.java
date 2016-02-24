@@ -202,17 +202,21 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withIcon(GoogleMaterial.Icon.gmd_close)
                 .withIdentifier(Activities.Exit.ordinal());
 
-// Create the AccountHeader;
+        /**
+         * AccountHeader setup
+         */
         ProfileDrawerItem profileMain;
         profilePhotoLocation = sharedPrefs.getString(PROFILE_PHOTO_LOCATION_KEY, "");
 
         if (sharedPrefs.getBoolean(SIGNED_IN_KEY, false)) {
             profileMain = new ProfileDrawerItem().withName(ACCOUNT_NAME).withEmail(ACCOUNT_EMAIL).withIcon(profilePhotoLocation);
         } else {
-            profileMain = new ProfileDrawerItem().withIcon(R.drawable.ic_account_circle_white_48dp);
+            profileMain = new ProfileDrawerItem().withIcon(R.drawable.avatar_default);
         }
 
-// Create AccountHeader
+        /**
+         * AccountHeader implementing
+         */
         AccountHeader accountHeader = new AccountHeaderBuilder()
                 .withActivity(this)
                 .addProfiles(
