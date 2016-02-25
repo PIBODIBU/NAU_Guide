@@ -1,5 +1,7 @@
 package ua.nau.edu.NAU_Guide;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -7,7 +9,11 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.widget.ImageView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.squareup.picasso.Picasso;
@@ -24,12 +30,12 @@ import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 
-public class LectorsListActivity extends BaseNavigationDrawerActivity {
+public class LectorsListActivity extends BaseNavigationDrawerActivity implements SearchView.OnQueryTextListener {
 
     private static final String REQUEST_URL = "http://nauguide.esy.es/include/getLectors.php";
     private static final String TAG = "LectorsListActivity";
 
-    private static RecyclerView.Adapter adapter;
+    private static LectorsAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private static RecyclerView recyclerView;
     private ArrayList<LectorsDataModel> data = new ArrayList<LectorsDataModel>();
@@ -37,6 +43,7 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
     private SharedPrefUtils sharedPrefUtils;
     private SharedPreferences settings;
     private SharedPreferences settingsVK;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,4 +146,56 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
 
         super.onDestroy();
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_lector_list, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        searchView.setQueryHint(getResources().getString(R.string.lectorslist_search_hint));
+        searchView.setOnQueryTextListener(this);
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                searchView.onActionViewCollapsed();
+
+                adapter.setDataSet(data);
+                adapter.notifyDataSetChanged();
+                recyclerView.scrollToPosition(0);
+
+                return true;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        ArrayList<LectorsDataModel> filteredDataSet = new ArrayList<>();
+
+        for (LectorsDataModel dataItem : data) {
+            if (dataItem.getName().toLowerCase().contains(newText.toLowerCase())) {
+                filteredDataSet.add(dataItem);
+            }
+        }
+
+        adapter.setDataSet(filteredDataSet);
+        adapter.notifyDataSetChanged();
+        recyclerView.scrollToPosition(0);
+
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
 }

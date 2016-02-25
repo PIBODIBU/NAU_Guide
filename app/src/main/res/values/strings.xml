@@ -52,4 +52,6 @@
 
     <string name="dialog_title_choose_bg">Выберите фон</string>
 
+    <string name="lectorslist_search_hint">Введите имя</string>
+
 </resources>

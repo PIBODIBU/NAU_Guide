@@ -86,4 +86,8 @@ public class LectorsAdapter extends RecyclerView.Adapter<LectorsAdapter.MyViewHo
     public int getItemCount() {
         return dataSet.size();
     }
+
+    public void setDataSet(ArrayList<LectorsDataModel> newDataSet) {
+        this.dataSet = newDataSet;
+    }
 }
