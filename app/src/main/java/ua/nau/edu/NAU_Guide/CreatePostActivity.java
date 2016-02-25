@@ -21,7 +21,6 @@ import ua.nau.edu.API.APICreateBuilder;
 import ua.nau.edu.API.APIRefreshBuilder;
 import ua.nau.edu.API.APIStrings;
 import ua.nau.edu.API.APIValues;
-import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 

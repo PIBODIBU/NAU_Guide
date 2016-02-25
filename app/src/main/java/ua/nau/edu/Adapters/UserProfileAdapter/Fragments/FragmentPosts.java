@@ -2,6 +2,7 @@ package ua.nau.edu.Adapters.UserProfileAdapter.Fragments;
 
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gc.materialdesign.views.ProgressBarIndeterminate;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -75,6 +77,15 @@ public class FragmentPosts extends Fragment {
         startLoadPosition += loadNumber;
 
         return FragmentView;
+    }
+
+    @Override
+    public void onDestroy() {
+        for (int i = 0; i < data.size(); i++) {
+            Picasso.with(supportActivity).invalidate(Uri.parse(data.get(i).getAuthorPhotoUrl()));
+        }
+
+        super.onDestroy();
     }
 
     private void setUpPostsLoaders() {

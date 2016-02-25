@@ -27,6 +27,8 @@ import android.widget.Toast;
 
 import com.gc.materialdesign.views.CustomView;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -175,8 +177,9 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             postSubTitle.setText(dataSet.get(listPosition).getCreateTime());
             postMessage.setText(dataSet.get(listPosition).getMessage());
 
-            Picasso.with(context).load(Uri.parse(dataSet.get(listPosition).
-                    getAuthorPhotoUrl()))
+            Picasso
+                    .with(context)
+                    .load(Uri.parse(dataSet.get(listPosition).getAuthorPhotoUrl()))
                     .transform(new CircleTransform())
                     .into(authorImage);
 

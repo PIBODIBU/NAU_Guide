@@ -1,6 +1,7 @@
 package ua.nau.edu.NAU_Guide;
 
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -9,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -127,5 +129,14 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity {
         }.execute();
 
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        for (int i = 0; i < data.size(); i++) {
+            Picasso.with(this).invalidate(Uri.parse(data.get(i).getPhotoUrl()));
+        }
+
+        super.onDestroy();
     }
 }

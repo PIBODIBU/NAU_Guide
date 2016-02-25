@@ -1,11 +1,9 @@
 package ua.nau.edu.NAU_Guide;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -16,11 +14,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import com.gc.materialdesign.views.AutoHideButtonFloat;
 import com.gc.materialdesign.views.ButtonFloat;
-import com.gc.materialdesign.views.ProgressBarIndeterminate;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -81,6 +77,15 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
         startLoadPosition += loadNumber;
 
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        for (int i = 0; i < data.size(); i++) {
+            Picasso.with(this).invalidate(Uri.parse(data.get(i).getAuthorPhotoUrl()));
+        }
+
+        super.onDestroy();
     }
 
     private boolean isLoggedAsLector() {

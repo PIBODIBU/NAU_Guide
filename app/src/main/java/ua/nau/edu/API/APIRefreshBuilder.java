@@ -3,11 +3,14 @@ package ua.nau.edu.API;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -92,6 +95,7 @@ public class APIRefreshBuilder {
             protected void onPreExecute() {
                 super.onPreExecute();
                 adapter.setLoading();
+                invalidatePicassoCache();
                 clearDataSet();
                 Log.i(TAG, BUILDER_TAG + "Refreshing items...");
             }
@@ -209,6 +213,7 @@ public class APIRefreshBuilder {
             protected void onPreExecute() {
                 super.onPreExecute();
                 adapter.setLoading();
+                invalidatePicassoCache();
                 clearDataSet();
                 Log.i(TAG, BUILDER_TAG + "Refreshing items...");
             }
@@ -296,6 +301,12 @@ public class APIRefreshBuilder {
         }
     }
 
+    private void invalidatePicassoCache() {
+        for (int i = 0; i < data.size(); i++) {
+            Picasso.with(context).invalidate(Uri.parse(data.get(i).getAuthorPhotoUrl()));
+        }
+    }
+
     private void onItemsLoadComplete() {
         // Update completed
         Log.i(TAG, BUILDER_TAG + "Refreshed");
@@ -309,7 +320,6 @@ public class APIRefreshBuilder {
         data.clear();
         if (data.size() == 0)
             Log.i(TAG, BUILDER_TAG + "Deleted");
-        //adapter.notifyDataSetChanged();
     }
 
     public void setOnRefreshedAllListener(OnRefreshedAllListener onRefreshedAllListener) {

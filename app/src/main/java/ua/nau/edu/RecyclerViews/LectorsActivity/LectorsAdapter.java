@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -66,7 +68,9 @@ public class LectorsAdapter extends RecyclerView.Adapter<LectorsAdapter.MyViewHo
 
         textViewName.setText(dataSet.get(listPosition).getName());
         textViewId.setText(dataSet.get(listPosition).getInstitute());
-        Picasso.with(context).load(Uri.parse(dataSet.get(listPosition).getPhotoUrl())).transform(new CircleTransform()).into(imageView);
+        Picasso.with(context)
+                .load(Uri.parse(dataSet.get(listPosition).getPhotoUrl()))
+                .transform(new CircleTransform()).into(imageView);
 
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override

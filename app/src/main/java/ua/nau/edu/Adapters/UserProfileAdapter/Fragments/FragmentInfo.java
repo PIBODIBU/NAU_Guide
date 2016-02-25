@@ -24,6 +24,8 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
@@ -112,7 +114,9 @@ public class FragmentInfo extends Fragment {
 
                 // Loading default avatar
                 Picasso.with(supportActivity)
-                        .load(R.drawable.avatar_default).transform(new CircleTransform()).into(avatarSmall);
+                        .load(R.drawable.avatar_default)
+                        .transform(new CircleTransform())
+                        .into(avatarSmall);
             }
 
             @Override
@@ -183,7 +187,11 @@ public class FragmentInfo extends Fragment {
                         */
                         if (!PHOTO_URL.equals("")) {
                             Picasso.with(supportActivity)
-                                    .load(Uri.parse(PHOTO_URL)).transform(new CircleTransform()).into(avatarSmall);
+                                    .load(Uri.parse(PHOTO_URL))
+                                    .memoryPolicy(MemoryPolicy.NO_CACHE)
+                                    .networkPolicy(NetworkPolicy.NO_CACHE)
+                                    .transform(new CircleTransform())
+                                    .into(avatarSmall);
                             avatarSmall.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -234,7 +242,9 @@ public class FragmentInfo extends Fragment {
 
                 // Loading default avatar
                 Picasso.with(supportActivity)
-                        .load(R.drawable.avatar_default).transform(new CircleTransform()).into(avatarSmall);
+                        .load(R.drawable.avatar_default)
+                        .transform(new CircleTransform())
+                        .into(avatarSmall);
             }
 
             @Override
@@ -308,6 +318,8 @@ public class FragmentInfo extends Fragment {
                         if (!PHOTO_URL.equals("")) {
                             Picasso.with(supportActivity)
                                     .load(Uri.parse(PHOTO_URL))
+                                    .memoryPolicy(MemoryPolicy.NO_CACHE)
+                                    .networkPolicy(NetworkPolicy.NO_CACHE)
                                     .transform(new CircleTransform())
                                     .into(avatarSmall);
 
@@ -379,6 +391,8 @@ public class FragmentInfo extends Fragment {
                 Picasso
                         .with(activity)
                         .load(Uri.parse(PHOTO_URL))
+                        .memoryPolicy(MemoryPolicy.NO_CACHE)
+                        .networkPolicy(NetworkPolicy.NO_CACHE)
                         .into(avatarBig);
             }
 
