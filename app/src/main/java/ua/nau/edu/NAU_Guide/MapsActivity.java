@@ -1,24 +1,36 @@
 package ua.nau.edu.NAU_Guide;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
-import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
-import android.view.InflateException;
-import android.view.LayoutInflater;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
@@ -26,39 +38,54 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+import io.codetail.animation.SupportAnimator;
+import io.codetail.animation.ViewAnimationUtils;
+import io.codetail.widget.RevealFrameLayout;
+import io.codetail.widget.RevealLinearLayout;
 import ua.nau.edu.Enum.EnumExtras;
 import ua.nau.edu.Enum.EnumMaps;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
-import ua.nau.edu.Fragments.MapsFragment;
+import ua.nau.edu.RecyclerViews.MapsActivity.MapsAdapter;
+import ua.nau.edu.RecyclerViews.MapsActivity.MapsDataModel;
 import ua.nau.edu.Systems.Route;
 import ua.nau.edu.University.NAU;
 
-public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+public class MapsActivity extends BaseNavigationDrawerActivity
+        implements GoogleMap.OnMarkerClickListener, SearchView.OnQueryTextListener {
     public MapsActivity() {
     }
 
-    private static final String TAG = "MainActivity";
+    private final String TAG = this.getClass().getSimpleName();
+    private final String SEARCH_QUERY_CLOSE = "sfnjuyb323dso8cjnwenfvdbhfgbhewie";
 
     private int currentMarkerID = -1;
     private String currentMarkerLabel = "";
     private Marker mainActivityMarker = null;
+    private Marker myLocationMarker;
 
-    private InputMethodManager MethodManager = null;
+    private InputMethodManager methodManager;
     private SharedPreferences settings = null;
     private SharedPreferences settingsVK = null;
+    private SearchView searchView;
+    private HashMap<Integer, Marker> markerHashMap = new HashMap<>();
+    private HashMap<Integer, String> nauCorpNamesFull;
+    private HashMap<Integer, String> nauCorpNamesShort;
+
+    private RelativeLayout rootView;
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private NAU university;
@@ -76,6 +103,12 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     private static final String CURRENT_LATITUDE = EnumMaps.CURRENT_LATITUDE.toString();
     private static final String CURRENT_LONGTITUDE = EnumMaps.CURRENT_LONGTITUDE.toString();
 
+    private RevealFrameLayout revealRecycler;
+    private RecyclerView recyclerView;
+    private static MapsAdapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private ArrayList<MapsDataModel> data = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,16 +120,68 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 // Get and set system services & Buttons & SharedPreferences & Requests
         settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
         settingsVK = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
-        MethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+        methodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+
+        rootView = (RelativeLayout) findViewById(R.id.root_view);
+        nauCorpNamesFull = university.getCorpsInfoNameFull();
+        nauCorpNamesShort = university.getCorpsInfoNameShort();
+
 
         getDrawer(
                 settingsVK.getString(VK_INFO_KEY, ""),
                 settingsVK.getString(VK_EMAIL_KEY, "")
         );
 
-        setMenuId(R.menu.menu_maps);
         setUpMapIfNeeded();
         initFloatingActionMenu();
+        setUpRecyclerView();
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.getBoolean("RecyclerViewWasVisibility", false)) {
+                revealShow(recyclerView);
+
+                // Clearing ArrayList before adding new items
+                data.clear();
+
+                // Adding all corps to RecyclerView
+                for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
+                    data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
+                }
+
+                adapter.setDataSet(data);
+                adapter.notifyDataSetChanged();
+
+            } else {
+                recyclerView.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private void setUpRecyclerView() {
+        revealRecycler = (RevealFrameLayout) findViewById(R.id.reveal_recycler);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerview_user_data);
+        recyclerView.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        adapter = new MapsAdapter(data, this);
+        recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (recyclerView.getVisibility() == View.VISIBLE) {
+            outState.putBoolean("RecyclerViewWasVisibility", true);
+        } else if (recyclerView.getVisibility() == View.GONE) {
+            outState.putBoolean("RecyclerViewWasVisibility", false);
+        }
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -107,8 +192,120 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
     }
 
     @Override
+    public void onBackPressed() {
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        try {
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_MENU: {
+                    if (drawer.isDrawerOpen())
+                        drawer.closeDrawer();
+                    else
+                        drawer.openDrawer();
+                    break;
+                }
+                case KeyEvent.KEYCODE_BACK: {
+                    if (drawer.isDrawerOpen()) { // Check if Drawer is opened
+                        drawer.closeDrawer();
+                    } else if (searchView != null) {
+                        if (!searchView.isIconified()) {
+                            revealClose(recyclerView);
+                            searchView.onActionViewCollapsed();
+                        } else {
+                            super.onBackPressed();
+                        }
+                    } else {
+                        super.onBackPressed();
+                    }
+
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_maps, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        MenuItem searchItem = menu.findItem(R.id.search);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        /**
+         * Setting Up SearchView
+         */
+        setUpSearchView(searchView, searchItem);
+
+        return super.onCreateOptionsMenu(menu);
+
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        Log.d(TAG, "Query changed: " + newText);
+
+        // Clearing ArrayList before adding new items
+        data.clear();
+
+        if (!newText.equals("")) {
+            // Searching for results
+            for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
+                if (entry.getValue().toLowerCase().contains(newText.toLowerCase().trim()))
+                    data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
+            }
+
+            for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameShort().entrySet()) {
+                if (entry.getValue().toLowerCase().contains(newText.toLowerCase().trim()))
+                    data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
+            }
+
+
+            // Nothing was found. Show warning
+            if (data.size() == 0) {
+                // TODO add warning message
+                Snackbar.make(rootView, "Ничего не найдено", Snackbar.LENGTH_LONG).show();
+            }
+        } else {
+            for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
+                data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
+            }
+        }
+
+        adapter.setDataSet(data);
+        adapter.notifyDataSetChanged();
+
+        adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int itemId) {
+                // Hide RecyclerView & SearchView & keyboard
+                if (getCurrentFocus() != null)
+                    methodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                revealClose(recyclerView);
+                searchView.onActionViewCollapsed();
+
+                // Zooming to marker
+                zoomToMarker(markerHashMap.get(itemId));
+            }
+        });
+
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.location: {
                 zoomToMyLocation();
@@ -119,52 +316,101 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         }
     }
 
+    /**
+     * Setting Up SearchView
+     *
+     * @param searchView SearchView for setup
+     * @param searchItem MenuItem for OnActionExpandListener implementing
+     */
+    private void setUpSearchView(final SearchView searchView, final MenuItem searchItem) {
+        searchView.setQueryHint(getResources().getString(R.string.maps_search_hint));
+        searchView.setOnQueryTextListener(this);
+        searchView.onActionViewCollapsed();
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                Log.d(TAG, "OnCloseListener/ onClose() called");
+
+                // Hide keyboard
+                if (getCurrentFocus() != null) {
+                    methodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                }
+
+                // Close RecyclerView & SearchView
+                searchView.onActionViewCollapsed();
+                revealClose(recyclerView);
+
+                return true;
+            }
+        });
+
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Show RecyclerView
+                revealShow(recyclerView);
+
+                // Clearing ArrayList before adding new items
+                data.clear();
+
+                // Adding all corps to RecyclerView
+                for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
+                    data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
+                }
+
+                adapter.setDataSet(data);
+                adapter.notifyDataSetChanged();
+
+                // Animating to clicked position
+                adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
+                    @Override
+                    public void onClick(int itemId) {
+                        // Hide RecyclerView & SearchView & keyboard
+                        if (getCurrentFocus() != null)
+                            methodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                        revealClose(recyclerView);
+                        searchView.onActionViewCollapsed();
+
+                        // Zooming to marker
+                        zoomToMarker(markerHashMap.get(itemId));
+                    }
+                });
+
+            }
+        });
+    }
+
     private void setUpMapIfNeeded() {
         Log.i(TAG, "setUpMapIfNeeded called");
 
-        final ProgressDialog dialog = new ProgressDialog(MapsActivity.this);
+        if (mMap == null) {
+            MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
 
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected void onPreExecute() {
-                dialog.setMessage(getResources().getString(R.string.dialog_loading));
-                dialog.setIndeterminate(true);
-                dialog.setCancelable(false);
-                dialog.show();
+            mapFragment.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    mMap = googleMap;
 
-                super.onPreExecute();
-            }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                // Do a null check to confirm that we have not already instantiated the map.
-                if (mMap == null) {
-                    // Try to obtain the map from the SupportMapFragment.
-                    mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                            .getMap();
-
-                    // Check if we were successful in obtaining the map.
                     if (mMap != null) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                setUpMap();
-                            }
-                        });
-                    }
-                }
-                return null;
-            }
+                        setUpMap();
 
-            @Override
-            protected void onPostExecute(Void result) {
-                super.onPostExecute(result);
-                openMarkerFromIntent();
-                dialog.dismiss();
-            }
-        }.execute();
+                        Log.d(TAG, "Setting up GoogleApiClient...");
+                    }
+
+                    openMarkerFromIntent();
+                }
+            });
+        }
     }
 
+    /**
+     * Adding custom marker on GoogleMap
+     *
+     * @param i     loop iterator
+     * @param icon  marker's icon resource id
+     * @param title title of icon
+     */
     private void addMarkerCustom(Integer i, int icon, String title) {
         Marker mMapMarker = mMap.addMarker(new MarkerOptions()
                 .position(university.getCorps().get(i))
@@ -173,10 +419,15 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         mMapMarker.setIcon(BitmapDescriptorFactory.fromResource(icon));
         if (getIntent().getIntExtra("MAINACTIVITY_CORP_ID", -1) == i)
             mainActivityMarker = mMapMarker;
+
+        markerHashMap.put(i, mMapMarker);
     }
 
+    /**
+     * Activity wasn't started from Drawer
+     * Need to open marker
+     */
     private void openMarkerFromIntent() {
-//Запустили активити не из дровера
         if (mainActivityMarker != null) {
             //Записываем id текущего маркера в глобальную переменную
             currentMarkerID = getMarkerId(mainActivityMarker);
@@ -196,25 +447,35 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         }
     }
 
+    /**
+     * Setting Up GoogleMap
+     */
     private void setUpMap() {
-        //Стартовое положение камеры
+        // Camera start position
         LatLng nau = new LatLng(50.437476, 30.428322);
         CameraPosition cameraPosition_start = new CameraPosition.Builder()
                 .target(nau)      // Sets the center of the map to NAU
                 .zoom(15)                   // Sets the zoom
                 .bearing(160)                // Sets the orientation of the camera to east
-                        //.tilt(30)                   // Sets the tilt of the camera to 30 degrees
                 .build();                   // Creates a CameraPosition from the builder
 
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition_start));
 
+        try {
+            mMap.setMyLocationEnabled(true);
+        } catch (SecurityException ex) {
+            ex.printStackTrace();
+        }
         mMap.getUiSettings().setMapToolbarEnabled(false);
-        mMap.setMyLocationEnabled(true);
+        mMap.setIndoorEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setCompassEnabled(false);
 
-        //Добавление маркеров на карту из класса НАУ
-        for (int i = 1; i <= 28; i++) {
+        /**
+         * Adding markers from {@link ua.nau.edu.University.NAU}
+         * Important! Loop needs to be started from 1
+         */
+        for (int i = 1; i <= university.getHashMapSize(); i++) {
             addMarkerCustom(i, university.getCorpsIcon().get(i), university.getCorpsMarkerLabel().get(i));
         }
 
@@ -260,10 +521,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
 
         //Consume the method
         return true;
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
     }
 
     private void initFloatingActionMenu() {
@@ -327,8 +584,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                     startActivity(new Intent(MapsActivity.this, InfoActivity.class)
                             .putExtra(CORP_ID_KEY, currentMarkerID)
                             .putExtra(CORP_LABEL_KEY, currentMarkerLabel));
-                    //.putExtra(CURRENT_LATITUDE, mMap.getMyLocation().getLatitude())
-                    //.putExtra(CURRENT_LONGTITUDE, mMap.getMyLocation().getLongitude()));
                 }
             }
         });
@@ -336,9 +591,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         fab_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //startActivity(new Intent(MapsActivity.this, FloorActivity.class));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(-33.86997, 151.2089), 18));
+                startActivity(new Intent(MapsActivity.this, FloorActivity.class));
+                /*mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(-33.86997, 151.2089), 18));*/
             }
         });
     }
@@ -385,6 +640,19 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
                     showGPSDisabledAlertToUser();
             }
         }.execute();
+    }
+
+    /**
+     * Zoom camera to marker & show InfoWindow
+     *
+     * @param marker marker for zooming
+     */
+    private void zoomToMarker(Marker marker) {
+        currentMarkerID = getMarkerId(marker);
+        currentMarkerLabel = university.getCorpsLabel().get(currentMarkerID);
+        fab_menu.open(true);
+        marker.showInfoWindow();
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
     }
 
     private LatLng getMyCoordinate() {
@@ -468,20 +736,47 @@ public class MapsActivity extends BaseNavigationDrawerActivity implements OnMapR
         dialog.show();
     }
 
-    public void initNavigationWindow(int markerid) {
-        try {
-            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                    Uri.parse("http://maps.google.com/maps?   saddr=" +
-                            mMap.getMyLocation().getLatitude() + "," +
-                            mMap.getMyLocation().getLongitude() + "&daddr=" +
-                            university.getCorps().get(markerid).latitude + "," + university.getCorps().get(markerid).longitude));
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.addCategory(Intent.CATEGORY_LAUNCHER);
-            intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
-            startActivity(intent);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void revealShow(final View view) {
+        // get the center for the clipping circle
+        int cx = (view.getLeft() + view.getRight()) / 2;
+        int cy = (view.getTop() + view.getBottom()) / 2;
+
+        // get the final radius for the clipping circle
+        int dx = Math.max(cx, view.getWidth() - cx);
+        int dy = Math.max(cy, view.getHeight() - cy);
+        float finalRadius = (float) Math.hypot(dx, dy);
+
+        SupportAnimator animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
+        animator.setInterpolator(new AccelerateDecelerateInterpolator());
+        animator.setDuration(300);
+        view.setVisibility(View.VISIBLE);
+        animator.start();
+
+    }
+
+    private void revealClose(final View view) {
+        // get the center for the clipping circle
+        int cx = (view.getLeft() + view.getRight()) / 2;
+        int cy = (view.getTop() + view.getBottom()) / 2;
+
+        // get the final radius for the clipping circle
+        int dx = Math.max(cx, view.getWidth() - cx);
+        int dy = Math.max(cy, view.getHeight() - cy);
+        float finalRadius = (float) Math.hypot(dx, dy);
+
+        SupportAnimator animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
+        animator.setInterpolator(new AccelerateDecelerateInterpolator());
+        animator.setDuration(300);
+        animator = animator.reverse();
+        animator.start();
+
+        view.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                view.setVisibility(View.GONE);
+            }
+        }, 300);
+
     }
 
 }

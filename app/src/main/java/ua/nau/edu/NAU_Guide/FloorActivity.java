@@ -4,9 +4,13 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.View;
 
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGParseException;
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import ua.nau.edu.Systems.TouchImageView;
 
@@ -23,9 +27,12 @@ public class FloorActivity extends BaseToolbarActivity {
 
         getToolbar();
 
-        TouchImageView map = (TouchImageView) findViewById(R.id.map);
+        /*TouchImageView map = (TouchImageView) findViewById(R.id.map);
         //map_1.setImageBitmap(svgToBitmap(getResources(), R.raw.splatter, 300, 200));
-        map.setImageResource(R.drawable.map);
+        map.setImageResource(R.drawable.map);*/
+
+        SubsamplingScaleImageView map = (SubsamplingScaleImageView) findViewById(R.id.map);
+        map.setImage(ImageSource.resource(R.drawable.map_1));
     }
 
     @Override

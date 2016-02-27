@@ -53,5 +53,6 @@
     <string name="dialog_title_choose_bg">Выберите фон</string>
 
     <string name="lectorslist_search_hint">Введите имя</string>
+    <string name="maps_search_hint">Введите институт</string>
 
 </resources>

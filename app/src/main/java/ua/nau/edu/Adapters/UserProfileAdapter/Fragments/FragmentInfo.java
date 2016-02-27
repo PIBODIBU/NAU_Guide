@@ -5,6 +5,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -361,6 +363,7 @@ public class FragmentInfo extends Fragment {
         private static final String TAG = "FragmentInfo";
 
         private AlertDialog.Builder dialogBuilder;
+        private AlertDialog dialog;
         private ImageView avatarBig;
 
         private Activity activity;
@@ -372,7 +375,12 @@ public class FragmentInfo extends Fragment {
         }
 
         @Override
-        public Dialog onCreateDialog(@NonNull Bundle savedInstanceState) {
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            if (savedInstanceState != null) {
+                PHOTO_URL = savedInstanceState.getString("PHOTO_URL");
+
+            }
+
             dialogBuilder = new AlertDialog.Builder(getActivity());
             LayoutInflater inflater = getActivity().getLayoutInflater();
             View mainLayout = inflater.inflate(R.layout.dialog_avatar, null);
@@ -384,7 +392,7 @@ public class FragmentInfo extends Fragment {
 
             setCancelable(true);
 
-            AlertDialog dialog = dialogBuilder.create();
+            dialog = dialogBuilder.create();
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
 
             if (PHOTO_URL != null && !PHOTO_URL.equals("")) {
@@ -400,6 +408,16 @@ public class FragmentInfo extends Fragment {
             return dialog;
         }
 
+        @Override
+        public void onSaveInstanceState(Bundle outState) {
+            outState.putString("PHOTO_URL", PHOTO_URL);
+
+            avatarBig.buildDrawingCache();
+            Bitmap avatarBigBitmap = avatarBig.getDrawingCache();
+            outState.putParcelable("BIG_IMAGE", avatarBigBitmap);
+
+            super.onSaveInstanceState(outState);
+        }
     }
 
 }

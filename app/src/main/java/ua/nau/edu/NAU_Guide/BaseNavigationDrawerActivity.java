@@ -319,7 +319,9 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                     public void onDrawerOpened(View drawerView) {
                         // Скрываем клавиатуру при открытии Navigation Drawer
                         if (MethodManager.isAcceptingText()) {
-                            MethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                            if (getCurrentFocus() != null) {
+                                MethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                            }
                             wasInputActive = true;
                         } else {
                             wasInputActive = false;

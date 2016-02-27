@@ -62,7 +62,7 @@ public class NAU extends University {
 
 /** CORPS **/
         Corps.put(1, new LatLng(50.440259, 30.429853));
-        Corps.put(2, new LatLng(50.4386988, 30.4314867));
+        Corps.put(2, new LatLng(50.439356, 30.433073));
         Corps.put(3, new LatLng(50.437539, 30.433644));
         Corps.put(4, new LatLng(50.438143, 30.433748));
         Corps.put(5, new LatLng(50.438557, 30.432804));

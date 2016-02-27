@@ -33,6 +33,9 @@ android {
 
 repositories {
     maven { url "https://jitpack.io" }
+    maven {
+        url "http://indooratlas-ltd.bintray.com/mvn-public"
+    }
     mavenCentral()
     jcenter()
 }
@@ -75,4 +78,6 @@ dependencies {
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.daimajia.slider:library:1.1.5@aar'
 
+    compile 'com.indooratlas.android:indooratlas-android-sdk:2.0.2-beta@aar'
+    compile 'com.davemorrissey.labs:subsampling-scale-image-view:3.4.1'
 }

@@ -1,69 +1,93 @@
-package ua.nau.edu.NAU_Guide;
+package ua.nau.edu.NAU_Guide.Debug;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
-import android.view.InflateException;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import android.support.design.widget.Snackbar;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import ua.nau.edu.Enum.EnumExtras;
 import ua.nau.edu.Enum.EnumMaps;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
-import ua.nau.edu.Fragments.MapsFragment;
+import ua.nau.edu.NAU_Guide.BaseNavigationDrawerActivity;
+import ua.nau.edu.NAU_Guide.FloorActivity;
+import ua.nau.edu.NAU_Guide.InfoActivity;
+import ua.nau.edu.NAU_Guide.MainActivity;
+import ua.nau.edu.NAU_Guide.R;
+import ua.nau.edu.RecyclerViews.MapsActivity.MapsAdapter;
+import ua.nau.edu.RecyclerViews.MapsActivity.MapsDataModel;
 import ua.nau.edu.Systems.Route;
 import ua.nau.edu.University.NAU;
 
-public class MapsTestActivity extends BaseNavigationDrawerActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+public class MapsTestActivity extends BaseNavigationDrawerActivity
+        implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, SearchView.OnQueryTextListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     public MapsTestActivity() {
     }
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "MapsTestActivity";
 
     private int currentMarkerID = -1;
     private String currentMarkerLabel = "";
     private Marker mainActivityMarker = null;
+    private Marker myLocationMarker;
 
-    private InputMethodManager MethodManager = null;
+    private InputMethodManager methodManager;
     private SharedPreferences settings = null;
     private SharedPreferences settingsVK = null;
+    private SearchView searchView;
+    private HashMap<Integer, Marker> markerHashMap = new HashMap<>();
+    private HashMap<Integer, String> nauCorpNamesFull;
+    private HashMap<Integer, String> nauCorpNamesShort;
+
+    private RelativeLayout rootView;
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private GoogleApiClient googleApiClient;
     private NAU university;
     private Route supportRoute = new Route();
     private FloatingActionMenu fab_menu;
@@ -79,6 +103,18 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity implements On
     private static final String CURRENT_LATITUDE = EnumMaps.CURRENT_LATITUDE.toString();
     private static final String CURRENT_LONGTITUDE = EnumMaps.CURRENT_LONGTITUDE.toString();
 
+    /**
+     * GoogleApiClient variables
+     */
+    private static int UPDATE_INTERVAL = 1000; // 5 sec
+    private static int FATEST_INTERVAL = 1000; // 5 sec
+    private static int DISPLACEMENT = 0; // 1 meters
+
+    private RecyclerView recyclerView;
+    private static MapsAdapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private ArrayList<MapsDataModel> data = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,16 +126,109 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity implements On
 // Get and set system services & Buttons & SharedPreferences & Requests
         settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
         settingsVK = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
-        MethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+        methodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+
+        rootView = (RelativeLayout) findViewById(R.id.root_view);
+        nauCorpNamesFull = university.getCorpsInfoNameFull();
+        nauCorpNamesShort = university.getCorpsInfoNameShort();
+
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerview_user_data);
+        recyclerView.setHasFixedSize(true);
+        //recyclerView.addItemDecoration(new DividerItemDecoration(this));
+
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        adapter = new MapsAdapter(data, this);
+        recyclerView.setAdapter(adapter);
 
         getDrawer(
                 settingsVK.getString(VK_INFO_KEY, ""),
                 settingsVK.getString(VK_EMAIL_KEY, "")
         );
 
-        setMenuId(R.menu.menu_maps);
+        initGoogleApiClient();
         setUpMapIfNeeded();
         initFloatingActionMenu();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy()/ Disconnecting GoogleApiClient...");
+        googleApiClient.disconnect();
+        super.onDestroy();
+    }
+
+    private void initGoogleApiClient() {
+        if (googleApiClient == null) {
+            googleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+        googleApiClient.connect();
+    }
+
+    private void createLocationRequest() {
+        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FATEST_INTERVAL);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setSmallestDisplacement(DISPLACEMENT);
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, mLocationRequest, this);
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.d(TAG, "GoogleApiClient/ Connected");
+
+        // TODO Remove debug items
+        Snackbar.make(rootView, "Connected to GoogleApiClient", Snackbar.LENGTH_LONG).show();
+
+        try {
+            myLocationMarker = mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(LocationServices.FusedLocationApi.getLastLocation(googleApiClient).getLatitude(),
+                            LocationServices.FusedLocationApi.getLastLocation(googleApiClient).getLongitude()))
+                    .title("My Location")
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.avatar_default)));
+        } catch (SecurityException ex) {
+            ex.printStackTrace();
+        }
+
+        createLocationRequest();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.d(TAG, "GoogleApiClient/ ConnectionSuspended");
+
+        // TODO Remove debug items
+        Snackbar.make(rootView, "Connection to GoogleApiClient is suspended", Snackbar.LENGTH_LONG).show();
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.d(TAG, "GoogleApiClient/ Connection failed");
+
+        // TODO Remove debug items
+        Snackbar.make(rootView, "Connection to GoogleApiClient failed", Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d(TAG, "LocationServices/ onLocationChanged(): " + location.getLatitude() + ", " + location.getLongitude());
+
+        // TODO Remove debug items
+        Snackbar.make(rootView, location.getLatitude() + ", " + location.getLongitude(), Snackbar.LENGTH_LONG).show();
+
+        myLocationMarker.remove();
+        myLocationMarker = mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                .title("My Location")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
     }
 
     @Override
@@ -107,6 +236,126 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity implements On
         super.onResume();
 
         //setUpMapIfNeeded();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_maps, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        searchView.setQueryHint(getResources().getString(R.string.maps_search_hint));
+        searchView.setOnQueryTextListener(this);
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                searchView.onActionViewCollapsed();
+
+                if (getCurrentFocus() != null) {
+                    methodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                }
+
+                recyclerView.setVisibility(View.VISIBLE);
+
+                return true;
+            }
+        });
+
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recyclerView.setVisibility(View.VISIBLE);
+
+                data.clear();
+
+                if (data.size() == 0) {
+                    for (int i = 1; i <= nauCorpNamesFull.size(); i++) {
+                        data.add(new MapsDataModel(nauCorpNamesFull.get(i), i));
+                    }
+                }
+
+                adapter.setDataSet(data);
+                adapter.notifyDataSetChanged();
+
+                adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
+                    @Override
+                    public void onClick(int itemId) {
+                        recyclerView.setVisibility(View.GONE);
+                        if (getCurrentFocus() != null) {
+                            methodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                        }
+
+                        Marker currentMarker = markerHashMap.get(itemId);
+
+                        currentMarkerID = getMarkerId(currentMarker);
+                        currentMarkerLabel = university.getCorpsLabel().get(currentMarkerID);
+                        fab_menu.open(true);
+                        currentMarker.showInfoWindow();
+                        mMap.animateCamera(CameraUpdateFactory.newLatLng(currentMarker.getPosition()));
+                    }
+                });
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
+
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        Log.d(TAG, "Query changed: " + newText);
+
+        data.clear();
+
+        for (int i = 1; i <= nauCorpNamesFull.size(); i++) {
+            String corpNameFull = nauCorpNamesFull.get(i);
+            String corpNameShort = nauCorpNamesShort.get(i);
+
+            if (corpNameFull.toLowerCase().contains(newText.toLowerCase().trim()))
+                data.add(new MapsDataModel(corpNameFull, i));
+
+            if (corpNameShort.toLowerCase().contains(newText.toLowerCase().trim()))
+                data.add(new MapsDataModel(corpNameShort, i));
+        }
+
+        if (data.size() == 0) {
+            for (int i = 1; i <= nauCorpNamesFull.size(); i++) {
+                data.add(new MapsDataModel(nauCorpNamesFull.get(i), i));
+            }
+        }
+
+        if (data != null) {
+            adapter.setDataSet(data);
+            adapter.notifyDataSetChanged();
+
+            adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
+                @Override
+                public void onClick(int itemId) {
+                    recyclerView.setVisibility(View.GONE);
+                    if (getCurrentFocus() != null) {
+                        methodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    }
+
+                    Marker currentMarker = markerHashMap.get(itemId);
+                    currentMarkerID = getMarkerId(currentMarker);
+                    currentMarkerLabel = university.getCorpsLabel().get(currentMarkerID);
+                    fab_menu.open(true);
+                    currentMarker.showInfoWindow();
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(currentMarker.getPosition()));
+                }
+            });
+        }
+
+        return true;
     }
 
     @Override
@@ -125,47 +374,24 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity implements On
     private void setUpMapIfNeeded() {
         Log.i(TAG, "setUpMapIfNeeded called");
 
-        final ProgressDialog dialog = new ProgressDialog(MapsTestActivity.this);
+        if (mMap == null) {
+            MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
 
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected void onPreExecute() {
-                dialog.setMessage(getResources().getString(R.string.dialog_loading));
-                dialog.setIndeterminate(true);
-                dialog.setCancelable(false);
-                dialog.show();
+            mapFragment.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    mMap = googleMap;
 
-                super.onPreExecute();
-            }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                // Do a null check to confirm that we have not already instantiated the map.
-                if (mMap == null) {
-                    // Try to obtain the map from the SupportMapFragment.
-                    mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                            .getMap();
-
-                    // Check if we were successful in obtaining the map.
                     if (mMap != null) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                setUpMap();
-                            }
-                        });
-                    }
-                }
-                return null;
-            }
+                        setUpMap();
 
-            @Override
-            protected void onPostExecute(Void result) {
-                super.onPostExecute(result);
-                openMarkerFromIntent();
-                dialog.dismiss();
-            }
-        }.execute();
+                        Log.d(TAG, "Setting up GoogleApiClient...");
+                    }
+
+                    openMarkerFromIntent();
+                }
+            });
+        }
     }
 
     private void addMarkerCustom(Integer i, int icon, String title) {
@@ -176,6 +402,8 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity implements On
         mMapMarker.setIcon(BitmapDescriptorFactory.fromResource(icon));
         if (getIntent().getIntExtra("MAINACTIVITY_CORP_ID", -1) == i)
             mainActivityMarker = mMapMarker;
+
+        markerHashMap.put(i, mMapMarker);
     }
 
     private void openMarkerFromIntent() {
@@ -211,8 +439,9 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity implements On
 
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition_start));
 
-        mMap.getUiSettings().setMapToolbarEnabled(false);
         mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.setIndoorEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setCompassEnabled(false);
 
@@ -339,9 +568,9 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity implements On
         fab_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //startActivity(new Intent(MapsActivity.this, FloorActivity.class));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(-33.86997, 151.2089), 18));
+                startActivity(new Intent(MapsTestActivity.this, FloorActivity.class));
+                /*mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(-33.86997, 151.2089), 18));*/
             }
         });
     }

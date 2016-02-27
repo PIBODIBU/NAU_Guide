@@ -75,7 +75,8 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/MapsActivity_label">
+            android:label="@string/MapsActivity_label"
+            android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.app.default_searchable"
                 android:value=".SearchActivity" />
@@ -115,8 +116,12 @@
             android:windowSoftInputMode="stateVisible|adjustResize" />
 
         <activity
-            android:name=".MapsTestActivity"
+            android:name=".Debug.MapsTestActivity"
             android:label="Test Map" />
+
+        <activity
+            android:name=".Debug.MapsOverlayActivity"
+            android:label="IndoorAtlas Test" />
 
     </application>
 
