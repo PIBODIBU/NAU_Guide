@@ -1,21 +1,20 @@
 package ua.nau.edu.NAU_Guide;
 
-import android.os.AsyncTask;
-import android.support.v7.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.vk.sdk.api.VKApi;
@@ -30,9 +29,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Enum.EnumSharedPreferencesVK;
-import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.RecyclerViews.MainActivity.MainActivityAdapter;
 import ua.nau.edu.RecyclerViews.MainActivity.MainActivityDataModel;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
@@ -69,8 +68,6 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
     private RecyclerView.LayoutManager layoutManager;
     private static RecyclerView recyclerView;
     private static ArrayList<MainActivityDataModel> data;
-    static View.OnClickListener myOnClickListener;
-    private static ArrayList<Integer> removedItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +119,7 @@ public class MainActivity extends BaseNavigationDrawerActivity implements
             ));
         }
 
-        adapter = new MainActivityAdapter(data, this);
+        adapter = new MainActivityAdapter(data, this, this);
         recyclerView.setAdapter(adapter);
     }
 

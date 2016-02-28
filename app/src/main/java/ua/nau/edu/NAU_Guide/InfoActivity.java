@@ -131,16 +131,6 @@ public class InfoActivity extends BaseToolbarActivity {
 
     }
 
-    private void rotateImageView(ImageView imgView, float degree) {
-        final RotateAnimation rotateAnim = new RotateAnimation(0.0f, degree,
-                RotateAnimation.RELATIVE_TO_SELF, 0.5f,
-                RotateAnimation.RELATIVE_TO_SELF, 0.5f);
-
-        rotateAnim.setDuration(0);
-        rotateAnim.setFillAfter(true);
-        imgView.startAnimation(rotateAnim);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;

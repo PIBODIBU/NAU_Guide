@@ -1,5 +1,6 @@
 package ua.nau.edu.RecyclerViews.MainActivity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +22,7 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
 
     private ArrayList<MainActivityDataModel> dataSet;
     private Context context;
+    private Activity activity;
 
     View.OnClickListener mOnClickListener;
 
@@ -53,9 +55,10 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
         }
     }
 
-    public MainActivityAdapter(ArrayList<MainActivityDataModel> data, Context context) {
+    public MainActivityAdapter(ArrayList<MainActivityDataModel> data, Context context, Activity activity) {
         this.dataSet = data;
         this.context = context;
+        this.activity = activity;
     }
 
     @Override
@@ -89,6 +92,7 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
             @Override
             public void onClick(View v) {
                 context.startActivity(new Intent(context, MapsActivity.class).putExtra("MAINACTIVITY_CORP_ID", listPosition + 1));
+                activity.overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
         });
     }

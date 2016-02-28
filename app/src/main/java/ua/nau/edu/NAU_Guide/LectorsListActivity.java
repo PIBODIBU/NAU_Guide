@@ -13,7 +13,6 @@ import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.widget.ImageView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.squareup.picasso.Picasso;
@@ -27,6 +26,7 @@ import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsAdapter;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsDataModel;
 import ua.nau.edu.API.APIDialogs;
+import ua.nau.edu.Systems.SearchViewUtils;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 
@@ -158,6 +158,7 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity implements
 
         searchView.setQueryHint(getResources().getString(R.string.lectorslist_search_hint));
         searchView.setOnQueryTextListener(this);
+        SearchViewUtils.setHintColor(this, searchView, R.color.searchView_hint_color);
 
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override

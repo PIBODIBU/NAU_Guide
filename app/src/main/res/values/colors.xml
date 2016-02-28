@@ -23,4 +23,31 @@
     <color name="lectors_list_item_selected">#1a0288d1</color>
     <color name="lectors_list_item_normal">@android:color/transparent</color>
 
+    <color name="searchView_hint_color">#66E0E0E0</color>
+
 </resources>
+
+    <!--
+    Transparency (Add it before hex color)
+    100% — FF
+    95% — F2
+    90% — E6
+    85% — D9
+    80% — CC
+    75% — BF
+    70% — B3
+    65% — A6
+    60% — 99
+    55% — 8C
+    50% — 80
+    45% — 73
+    40% — 66
+    35% — 59
+    30% — 4D
+    25% — 40
+    20% — 33
+    15% — 26
+    10% — 1A
+    5% — 0D
+    0% — 00
+    -->

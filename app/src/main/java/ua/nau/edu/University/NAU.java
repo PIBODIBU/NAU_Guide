@@ -156,9 +156,9 @@ public class NAU extends University {
 
         CorpsIcon.put(16, R.drawable.mark_sport);
 
-        CorpsMarkerLabel.put(16, context.getApplicationContext().getResources().getString(R.string.sport));
+        CorpsMarkerLabel.put(16, context.getResources().getString(R.string.sport));
 
-        CorpsLabel.put(16, context.getApplicationContext().getResources().getString(R.string.sport));
+        CorpsLabel.put(16, context.getResources().getString(R.string.sport));
 
 /** HOSTEL **/
         Corps.put(17, new LatLng(50.440152, 30.435087)); // 1
@@ -186,9 +186,9 @@ public class NAU extends University {
         CorpsIcon.put(27, R.drawable.host_11);
 
         for (int i = 17; i <= 27; i++) {
-            CorpsMarkerLabel.put(i, context.getApplicationContext().getResources().getString(R.string.host) + " " + Integer.toString(i - 16));
+            CorpsMarkerLabel.put(i, context.getResources().getString(R.string.host) + " " + Integer.toString(i - 16));
 
-            CorpsLabel.put(i, context.getApplicationContext().getResources().getString(R.string.host) + " " + Integer.toString(i - 16));
+            CorpsLabel.put(i, context.getResources().getString(R.string.host) + " " + Integer.toString(i - 16));
         }
 
 /** LIBRARY **/

@@ -19,13 +19,6 @@
         <item name="android:textAppearanceSmallPopupMenu">@style/myPopupMenuTextAppearanceSmall
         </item>
 
-        <item name="android:actionBarWidgetTheme">@style/AppTheme.SearchViewStyle</item>
-
-    </style>
-
-
-    <style name="AppTheme.SearchViewStyle" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:textColorHint">@color/grey</item>
     </style>
 
 

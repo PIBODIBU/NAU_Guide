@@ -1,7 +1,5 @@
 package ua.nau.edu.NAU_Guide;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
@@ -9,10 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -27,8 +23,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -51,10 +45,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.codetail.animation.SupportAnimator;
-import io.codetail.animation.ViewAnimationUtils;
-import io.codetail.widget.RevealFrameLayout;
-import io.codetail.widget.RevealLinearLayout;
 import ua.nau.edu.Enum.EnumExtras;
 import ua.nau.edu.Enum.EnumMaps;
 import ua.nau.edu.Enum.EnumSharedPreferences;
@@ -62,6 +52,7 @@ import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 import ua.nau.edu.RecyclerViews.MapsActivity.MapsAdapter;
 import ua.nau.edu.RecyclerViews.MapsActivity.MapsDataModel;
 import ua.nau.edu.Systems.Route;
+import ua.nau.edu.Systems.SearchViewUtils;
 import ua.nau.edu.University.NAU;
 
 public class MapsActivity extends BaseNavigationDrawerActivity
@@ -70,20 +61,18 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     }
 
     private final String TAG = this.getClass().getSimpleName();
-    private final String SEARCH_QUERY_CLOSE = "sfnjuyb323dso8cjnwenfvdbhfgbhewie";
+
+    private Bundle savedInstanceState;
 
     private int currentMarkerID = -1;
     private String currentMarkerLabel = "";
     private Marker mainActivityMarker = null;
-    private Marker myLocationMarker;
 
     private InputMethodManager methodManager;
     private SharedPreferences settings = null;
     private SharedPreferences settingsVK = null;
     private SearchView searchView;
     private HashMap<Integer, Marker> markerHashMap = new HashMap<>();
-    private HashMap<Integer, String> nauCorpNamesFull;
-    private HashMap<Integer, String> nauCorpNamesShort;
 
     private RelativeLayout rootView;
 
@@ -103,7 +92,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     private static final String CURRENT_LATITUDE = EnumMaps.CURRENT_LATITUDE.toString();
     private static final String CURRENT_LONGTITUDE = EnumMaps.CURRENT_LONGTITUDE.toString();
 
-    private RevealFrameLayout revealRecycler;
     private RecyclerView recyclerView;
     private static MapsAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -114,6 +102,10 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        if (savedInstanceState != null) {
+            this.savedInstanceState = savedInstanceState;
+        }
+
         university = new NAU(this);
         university.init();
 
@@ -123,42 +115,18 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         methodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
 
         rootView = (RelativeLayout) findViewById(R.id.root_view);
-        nauCorpNamesFull = university.getCorpsInfoNameFull();
-        nauCorpNamesShort = university.getCorpsInfoNameShort();
-
-
-        getDrawer(
-                settingsVK.getString(VK_INFO_KEY, ""),
-                settingsVK.getString(VK_EMAIL_KEY, "")
-        );
 
         setUpMapIfNeeded();
         initFloatingActionMenu();
         setUpRecyclerView();
 
-        if (savedInstanceState != null) {
-            if (savedInstanceState.getBoolean("RecyclerViewWasVisibility", false)) {
-                revealShow(recyclerView);
-
-                // Clearing ArrayList before adding new items
-                data.clear();
-
-                // Adding all corps to RecyclerView
-                for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
-                    data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
-                }
-
-                adapter.setDataSet(data);
-                adapter.notifyDataSetChanged();
-
-            } else {
-                recyclerView.setVisibility(View.GONE);
-            }
-        }
+        getDrawer(
+                settingsVK.getString(VK_INFO_KEY, ""),
+                settingsVK.getString(VK_EMAIL_KEY, "")
+        );
     }
 
     private void setUpRecyclerView() {
-        revealRecycler = (RevealFrameLayout) findViewById(R.id.reveal_recycler);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview_user_data);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
@@ -176,10 +144,12 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         if (recyclerView.getVisibility() == View.VISIBLE) {
-            outState.putBoolean("RecyclerViewWasVisibility", true);
+            outState.putString("SearchViewQuery", searchView.getQuery().toString());
+            outState.putBoolean("RecyclerViewWasVisible", true);
         } else if (recyclerView.getVisibility() == View.GONE) {
-            outState.putBoolean("RecyclerViewWasVisibility", false);
+            outState.putBoolean("RecyclerViewWasVisible", false);
         }
+
 
         super.onSaveInstanceState(outState);
     }
@@ -189,10 +159,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         super.onResume();
 
         //setUpMapIfNeeded();
-    }
-
-    @Override
-    public void onBackPressed() {
     }
 
     @Override
@@ -211,13 +177,15 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                         drawer.closeDrawer();
                     } else if (searchView != null) {
                         if (!searchView.isIconified()) {
-                            revealClose(recyclerView);
+                            Animation.Reveal.revealClose(recyclerView);
                             searchView.onActionViewCollapsed();
                         } else {
                             super.onBackPressed();
+                            overridePendingTransition(R.anim.pull_in_left, R.anim.push_out_right);
                         }
                     } else {
                         super.onBackPressed();
+                        overridePendingTransition(R.anim.pull_in_left, R.anim.push_out_right);
                     }
 
                     break;
@@ -291,9 +259,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity
             @Override
             public void onClick(int itemId) {
                 // Hide RecyclerView & SearchView & keyboard
-                if (getCurrentFocus() != null)
-                    methodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-                revealClose(recyclerView);
+                hideKeyboard();
+                Animation.Reveal.revealClose(recyclerView);
                 searchView.onActionViewCollapsed();
 
                 // Zooming to marker
@@ -320,56 +287,61 @@ public class MapsActivity extends BaseNavigationDrawerActivity
      * Setting Up SearchView
      *
      * @param searchView SearchView for setup
-     * @param searchItem MenuItem for OnActionExpandListener implementing
      */
-    private void setUpSearchView(final SearchView searchView, final MenuItem searchItem) {
+    private void setUpSearchView(final SearchView searchView, MenuItem searchMenu) {
         searchView.setQueryHint(getResources().getString(R.string.maps_search_hint));
         searchView.setOnQueryTextListener(this);
-        searchView.onActionViewCollapsed();
+        SearchViewUtils.setHintColor(this, searchView, R.color.searchView_hint_color);
 
+        /**
+         * Restoring saved state of SearchView & RecyclerView
+         */
+        if (savedInstanceState != null) {
+            if (savedInstanceState.getBoolean("RecyclerViewWasVisible", false)) {
+                searchView.onActionViewExpanded();
+                searchView.setQuery(savedInstanceState.getString("SearchViewQuery", ""), false);
+
+                Animation.Reveal.revealOpen(recyclerView);
+            }
+        }
+
+        /**
+         * SearchView is closing with button (on Toolbar)
+         */
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
                 Log.d(TAG, "OnCloseListener/ onClose() called");
 
                 // Hide keyboard
-                if (getCurrentFocus() != null) {
-                    methodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-                }
+                hideKeyboard();
 
                 // Close RecyclerView & SearchView
                 searchView.onActionViewCollapsed();
-                revealClose(recyclerView);
+                Animation.Reveal.revealClose(recyclerView);
 
                 return true;
             }
         });
 
+        /**
+         * SearchView is pressed, opening...
+         */
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Show RecyclerView
-                revealShow(recyclerView);
+                Animation.Reveal.revealOpen(recyclerView);
 
-                // Clearing ArrayList before adding new items
-                data.clear();
-
-                // Adding all corps to RecyclerView
-                for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
-                    data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
-                }
-
-                adapter.setDataSet(data);
-                adapter.notifyDataSetChanged();
+                addDefaultItems();
 
                 // Animating to clicked position
                 adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
                     @Override
                     public void onClick(int itemId) {
                         // Hide RecyclerView & SearchView & keyboard
-                        if (getCurrentFocus() != null)
-                            methodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-                        revealClose(recyclerView);
+                        hideKeyboard();
+                        Animation.Reveal.revealClose(recyclerView);
                         searchView.onActionViewCollapsed();
 
                         // Zooming to marker
@@ -377,6 +349,32 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                     }
                 });
 
+            }
+        });
+
+    }
+
+    /**
+     * Adding default items to RecyclerView.Adapter
+     */
+    private void addDefaultItems() {
+        data.clear();
+        for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
+            data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
+        }
+        adapter.setDataSet(data);
+        adapter.notifyDataSetChanged();
+
+        adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int itemId) {
+                // Hide RecyclerView & SearchView & keyboard
+                hideKeyboard();
+                Animation.Reveal.revealClose(recyclerView);
+                searchView.onActionViewCollapsed();
+
+                // Zooming to marker
+                zoomToMarker(markerHashMap.get(itemId));
             }
         });
     }
@@ -394,8 +392,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
                     if (mMap != null) {
                         setUpMap();
-
-                        Log.d(TAG, "Setting up GoogleApiClient...");
                     }
 
                     openMarkerFromIntent();
@@ -414,9 +410,18 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     private void addMarkerCustom(Integer i, int icon, String title) {
         Marker mMapMarker = mMap.addMarker(new MarkerOptions()
                 .position(university.getCorps().get(i))
-                .title(title));
+                .title(title)
+                .icon(BitmapDescriptorFactory.fromResource(icon)));
 
-        mMapMarker.setIcon(BitmapDescriptorFactory.fromResource(icon));
+        if (getIntent().getIntExtra("MAINACTIVITY_CORP_ID", -1) == i)
+            mainActivityMarker = mMapMarker;
+
+        markerHashMap.put(i, mMapMarker);
+    }
+
+    private void addMarkerCustom(int i, MarkerOptions markerOptions) {
+        Marker mMapMarker = mMap.addMarker(markerOptions);
+
         if (getIntent().getIntExtra("MAINACTIVITY_CORP_ID", -1) == i)
             mainActivityMarker = mMapMarker;
 
@@ -472,18 +477,37 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         mMap.getUiSettings().setCompassEnabled(false);
 
         /**
-         * Adding markers from {@link ua.nau.edu.University.NAU}
+         * Adding markers from {@link ua.nau.edu.University.NAU} using {@link android.os.AsyncTask}
          * Important! Loop needs to be started from 1
          */
-        for (int i = 1; i <= university.getHashMapSize(); i++) {
-            addMarkerCustom(i, university.getCorpsIcon().get(i), university.getCorpsMarkerLabel().get(i));
-        }
+        new AsyncTask<Void, Void, HashMap<Integer, MarkerOptions>>() {
+            @Override
+            protected void onPostExecute(HashMap<Integer, MarkerOptions> markerOptions) {
+                for (int i = 1; i <= markerOptions.size(); i++) {
+                    addMarkerCustom(i, markerOptions.get(i));
+                }
+            }
+
+            @Override
+            protected HashMap<Integer, MarkerOptions> doInBackground(Void... params) {
+                HashMap<Integer, MarkerOptions> markerOptions = new HashMap<>();
+
+                for (int i = 1; i <= university.getHashMapSize(); i++) {
+                    markerOptions.put(i, new MarkerOptions()
+                            .position(university.getCorps().get(i))
+                            .title(university.getCorpsMarkerLabel().get(i))
+                            .icon(BitmapDescriptorFactory.fromResource(university.getCorpsIcon().get(i))));
+                }
+
+                return markerOptions;
+            }
+        }.execute();
 
         //Обработчик нажатия на маркер
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                //Открываем FabMenu
+                // Open FabMenu
                 fab_menu.open(true);
 
                 //Записываем id текущего маркера в глобальную переменную
@@ -736,47 +760,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         dialog.show();
     }
 
-    private void revealShow(final View view) {
-        // get the center for the clipping circle
-        int cx = (view.getLeft() + view.getRight()) / 2;
-        int cy = (view.getTop() + view.getBottom()) / 2;
-
-        // get the final radius for the clipping circle
-        int dx = Math.max(cx, view.getWidth() - cx);
-        int dy = Math.max(cy, view.getHeight() - cy);
-        float finalRadius = (float) Math.hypot(dx, dy);
-
-        SupportAnimator animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
-        animator.setInterpolator(new AccelerateDecelerateInterpolator());
-        animator.setDuration(300);
-        view.setVisibility(View.VISIBLE);
-        animator.start();
-
-    }
-
-    private void revealClose(final View view) {
-        // get the center for the clipping circle
-        int cx = (view.getLeft() + view.getRight()) / 2;
-        int cy = (view.getTop() + view.getBottom()) / 2;
-
-        // get the final radius for the clipping circle
-        int dx = Math.max(cx, view.getWidth() - cx);
-        int dy = Math.max(cy, view.getHeight() - cy);
-        float finalRadius = (float) Math.hypot(dx, dy);
-
-        SupportAnimator animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
-        animator.setInterpolator(new AccelerateDecelerateInterpolator());
-        animator.setDuration(300);
-        animator = animator.reverse();
-        animator.start();
-
-        view.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                view.setVisibility(View.GONE);
-            }
-        }, 300);
-
+    private void hideKeyboard() {
+        if (getCurrentFocus() != null)
+            methodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
     }
 
 }

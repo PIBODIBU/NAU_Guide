@@ -184,7 +184,8 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         final PrimaryDrawerItem download = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_download)
                 .withIcon(GoogleMaterial.Icon.gmd_file_download)
-                .withIdentifier(Activities.DownloadActivity.ordinal());
+                .withIdentifier(Activities.DownloadActivity.ordinal())
+                .withEnabled(false);
 
         final PrimaryDrawerItem settings = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_settings)
@@ -363,6 +364,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                         startActivity(new Intent(BaseNavigationDrawerActivity.this, MainActivity.class)
                                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                         finish();
+                                        overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
                                         break;
                                     }
                                 }
@@ -373,6 +375,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                         startActivity(new Intent(BaseNavigationDrawerActivity.this, MapsActivity.class)
                                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                         finish();
+                                        overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
                                         break;
                                     }
                                 }
@@ -383,6 +386,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                         startActivity(new Intent(BaseNavigationDrawerActivity.this, LectorsListActivity.class)
                                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                         finish();
+                                        overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
                                         break;
                                     }
                                 }
@@ -395,6 +399,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                                 .putExtra("uniqueId", sharedPrefUtils.getUniqueId())
                                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                         finish();
+                                        overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
                                         break;
                                     }
                                 }
@@ -405,6 +410,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                         startActivity(new Intent(BaseNavigationDrawerActivity.this, NewsActivity.class)
                                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                         finish();
+                                        overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
                                         break;
                                     }
                                 }
@@ -416,6 +422,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                         break;
                                     } else {
                                         startActivity(new Intent(BaseNavigationDrawerActivity.this, SearchActivity.class));
+                                        overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
                                     }
                                     break;
                                 }
