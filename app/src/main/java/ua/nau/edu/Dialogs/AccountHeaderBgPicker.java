@@ -34,8 +34,7 @@ public class AccountHeaderBgPicker extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(@NonNull Bundle savedInstanceState) {
-        sharedPrefUtils = new SharedPrefUtils(getActivity().getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, getActivity().MODE_PRIVATE),
-                getActivity().getSharedPreferences(sharedPrefUtils.VK_PREFERENCES, getActivity().MODE_PRIVATE));
+        sharedPrefUtils = new SharedPrefUtils(getActivity());
 
         dialogBuilder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -107,7 +106,7 @@ public class AccountHeaderBgPicker extends DialogFragment {
             @Override
             public void onShow(DialogInterface dialogArg) {
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(getActivity(), R.color.colorAppPrimary));
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(getActivity(), R.color.colorAppPrimary));
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(getActivity(), R.color.black));
             }
         });
 

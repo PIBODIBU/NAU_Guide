@@ -40,7 +40,6 @@ public class FragmentPosts extends Fragment {
     private static NewsAdapter adapter;
     private LinearLayoutManager layoutManager;
     private static RecyclerView recyclerView;
-    private ProgressBarIndeterminate progressBar;
     private ArrayList<NewsDataModel> data = new ArrayList<NewsDataModel>();
     private APILoaderBuilder postsLoaderWithoutDialog;
     private APILoaderBuilder postsLoaderWithDialog;
@@ -59,9 +58,7 @@ public class FragmentPosts extends Fragment {
         FragmentView = inflater.inflate(R.layout.fragment_user_posts, container, false);
         authorUniqueId = getActivity().getIntent().getExtras().getString("uniqueId");
 
-        sharedPrefUtils = new SharedPrefUtils(
-                supportActivity.getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, supportActivity.MODE_PRIVATE),
-                supportActivity.getSharedPreferences(sharedPrefUtils.VK_PREFERENCES, LectorsListActivity.MODE_PRIVATE));
+        sharedPrefUtils = new SharedPrefUtils(supportActivity);
 
         setUpRecyclerView();
         setUpPostsLoaders();
@@ -82,7 +79,8 @@ public class FragmentPosts extends Fragment {
     @Override
     public void onDestroy() {
         for (int i = 0; i < data.size(); i++) {
-            Picasso.with(supportActivity).invalidate(Uri.parse(data.get(i).getAuthorPhotoUrl()));
+            if (data.get(i) != null)
+                Picasso.with(supportActivity).invalidate(Uri.parse(data.get(i).getAuthorPhotoUrl()));
         }
 
         super.onDestroy();

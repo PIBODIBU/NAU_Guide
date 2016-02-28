@@ -58,9 +58,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news);
-        sharedPrefUtils = new SharedPrefUtils(
-                getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, MODE_PRIVATE),
-                getSharedPreferences(sharedPrefUtils.VK_PREFERENCES, LectorsListActivity.MODE_PRIVATE));
+        sharedPrefUtils = new SharedPrefUtils(this);
 
         getDrawer(
                 sharedPrefUtils.getName(),

@@ -23,7 +23,7 @@
     <color name="lectors_list_item_selected">#1a0288d1</color>
     <color name="lectors_list_item_normal">@android:color/transparent</color>
 
-    <color name="searchView_hint_color">#66E0E0E0</color>
+    <color name="searchView_hint_color">#8Cbdbdbd</color>
 
 </resources>
 

@@ -44,8 +44,6 @@ import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class BaseToolbarActivity extends AppCompatActivity {
     private InputMethodManager MethodManager;
-    private SharedPreferences sharedPrefs;
-    private SharedPreferences sharedPrefsVK;
     private SharedPrefUtils sharedPrefUtils;
 
     private int menuId = -1;
@@ -73,7 +71,6 @@ public class BaseToolbarActivity extends AppCompatActivity {
                     break;
                 }
                 case KeyEvent.KEYCODE_BACK: {
-                    //super.onKeyDown(KeyEvent.KEYCODE_BACK, null);
                     super.onBackPressed();
                     break;
                 }
@@ -111,9 +108,6 @@ public class BaseToolbarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         MethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-
-        sharedPrefs = getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, MODE_PRIVATE);
-        sharedPrefsVK = getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, MainActivity.MODE_PRIVATE);
-        sharedPrefUtils = new SharedPrefUtils(sharedPrefs, sharedPrefsVK);
+        sharedPrefUtils = new SharedPrefUtils(this);
     }
 }

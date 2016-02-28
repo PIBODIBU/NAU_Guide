@@ -47,8 +47,7 @@ public class CreatePostActivity extends BaseToolbarActivity {
 
         setUpAPI();
 
-        sharedPrefUtils = new SharedPrefUtils(getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, MODE_PRIVATE),
-                getSharedPreferences(sharedPrefUtils.VK_PREFERENCES, MainActivity.MODE_PRIVATE));
+        sharedPrefUtils = new SharedPrefUtils(this);
         inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
 
         messageEditText = (EditText) findViewById(R.id.post_message);

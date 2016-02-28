@@ -9,6 +9,8 @@ import io.codetail.animation.ViewAnimationUtils;
 public class Animation {
     public static class Reveal {
         public static void revealOpen(final View view) {
+            int animDuration = 300;
+
             // get the center for the clipping circle
             int cx = (view.getLeft() + view.getRight()) / 2;
             int cy = (view.getTop() + view.getBottom()) / 2;
@@ -20,7 +22,7 @@ public class Animation {
 
             SupportAnimator animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
             animator.setInterpolator(new AccelerateDecelerateInterpolator());
-            animator.setDuration(300);
+            animator.setDuration(animDuration);
             view.setVisibility(View.VISIBLE);
 
             try {
@@ -31,6 +33,8 @@ public class Animation {
         }
 
         public static void revealClose(final View view) {
+            int animDuration = 300;
+
             // get the center for the clipping circle
             int cx = (view.getLeft() + view.getRight()) / 2;
             int cy = (view.getTop() + view.getBottom()) / 2;
@@ -42,7 +46,7 @@ public class Animation {
 
             SupportAnimator animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
             animator.setInterpolator(new AccelerateDecelerateInterpolator());
-            animator.setDuration(300);
+            animator.setDuration(animDuration);
             animator = animator.reverse();
 
             try {
@@ -56,7 +60,7 @@ public class Animation {
                 public void run() {
                     view.setVisibility(View.GONE);
                 }
-            }, 300);
+            }, animDuration);
         }
     }
 

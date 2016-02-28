@@ -41,8 +41,6 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity implements
     private ArrayList<LectorsDataModel> data = new ArrayList<LectorsDataModel>();
 
     private SharedPrefUtils sharedPrefUtils;
-    private SharedPreferences settings;
-    private SharedPreferences settingsVK;
     private SearchView searchView;
 
     @Override
@@ -50,9 +48,7 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lectorslist);
 
-        settings = getSharedPreferences(sharedPrefUtils.APP_PREFERENCES, MODE_PRIVATE);
-        settingsVK = getSharedPreferences(sharedPrefUtils.VK_PREFERENCES, LectorsListActivity.MODE_PRIVATE);
-        sharedPrefUtils = new SharedPrefUtils(settings, settingsVK);
+        sharedPrefUtils = new SharedPrefUtils(this);
 
         getDrawer(
                 sharedPrefUtils.getName(),

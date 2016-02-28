@@ -15,6 +15,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+import ua.nau.edu.NAU_Guide.Animation;
+import ua.nau.edu.NAU_Guide.MainActivity;
 import ua.nau.edu.NAU_Guide.MapsActivity;
 import ua.nau.edu.NAU_Guide.R;
 

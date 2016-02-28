@@ -7,16 +7,16 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.gc.materialdesign.views.CustomView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.squareup.picasso.Transformation;
@@ -55,29 +55,16 @@ public class LoginActivity extends BaseToolbarActivity {
     /***
      * VIEWS
      ***/
-    private CustomView vk_log_in;
-    private CustomView login_skip;
-    private CustomView login_lector;
+    private RelativeLayout rootView;
     private TextInputLayout editTextUserName;
     private TextInputLayout editTextPassword;
     /*****/
 
-    private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
-    private static final String SIGNED_IN_KEY = EnumSharedPreferences.SIGNED_IN_KEY.toString();
     private static final String JUST_SIGNED_KEY = EnumSharedPreferences.JUST_SIGNED_KEY.toString();
-    private static final String VK_PREFERENCES = EnumSharedPreferencesVK.VK_PREFERENCES.toString();
-    private static final String VK_NAME_KEY = EnumSharedPreferencesVK.VK_INFO_KEY.toString();
-    private static final String VK_PHOTO_KEY = EnumSharedPreferencesVK.VK_PHOTO_KEY.toString();
-    private static final String VK_EMAIL_KEY = EnumSharedPreferencesVK.VK_EMAIL_KEY.toString();
-    private static final String VK_SIGNED_KEY = EnumSharedPreferencesVK.VK_SIGNED_KEY.toString();
-    private static final String VK_ID_KEY = EnumSharedPreferencesVK.VK_ID_KEY.toString();
-    private static final String PROFILE_PHOTO_LOCATION_KEY = EnumSharedPreferences.PROFILE_PHOTO_LOCATION_KEY.toString();
     private static String PROFILE_PHOTO_LOCATION;
     private String FilePath;
     private String FileName;
 
-    private SharedPreferences settings = null;
-    private SharedPreferences settingsVK = null;
     private SharedPrefUtils sharedPrefUtils;
     private Target loadtarget;
     private int VK_APP_ID;
@@ -99,17 +86,26 @@ public class LoginActivity extends BaseToolbarActivity {
 
         getToolbar();
 
-        settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
-        settingsVK = getSharedPreferences(VK_PREFERENCES, LoginActivity.MODE_PRIVATE);
-        sharedPrefUtils = new SharedPrefUtils(settings, settingsVK);
+        sharedPrefUtils = new SharedPrefUtils(this);
 
-        /*vk_log_in = (CustomView) findViewById(R.id.login_vk);
-        login_skip = (CustomView) findViewById(R.id.login_skip);
-        login_lector = (CustomView) findViewById(R.id.login_lector);*/
+        rootView = (RelativeLayout) findViewById(R.id.root_view);
 
         editTextUserName = (TextInputLayout) findViewById(R.id.username);
         editTextPassword = (TextInputLayout) findViewById(R.id.password);
 
+        if (savedInstanceState != null) {
+            if (editTextUserName.getEditText() != null)
+                editTextUserName.getEditText().setText(savedInstanceState.getString("username"));
+            if (editTextPassword.getEditText() != null)
+                editTextPassword.getEditText().setText(savedInstanceState.getString("password"));
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString("username", editTextUserName.getEditText().getText().toString());
+        outState.putString("password", editTextPassword.getEditText().getText().toString());
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -117,41 +113,48 @@ public class LoginActivity extends BaseToolbarActivity {
         if (!VKSdk.onActivityResult(requestCode, resultCode, data, new VKCallback<VKAccessToken>() {
             @Override
             public void onResult(VKAccessToken res) {
-                // Пользователь успешно авторизовался
+                /**
+                 * Success login
+                 */
                 request_info.executeWithListener(new VKRequest.VKRequestListener() {
                     @Override
                     public void onComplete(VKResponse response) {
-                        //Do complete stuff
+                        final MaterialDialog loadingDialog = APIDialogs.ProgressDialogs.loading(LoginActivity.this);
+                        loadingDialog.show();
+
                         users_full = ((VKList<VKApiUserFull>) response.parsedModel).get(0);
 
-                        FilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/NAU Guide";
-                        FileName = "profilePhoto_200.png";
+                        FilePath = getApplicationInfo().dataDir + "/images";
+                        FileName = "user_avatar.png";
                         PROFILE_PHOTO_LOCATION = FilePath + "/" + FileName;
 
-                        settingsVK
-                                .edit()
-                                        //.putString(VK_NAME_KEY, users_full.first_name + " " + users_full.last_name)
-                                .putString(VK_PHOTO_KEY, users_full.photo_200)
-                                .putString(VK_EMAIL_KEY, VKSdk.getAccessToken().email)
-                                .putInt(VK_ID_KEY, users_full.id)
-                                .putBoolean(VK_SIGNED_KEY, true)
-                                .apply();
 
-                        sharedPrefUtils.setName(users_full.first_name + " " + users_full.last_name);
+                        sharedPrefUtils.performLoginVK(
+                                users_full.first_name + " " + users_full.last_name,
+                                VKAccessToken.currentToken().email,
+                                PROFILE_PHOTO_LOCATION,
+                                users_full.id);
 
-                        settings
-                                .edit()
-                                .putBoolean(SIGNED_IN_KEY, true) /*** Important! Add this after each success login ***/
-                                .putString(PROFILE_PHOTO_LOCATION_KEY, PROFILE_PHOTO_LOCATION)
-                                .apply();
+                        loadAvatar(users_full.photo_200, FilePath, FileName, new AvatarLoadingCallbacks() {
+                            @Override
+                            public void onSuccess() {
+                                loadingDialog.dismiss();
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class)
+                                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                        .putExtra(JUST_SIGNED_KEY, true));
+                                finish();
+                            }
 
+                            @Override
+                            public void onFailed() {
+                                Snackbar.make(rootView, getString(R.string.loading_avatar_failed), Snackbar.LENGTH_LONG).show();
+                            }
 
-                        loadAvatar(users_full.photo_200, FilePath, FileName);
+                            @Override
+                            public void onPrepare() {
 
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                                .putExtra(JUST_SIGNED_KEY, true));
-                        finish();
+                            }
+                        });
 
                         super.onComplete(response);
                     }
@@ -172,8 +175,10 @@ public class LoginActivity extends BaseToolbarActivity {
 
             @Override
             public void onError(VKError error) {
-                // Произошла ошибка авторизации (например, пользователь запретил авторизацию)
-                toastShowLong(getString(R.string.VK_sign_error));
+                /**
+                 * Error during login
+                 */
+                Snackbar.make(rootView, getString(R.string.VK_sign_error), Snackbar.LENGTH_LONG).show();
             }
         })) {
             super.onActivityResult(requestCode, resultCode, data);
@@ -203,11 +208,13 @@ public class LoginActivity extends BaseToolbarActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.login_skip: {
+                hideKeyboard();
                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 finish();
                 break;
             }
             case R.id.login_vk: {
+                hideKeyboard();
                 VKSdk.login(LoginActivity.this, VKScope.EMAIL, VKScope.PHOTOS, VKScope.WALL);
                 break;
             }
@@ -220,8 +227,16 @@ public class LoginActivity extends BaseToolbarActivity {
     }
 
     private void login() {
-        String username = editTextUserName.getEditText().getText().toString().trim();
-        String password = editTextPassword.getEditText().getText().toString().trim();
+        String username = "";
+        String password = "";
+        try {
+            if (editTextUserName.getEditText() != null)
+                username = editTextUserName.getEditText().getText().toString().trim();
+            if (editTextPassword.getEditText() != null)
+                password = editTextPassword.getEditText().getText().toString().trim();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
         Log.d(TAG, "username == " + username + " password == " + password);
 
@@ -253,19 +268,11 @@ public class LoginActivity extends BaseToolbarActivity {
     private void userLogin(final String username, final String password) {
         new AsyncTask<String, Void, String>() {
 
-            MaterialDialog loadingDialog;
+            MaterialDialog loadingDialog = APIDialogs.ProgressDialogs.loading(LoginActivity.this);
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                loadingDialog = new MaterialDialog.Builder(LoginActivity.this)
-                        .content(LoginActivity.this.getResources().getString(R.string.dialog_loading))
-                        .progress(true, 0)
-                        .cancelable(false)
-                        .widgetColor(ContextCompat.getColor(LoginActivity.this, R.color.colorAppPrimary))
-                        .contentColor(ContextCompat.getColor(LoginActivity.this, R.color.black))
-                        .backgroundColor(ContextCompat.getColor(LoginActivity.this, R.color.white))
-                        .build();
                 loadingDialog.show();
             }
 
@@ -288,6 +295,7 @@ public class LoginActivity extends BaseToolbarActivity {
                         final JSONObject jsonObject = new JSONObject(response);
 
                         if (jsonObject.getString("error").equals("true")) {
+                            loadingDialog.dismiss();
                             APIDialogs.AlertDialogs.badLoginOrUsername(LoginActivity.this);
                         } else if (jsonObject.getString("error").equalsIgnoreCase("false")) {
                             doLoginStuff(
@@ -295,42 +303,52 @@ public class LoginActivity extends BaseToolbarActivity {
                                     jsonObject.getString("unique_id"),
                                     jsonObject.getString("email"),
                                     jsonObject.getString("photo_url"),
-                                    jsonObject.getString("token"));
+                                    jsonObject.getString("token"),
+                                    loadingDialog);
                         }
-
                     } catch (Throwable t) {
+                        loadingDialog.dismiss();
                         Log.e("LoginLectorActivty", "Could not parse malformed JSON: \"" + response + "\"");
                     }
                 } else {
-                    Toast.makeText(LoginActivity.this, "Connection error", Toast.LENGTH_LONG).show();
+                    loadingDialog.dismiss();
+                    Snackbar.make(rootView, "Connection error", Snackbar.LENGTH_LONG).show();
                 }
-
-                loadingDialog.dismiss();
             }
         }.execute(username, password);
     }
 
-    private void doLoginStuff(String name, String uniqueId, String email, String photoUrl, String token) {
-        FilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/NAU Guide";
-        FileName = "profilePhoto_200.png";
+    private void doLoginStuff(String name, String uniqueId, String email, String photoUrl, String token, final MaterialDialog loadingDialog) {
+        FilePath = getApplicationInfo().dataDir + "/images";
+        FileName = "user_avatar.png";
         PROFILE_PHOTO_LOCATION = FilePath + "/" + FileName;
 
-        settings
-                .edit()
-                .putBoolean(SIGNED_IN_KEY, true) /*** Important! Add this after each success login ***/
-                .putString(PROFILE_PHOTO_LOCATION_KEY, PROFILE_PHOTO_LOCATION)
-                .putString(sharedPrefUtils.TOKEN_KEY, token)
-                .apply();
+        /*************************************************
+         *  IMPORTANT! ADD THIS AFTER EACH SUCCESS LOGIN *
+         *                                               */
+        sharedPrefUtils.performLogin(name, email, uniqueId, token, PROFILE_PHOTO_LOCATION);
+        /*************************************************/
 
-        loadAvatar(photoUrl, FilePath, FileName, new CircleTransform());
+        loadAvatar(photoUrl, FilePath, FileName, new CircleTransform(), new AvatarLoadingCallbacks() {
+            @Override
+            public void onSuccess() {
+                loadingDialog.dismiss();
+                startActivity(new Intent(LoginActivity.this, MainActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                finish();
+            }
 
-        sharedPrefUtils.setName(name);
-        sharedPrefUtils.setEmail(email);
-        sharedPrefUtils.setUniqueId(uniqueId);
+            @Override
+            public void onFailed() {
+                loadingDialog.dismiss();
+                Snackbar.make(rootView, getString(R.string.loading_avatar_failed), Snackbar.LENGTH_LONG).show();
+            }
 
-        startActivity(new Intent(LoginActivity.this, MainActivity.class)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-        finish();
+            @Override
+            public void onPrepare() {
+
+            }
+        });
     }
 
     @Override
@@ -339,13 +357,13 @@ public class LoginActivity extends BaseToolbarActivity {
         super.onStop();
     }
 
-    public void loadAvatar(String Uri, final String FilePath, final String FileName) {
+    public void loadAvatar(String Uri, final String FilePath, final String FileName, final AvatarLoadingCallbacks callbacks) {
         if (loadtarget == null) loadtarget = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                // do something with the Bitmap
                 try {
                     File dir = new File(FilePath);
+
                     if (!dir.exists())
                         dir.mkdirs();
 
@@ -357,24 +375,26 @@ public class LoginActivity extends BaseToolbarActivity {
                     fOut.close();
                 } catch (Exception e) {
                     e.printStackTrace();
+                } finally {
+                    callbacks.onSuccess();
                 }
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
-
+                callbacks.onFailed();
             }
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
-
+                callbacks.onPrepare();
             }
         };
 
         Picasso.with(this).load(Uri).into(loadtarget);
     }
 
-    public void loadAvatar(String Uri, final String FilePath, final String FileName, Transformation transformation) {
+    public void loadAvatar(String Uri, final String FilePath, final String FileName, Transformation transformation, final AvatarLoadingCallbacks callbacks) {
         if (loadtarget == null) loadtarget = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
@@ -392,16 +412,20 @@ public class LoginActivity extends BaseToolbarActivity {
                     fOut.close();
                 } catch (Exception e) {
                     e.printStackTrace();
+                } finally {
+                    callbacks.onSuccess();
                 }
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
+                callbacks.onFailed();
 
             }
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
+                callbacks.onPrepare();
 
             }
         };
@@ -415,6 +439,14 @@ public class LoginActivity extends BaseToolbarActivity {
             ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
                     hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
+    }
+
+    private interface AvatarLoadingCallbacks {
+        void onSuccess();
+
+        void onFailed();
+
+        void onPrepare();
     }
 
 }

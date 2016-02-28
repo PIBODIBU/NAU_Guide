@@ -50,18 +50,9 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
     private boolean wasInputActive = false;
     private int menuId = -1;
 
-    private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
-    private static final String SIGNED_IN_KEY = EnumSharedPreferences.SIGNED_IN_KEY.toString();
-    private static final String JUST_SIGNED_KEY = EnumSharedPreferences.JUST_SIGNED_KEY.toString();
-    private static final String VK_PREFERENCES = EnumSharedPreferencesVK.VK_PREFERENCES.toString();
-    private static final String VK_SIGNED_KEY = EnumSharedPreferencesVK.VK_SIGNED_KEY.toString();
-    private static final String VK_PHOTO_KEY = EnumSharedPreferencesVK.VK_PHOTO_KEY.toString();
-    private static final String PROFILE_PHOTO_LOCATION_KEY = EnumSharedPreferences.PROFILE_PHOTO_LOCATION_KEY.toString();
     private static final String EXIT_KEY = EnumSharedPreferences.EXIT.toString();
     private static String profilePhotoLocation;
 
-    private SharedPreferences sharedPrefs = null;
-    private SharedPreferences sharedPrefsVK = null;
     private SharedPrefUtils sharedPrefUtils;
 
     public BaseNavigationDrawerActivity() {
@@ -207,9 +198,9 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
          * AccountHeader setup
          */
         ProfileDrawerItem profileMain;
-        profilePhotoLocation = sharedPrefs.getString(PROFILE_PHOTO_LOCATION_KEY, "");
+        profilePhotoLocation = sharedPrefUtils.getProfilePhotoLocation();
 
-        if (sharedPrefs.getBoolean(SIGNED_IN_KEY, false)) {
+        if (sharedPrefUtils.getSignedState()) {
             profileMain = new ProfileDrawerItem().withName(ACCOUNT_NAME).withEmail(ACCOUNT_EMAIL).withIcon(profilePhotoLocation);
         } else {
             profileMain = new ProfileDrawerItem().withIcon(R.drawable.avatar_default);
@@ -227,11 +218,11 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
                     public boolean onProfileChanged(View view, IProfile iProfile, boolean b) {
-                        if (!BaseNavigationDrawerActivity.this.sharedPrefs.getBoolean(SIGNED_IN_KEY, false)) {
+                        if (!sharedPrefUtils.getSignedState()) {
                             startActivity(new Intent(BaseNavigationDrawerActivity.this, LoginActivity.class)
                                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                         } else {
-                            if (!sharedPrefs.getString(sharedPrefUtils.TOKEN_KEY, "").equals("")) {
+                            if (!sharedPrefUtils.getToken().equals("")) {
                                 startActivity(new Intent(BaseNavigationDrawerActivity.this, UserProfileActivity.class)
                                         .putExtra("action", "getMyPage")
                                         .putExtra("uniqueId", sharedPrefUtils.getUniqueId())
@@ -490,7 +481,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
     }
 
-    void setMenuId(int menu) {
+    public void setMenuId(int menu) {
         this.menuId = menu;
     }
 
@@ -519,9 +510,6 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         MethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-
-        sharedPrefs = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
-        sharedPrefsVK = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
-        sharedPrefUtils = new SharedPrefUtils(sharedPrefs, sharedPrefsVK);
+        sharedPrefUtils = new SharedPrefUtils(this);
     }
 }

@@ -18,13 +18,18 @@
             android:tint="@color/colorAppPrimary"
             app:mpb_progressStyle="circular" />
 
-        <ImageView
-            android:id="@+id/reveal_image"
+        <io.codetail.widget.RevealFrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:layout_margin="16dp"
-            android:visibility="invisible" />
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/reveal_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:layout_margin="16dp" />
+
+        </io.codetail.widget.RevealFrameLayout>
 
     </RelativeLayout>
 </RelativeLayout>

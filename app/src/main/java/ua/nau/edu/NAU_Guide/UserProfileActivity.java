@@ -8,37 +8,26 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import ua.nau.edu.Adapters.UserProfileAdapter.Fragments.FragmentInfo;
 import ua.nau.edu.Adapters.UserProfileAdapter.Fragments.FragmentPosts;
 import ua.nau.edu.Adapters.UserProfileAdapter.Fragments.FragmentTimetable;
 import ua.nau.edu.Adapters.UserProfileAdapter.UserProfileAdapter;
 import ua.nau.edu.Enum.Activities;
-import ua.nau.edu.Enum.EnumSharedPreferences;
-import ua.nau.edu.Enum.EnumSharedPreferencesVK;
-import ua.nau.edu.NAU_Guide.LoginLector.LoginLectorActivity;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class UserProfileActivity extends BaseNavigationDrawerActivity {
 
-    private static final String REQUEST_URL = "http://nauguide.esy.es/include/getMyPage.php";
     private static final String TAG = "UserProfileActivity";
 
     private SharedPrefUtils sharedPrefUtils;
-
-    private TextView textView;
-    private ImageView userAvatar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userprofile);
 
-        sharedPrefUtils = new SharedPrefUtils(
-                getSharedPreferences(EnumSharedPreferences.APP_PREFERENCES.toString(), MODE_PRIVATE),
-                getSharedPreferences(EnumSharedPreferencesVK.VK_PREFERENCES.toString(), LoginLectorActivity.MODE_PRIVATE));
+        sharedPrefUtils = new SharedPrefUtils(this);
 
         if (!getIntent().getExtras().getString("getMyPage", "").equals("")) {
             getDrawer(

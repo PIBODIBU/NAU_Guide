@@ -46,15 +46,11 @@ import ua.nau.edu.Systems.CircleTransform;
 import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 
 public class FragmentInfo extends Fragment {
-    private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
 
     private static final String URL_GETMYPAGE = "http://nauguide.esy.es/include/getMyPage.php";
     private static final String URL_GETPAGE = "http://nauguide.esy.es/include/getLector.php";
 
     private static final String TAG = "FragmentInfo";
-    private boolean isBigAvatarLoadingStarted = false;
-
-    private SharedPreferences settings = null;
 
     private View FragmentView;
     private CoordinatorLayout coordinatorLayout;
@@ -64,14 +60,11 @@ public class FragmentInfo extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        settings = this.getActivity().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
 
         supportActivity = (UserProfileActivity) getActivity();
         FragmentView = inflater.inflate(R.layout.fragment_user_info, container, false);
 
-        sharedPrefUtils = new SharedPrefUtils(
-                supportActivity.getSharedPreferences(EnumSharedPreferences.APP_PREFERENCES.toString(), supportActivity.MODE_PRIVATE),
-                supportActivity.getSharedPreferences(EnumSharedPreferencesVK.VK_PREFERENCES.toString(), supportActivity.MODE_PRIVATE));
+        sharedPrefUtils = new SharedPrefUtils(supportActivity);
         coordinatorLayout = (CoordinatorLayout) supportActivity.findViewById(R.id.coordinatorLayout);
 
         switch (getActivity().getIntent().getExtras().getString("action", "")) {
@@ -378,7 +371,6 @@ public class FragmentInfo extends Fragment {
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             if (savedInstanceState != null) {
                 PHOTO_URL = savedInstanceState.getString("PHOTO_URL");
-
             }
 
             dialogBuilder = new AlertDialog.Builder(getActivity());
@@ -396,6 +388,7 @@ public class FragmentInfo extends Fragment {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
 
             if (PHOTO_URL != null && !PHOTO_URL.equals("")) {
+                Log.d(TAG, "Loading big avatar...");
                 Picasso
                         .with(activity)
                         .load(Uri.parse(PHOTO_URL))
@@ -404,7 +397,7 @@ public class FragmentInfo extends Fragment {
                         .into(avatarBig);
             }
 
-            Log.d("FragmentInfo", "Dialog created");
+            Log.d(TAG, "Dialog created");
             return dialog;
         }
 

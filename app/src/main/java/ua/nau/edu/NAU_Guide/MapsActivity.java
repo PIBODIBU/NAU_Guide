@@ -53,6 +53,7 @@ import ua.nau.edu.RecyclerViews.MapsActivity.MapsAdapter;
 import ua.nau.edu.RecyclerViews.MapsActivity.MapsDataModel;
 import ua.nau.edu.Systems.Route;
 import ua.nau.edu.Systems.SearchViewUtils;
+import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
 import ua.nau.edu.University.NAU;
 
 public class MapsActivity extends BaseNavigationDrawerActivity
@@ -61,6 +62,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     }
 
     private final String TAG = this.getClass().getSimpleName();
+
+    private SharedPrefUtils sharedPrefUtils;
 
     private Bundle savedInstanceState;
 
@@ -81,16 +84,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     private Route supportRoute = new Route();
     private FloatingActionMenu fab_menu;
 
-    private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
-    private static final String VK_PREFERENCES = EnumSharedPreferencesVK.VK_PREFERENCES.toString();
-    private static final String VK_INFO_KEY = EnumSharedPreferencesVK.VK_INFO_KEY.toString();
-    private static final String VK_EMAIL_KEY = EnumSharedPreferencesVK.VK_EMAIL_KEY.toString();
-
     private static final String CORP_ID_KEY = EnumExtras.CORP_ID_KEY.toString();
     private static final String CORP_LABEL_KEY = EnumExtras.CORP_LABEL_KEY.toString();
-
-    private static final String CURRENT_LATITUDE = EnumMaps.CURRENT_LATITUDE.toString();
-    private static final String CURRENT_LONGTITUDE = EnumMaps.CURRENT_LONGTITUDE.toString();
 
     private RecyclerView recyclerView;
     private static MapsAdapter adapter;
@@ -101,6 +96,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        sharedPrefUtils = new SharedPrefUtils(this);
 
         if (savedInstanceState != null) {
             this.savedInstanceState = savedInstanceState;
@@ -110,8 +106,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         university.init();
 
 // Get and set system services & Buttons & SharedPreferences & Requests
-        settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
-        settingsVK = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
         methodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
 
         rootView = (RelativeLayout) findViewById(R.id.root_view);
@@ -121,8 +115,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         setUpRecyclerView();
 
         getDrawer(
-                settingsVK.getString(VK_INFO_KEY, ""),
-                settingsVK.getString(VK_EMAIL_KEY, "")
+                sharedPrefUtils.getName(),
+                sharedPrefUtils.getEmail()
         );
     }
 
@@ -419,6 +413,12 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         markerHashMap.put(i, mMapMarker);
     }
 
+    /**
+     * Adding custom marker on GoogleMap
+     *
+     * @param i             loop iterator == merker Id
+     * @param markerOptions new MarkerOptions for custom Marker
+     */
     private void addMarkerCustom(int i, MarkerOptions markerOptions) {
         Marker mMapMarker = mMap.addMarker(markerOptions);
 
@@ -730,7 +730,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
             @Override
             public void onShow(DialogInterface arg) {
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorAppPrimary));
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorAppPrimary));
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
             }
         });
 
