@@ -3,16 +3,13 @@ package ua.nau.edu.NAU_Guide;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.LocationManager;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,6 +26,9 @@ import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -40,20 +40,20 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.Enum.EnumExtras;
-import ua.nau.edu.Enum.EnumMaps;
-import ua.nau.edu.Enum.EnumSharedPreferences;
-import ua.nau.edu.Enum.EnumSharedPreferencesVK;
+import ua.nau.edu.NAU_Guide.Debug.MapsDistanceDataModel;
 import ua.nau.edu.RecyclerViews.MapsActivity.MapsAdapter;
 import ua.nau.edu.RecyclerViews.MapsActivity.MapsDataModel;
-import ua.nau.edu.Systems.Route;
-import ua.nau.edu.Systems.SearchViewUtils;
-import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
+import ua.nau.edu.Support.GoogleMap.GoogleMapUtils;
+import ua.nau.edu.Support.GoogleMap.RouteDrawer.Route;
+import ua.nau.edu.Support.System.HardwareChecks;
+import ua.nau.edu.Support.View.SearchViewUtils;
+import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 import ua.nau.edu.University.NAU;
 
 public class MapsActivity extends BaseNavigationDrawerActivity
@@ -62,6 +62,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     }
 
     private final String TAG = this.getClass().getSimpleName();
+    private final Context activityContext = MapsActivity.this;
 
     private SharedPrefUtils sharedPrefUtils;
 
@@ -73,12 +74,12 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
     private InputMethodManager methodManager;
     private SharedPreferences settings = null;
-    private SharedPreferences settingsVK = null;
     private SearchView searchView;
     private HashMap<Integer, Marker> markerHashMap = new HashMap<>();
 
     private RelativeLayout rootView;
 
+    private GoogleApiClient googleApiClient;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private NAU university;
     private Route supportRoute = new Route();
@@ -92,11 +93,14 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<MapsDataModel> data = new ArrayList<>();
 
+    private boolean isSnackBarDistanceShowing = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         sharedPrefUtils = new SharedPrefUtils(this);
+        settings = getSharedPreferences(SharedPrefUtils.APP_PREFERENCES, MODE_PRIVATE);
 
         if (savedInstanceState != null) {
             this.savedInstanceState = savedInstanceState;
@@ -132,6 +136,14 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
     @Override
     protected void onDestroy() {
+        try {
+            Log.d(TAG, "Disconnecting GoogleClientApi...");
+            googleApiClient.disconnect();
+        } catch (NullPointerException ex) {
+            Log.d(TAG, "Can't disconnect. GoogleClientApi == null", ex);
+        }
+
+        Log.d(TAG, "onDestroy()");
         super.onDestroy();
     }
 
@@ -143,7 +155,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         } else if (recyclerView.getVisibility() == View.GONE) {
             outState.putBoolean("RecyclerViewWasVisible", false);
         }
-
 
         super.onSaveInstanceState(outState);
     }
@@ -171,7 +182,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                         drawer.closeDrawer();
                     } else if (searchView != null) {
                         if (!searchView.isIconified()) {
-                            Animation.Reveal.revealClose(recyclerView);
+                            Animation.Reveal.revealCloseTopRight(recyclerView);
                             searchView.onActionViewCollapsed();
                         } else {
                             super.onBackPressed();
@@ -254,7 +265,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
             public void onClick(int itemId) {
                 // Hide RecyclerView & SearchView & keyboard
                 hideKeyboard();
-                Animation.Reveal.revealClose(recyclerView);
+                Animation.Reveal.revealCloseTopRight(recyclerView);
                 searchView.onActionViewCollapsed();
 
                 // Zooming to marker
@@ -282,7 +293,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
      *
      * @param searchView SearchView for setup
      */
-    private void setUpSearchView(final SearchView searchView, MenuItem searchMenu) {
+    private void setUpSearchView(final SearchView searchView, final MenuItem searchMenu) {
         searchView.setQueryHint(getResources().getString(R.string.maps_search_hint));
         searchView.setOnQueryTextListener(this);
         SearchViewUtils.setHintColor(this, searchView, R.color.searchView_hint_color);
@@ -295,7 +306,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                 searchView.onActionViewExpanded();
                 searchView.setQuery(savedInstanceState.getString("SearchViewQuery", ""), false);
 
-                Animation.Reveal.revealOpen(recyclerView);
+                Animation.Reveal.revealOpenTopRight(recyclerView);
             }
         }
 
@@ -312,7 +323,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
                 // Close RecyclerView & SearchView
                 searchView.onActionViewCollapsed();
-                Animation.Reveal.revealClose(recyclerView);
+                Animation.Reveal.revealCloseTopRight(recyclerView);
 
                 return true;
             }
@@ -324,10 +335,20 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Show RecyclerView
-                Animation.Reveal.revealOpen(recyclerView);
+                searchView.clearFocus();
 
-                addDefaultItems();
+                //Show RecyclerView
+                Animation.Reveal.revealOpenTopRight(recyclerView);
+
+                searchView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        searchView.requestFocus();
+                        showKeyboard();
+                    }
+                }, Animation.Reveal.animDuration);
+
+                addDefaultSearchViewItems();
 
                 // Animating to clicked position
                 adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
@@ -335,7 +356,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                     public void onClick(int itemId) {
                         // Hide RecyclerView & SearchView & keyboard
                         hideKeyboard();
-                        Animation.Reveal.revealClose(recyclerView);
+                        Animation.Reveal.revealCloseTopRight(recyclerView);
                         searchView.onActionViewCollapsed();
 
                         // Zooming to marker
@@ -351,11 +372,15 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     /**
      * Adding default items to RecyclerView.Adapter
      */
-    private void addDefaultItems() {
+    private void addDefaultSearchViewItems() {
         data.clear();
-        for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
-            data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
+
+        HashMap<Integer, String> corpsNames = university.getCorpsInfoNameFull();
+        for (int entryId = 1; entryId <= corpsNames.size(); entryId++) {
+            data.add(new MapsDataModel(corpsNames.get(entryId), entryId));
+            Log.d(TAG, "adding search item with/" + "i: " + entryId);
         }
+
         adapter.setDataSet(data);
         adapter.notifyDataSetChanged();
 
@@ -364,7 +389,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
             public void onClick(int itemId) {
                 // Hide RecyclerView & SearchView & keyboard
                 hideKeyboard();
-                Animation.Reveal.revealClose(recyclerView);
+                Animation.Reveal.revealCloseTopRight(recyclerView);
                 searchView.onActionViewCollapsed();
 
                 // Zooming to marker
@@ -386,9 +411,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
                     if (mMap != null) {
                         setUpMap();
+                        initGoogleApiClient();
                     }
-
-                    openMarkerFromIntent();
                 }
             });
         }
@@ -416,14 +440,18 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     /**
      * Adding custom marker on GoogleMap
      *
-     * @param i             loop iterator == merker Id
-     * @param markerOptions new MarkerOptions for custom Marker
+     * @param i                  loop iterator == merker Id
+     * @param markerOptions      new MarkerOptions for custom Marker
+     * @param markerIdFromIntent Activity was started from button (e.g. on MainActivity), so
+     *                           need to get Id of Marker to open
      */
-    private void addMarkerCustom(int i, MarkerOptions markerOptions) {
+    private void addMarkerCustom(int i, MarkerOptions markerOptions, int markerIdFromIntent) {
         Marker mMapMarker = mMap.addMarker(markerOptions);
 
-        if (getIntent().getIntExtra("MAINACTIVITY_CORP_ID", -1) == i)
-            mainActivityMarker = mMapMarker;
+        if (markerIdFromIntent == i) {
+            Log.d(TAG, "addMarkerCustom()/ Intent: " + markerIdFromIntent + " == Iterator: " + i);
+            openMarkerFromIntent(mMapMarker);
+        }
 
         markerHashMap.put(i, mMapMarker);
     }
@@ -432,23 +460,27 @@ public class MapsActivity extends BaseNavigationDrawerActivity
      * Activity wasn't started from Drawer
      * Need to open marker
      */
-    private void openMarkerFromIntent() {
-        if (mainActivityMarker != null) {
+    private void openMarkerFromIntent(Marker marker) {
+        if (marker != null) {
+            Log.d(TAG, "openMarkerFromIntent() opening marker...");
+
             //Записываем id текущего маркера в глобальную переменную
-            currentMarkerID = getMarkerId(mainActivityMarker);
+            currentMarkerID = getMarkerId(marker);
             Log.i("MainActivity", "currentMarkerID =  " + Integer.toString(currentMarkerID));
 
             //Записываем label текущего маркера в глобальную переменную
-            currentMarkerLabel = university.getCorpsLabel().get(getMarkerId(mainActivityMarker));
+            currentMarkerLabel = university.getCorpsLabel().get(getMarkerId(marker));
 
             //Открываем FabMenu
             fab_menu.open(true);
 
             //Manually open the window
-            mainActivityMarker.showInfoWindow();
+            marker.showInfoWindow();
 
             //Animate to center
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(mainActivityMarker.getPosition()));
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+        } else {
+            Log.e(TAG, "openMarkerFromIntent() mainActivityMarker == null");
         }
     }
 
@@ -461,7 +493,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         CameraPosition cameraPosition_start = new CameraPosition.Builder()
                 .target(nau)      // Sets the center of the map to NAU
                 .zoom(15)                   // Sets the zoom
-                .bearing(160)                // Sets the orientation of the camera to east
+                .bearing(160)               // Sets the orientation of the camera to east
                 .build();                   // Creates a CameraPosition from the builder
 
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition_start));
@@ -483,8 +515,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         new AsyncTask<Void, Void, HashMap<Integer, MarkerOptions>>() {
             @Override
             protected void onPostExecute(HashMap<Integer, MarkerOptions> markerOptions) {
+                int markerIdFromIntent = getIntent().getIntExtra("MAINACTIVITY_CORP_ID", -1);
                 for (int i = 1; i <= markerOptions.size(); i++) {
-                    addMarkerCustom(i, markerOptions.get(i));
+                    addMarkerCustom(i, markerOptions.get(i), markerIdFromIntent);
                 }
             }
 
@@ -561,19 +594,19 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                     @Override
                     protected void onPreExecute() {
                         super.onPreExecute();
-                        Toast.makeText(MapsActivity.this, "Получение маршрута", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activityContext, "Получение маршрута", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     protected Void doInBackground(Void... params) {
                         if (!currentMarkerLabel.equals("") && currentMarkerID != 0 && currentMarkerID > 0 && currentMarkerID <= university.getHashMapSize()) {
-                            if (isInternetAvailable()) {
+                            if (HardwareChecks.isInternetAvailable()) {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
                                         supportRoute.clearPath();
 
-                                        supportRoute.drawRoute(mMap, MapsActivity.this, getMyCoordinate(), university.getCorps().get(currentMarkerID),
+                                        supportRoute.drawRoute(mMap, activityContext, getMyCoordinate(), university.getCorps().get(currentMarkerID),
                                                 Route.TRANSPORT_WALKING, false, Route.LANGUAGE_RUSSIAN, R.drawable.ic_place_black_24dp);
 
                                         CameraPosition currentPosition = new CameraPosition.Builder()
@@ -588,7 +621,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        showInternetDisabledAlertToUser();
+                                        APIDialogs.AlertDialogs.internetConnectionError(activityContext);
                                     }
                                 });
                             }
@@ -602,12 +635,14 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         fab_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!currentMarkerLabel.equals("") && currentMarkerID != 0 && currentMarkerID > 0 && currentMarkerID <= university.getHashMapSize()) {
-                    settings.edit().putInt(CORP_ID_KEY, currentMarkerID).apply();
+                if (!currentMarkerLabel.equals("") &&
+                        currentMarkerID != 0 && currentMarkerID > 0 &&
+                        currentMarkerID <= university.getHashMapSize()) {
 
-                    startActivity(new Intent(MapsActivity.this, InfoActivity.class)
+                    startActivity(new Intent(activityContext, InfoActivity.class)
                             .putExtra(CORP_ID_KEY, currentMarkerID)
                             .putExtra(CORP_LABEL_KEY, currentMarkerLabel));
+
                 }
             }
         });
@@ -615,14 +650,12 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         fab_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MapsActivity.this, FloorActivity.class));
-                /*mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(-33.86997, 151.2089), 18));*/
+                APIDialogs.AlertDialogs.customDialog(activityContext, "Внимание", "Сервис находится в разработке");
+                //startActivity(new Intent(activityContext, FloorActivity.class));
             }
         });
     }
 
-    //Получение айди маркера
     private int getMarkerId(Marker marker) {
         String s = marker.getId();
         s = s.substring(1, s.length());
@@ -632,38 +665,12 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     }
 
     private void zoomToMyLocation() {
-        new AsyncTask<Boolean, Void, Boolean>() {
-            @Override
-            protected void onPreExecute() {
-                Toast.makeText(getApplicationContext(), "Получение координат...", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            protected Boolean doInBackground(Boolean... params) {
-                if (isGPSEnabled()) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            LatLng latLng = new LatLng(mMap.getMyLocation().getLatitude(), mMap.getMyLocation().getLongitude());
-                            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16);
-                            mMap.animateCamera(cameraUpdate);
-                        }
-                    });
-
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(Boolean aBool) {
-                if (aBool)
-                    Toast.makeText(getApplicationContext(), "Получено!", Toast.LENGTH_SHORT).show();
-                else
-                    showGPSDisabledAlertToUser();
-            }
-        }.execute();
+        if (HardwareChecks.isWifiEnabled(this)) {
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(getMyCoordinate(), 16);
+            mMap.animateCamera(cameraUpdate);
+        } else {
+            APIDialogs.AlertDialogs.wifiDisabled(this);
+        }
     }
 
     /**
@@ -680,89 +687,120 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     }
 
     private LatLng getMyCoordinate() {
-        return new LatLng(mMap.getMyLocation().getLatitude(), mMap.getMyLocation().getLongitude());
-    }
+        Location currentLocation = null;
 
-    public boolean isInternetAvailable() {
-        Runtime runtime = Runtime.getRuntime();
         try {
-            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
-            int exitValue = ipProcess.waitFor();
-            return (exitValue == 0);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+        } catch (SecurityException ex) {
+            ex.printStackTrace();
+            Log.e(TAG, "getMyCoordinate() -> ", ex);
         }
 
-        return false;
-    }
-
-    public boolean isGPSEnabled() {
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-            return true;
+        if (currentLocation != null)
+            return new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
         else
-            return false;
+            return null;
     }
 
-    private void showGPSDisabledAlertToUser() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    /**
+     * Find the nearest point to user's location
+     *
+     * @param myLocation LatLng Object which points to user's current location
+     * @param points     HashMap<Integer, LatLng> Object, which contains points for comparing
+     * @return Key of points - object, which has minimal distance to user
+     */
+    private MapsDistanceDataModel findMinDistance(LatLng myLocation, HashMap<Integer, LatLng> points) {
+        int minId = -1;
+        double currentMin;
+        double previousMin = -1;
+        double minimalDistance = -1;
 
-        builder
-                .setMessage("Для определения местоположения необходимо включить GPS. Включить GPS сейчас?")
-                .setCancelable(false)
-                .setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                })
-                .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        dialog.cancel();
-                    }
-                });
-
-        final AlertDialog dialog = builder.create();
-
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface arg) {
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorAppPrimary));
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+        for (Map.Entry<Integer, LatLng> entry : points.entrySet()) {
+            currentMin = GoogleMapUtils.getDistanceBetweenPoints(myLocation, entry.getValue());
+            if (currentMin < previousMin) {
+                minId = entry.getKey();
+                minimalDistance = currentMin;
             }
-        });
+            previousMin = currentMin;
+        }
 
-        dialog.show();
+        Log.d(TAG, "minDistance = " + minimalDistance + "\nminId = " + minId);
+
+        return new MapsDistanceDataModel(minId, minimalDistance);
     }
 
-    private void showInternetDisabledAlertToUser() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder
-                .setTitle("Ошибка")
-                .setMessage("Нету соединения с Интернетом. Пожалуйста, проверьте настройки сети.")
-                .setCancelable(false)
-                .setNegativeButton("Ок", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        dialog.cancel();
-                    }
-                });
-        final AlertDialog dialog = builder.create();
+    private void initGoogleApiClient() {
+        // Create an instance of GoogleAPIClient.
+        if (googleApiClient == null) {
+            googleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                        @Override
+                        public void onConnected(Bundle bundle) {
+                            /*Log.d(TAG, "googleApiClient/ onConnected()");
 
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface arg) {
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorAppPrimary));
-            }
-        });
+                            LocationRequest mLocationRequest = new LocationRequest();
+                            mLocationRequest.setInterval(1000);
+                            mLocationRequest.setFastestInterval(1000);
+                            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                            mLocationRequest.setSmallestDisplacement(0);
 
-        dialog.show();
+                            try {
+                                LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, mLocationRequest, new LocationListener() {
+                                    @Override
+                                    public void onLocationChanged(Location location) {
+                                        double distance = GoogleMapUtils.getDistanceBetweenPoints(
+                                                new LatLng(location.getLatitude(), location.getLongitude()), new LatLng(50.437476, 30.428322));
+
+                                        Log.d(TAG, "getDistanceBetweenPoints()/ Distance to NAU == " + distance);
+
+                                        if (distance <= 1.0) {
+                                            Log.d(TAG, "You are in NAU area");
+                                        }
+
+                                        MapsDistanceDataModel minDistance = findMinDistance(getMyCoordinate(), university.getCorps());
+                                        isSnackBarDistanceShowing = true;
+                                        final Snackbar snackbarD = Snackbar.make(rootView, university.getCorpsLabel().get(minDistance.getMinId())
+                                                + " -> " + minDistance.getDistance(), Snackbar.LENGTH_INDEFINITE);
+                                        snackbarD.setAction("Ok. bro", new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                snackbarD.dismiss();
+                                                isSnackBarDistanceShowing = false;
+                                            }
+                                        }).show();
+                                    }
+                                });
+                            } catch (SecurityException e) {
+                                e.printStackTrace();
+                            }*/
+                        }
+
+                        @Override
+                        public void onConnectionSuspended(int i) {
+                            Log.d(TAG, "googleApiClient/ onConnectionSuspended()");
+                        }
+                    })
+                    .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                        @Override
+                        public void onConnectionFailed(ConnectionResult connectionResult) {
+                            Log.d(TAG, "googleApiClient/ onConnectionFailed()");
+                        }
+                    })
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+
+        googleApiClient.connect();
     }
 
     private void hideKeyboard() {
         if (getCurrentFocus() != null)
             methodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+    }
+
+    private void showKeyboard() {
+        if (getCurrentFocus() != null)
+            methodManager.showSoftInput(getCurrentFocus(), 0);
     }
 
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <color name="material_drawer_primary_text">@color/colorTextPrimary</color>
     <color name="material_drawer_selected_text">@color/colorAppPrimary</color>
-    <color name="material_drawer_primary_text">@color/grey</color>
     <color name="material_text_color">#263238</color>
     <color name="material_text_color_hint">#BDBDBD</color>
     <color name="material_edittext_border">#C5C5C5</color>
@@ -13,22 +13,39 @@
     <color name="white">#ffffff</color>
     <color name="red">#f44336</color>
 
-    <color name="colorAppPrimary">#0288d1</color>
+    <color name="material_yellow">@color/md_lime_A700</color>
+
+    <color name="colorAppPrimary">#2196F3</color>
+    <color name="colorAppAccent">#009688</color>
+    <color name="colorAppDark">#1976D2</color>
+    <color name="colorTextPrimary">#212121</color>
+    <color name="colorTextSecondary">#727272</color>
+    <color name="colorDivider">#B6B6B6</color>
+
     <color name="colorAppPressed">#02a6ff</color>
     <color name="colorAppRipped">#0288d1</color>
     <color name="actionbar_gradient_end">#88333333</color>
 
+    <color name="recyclerview_background">#ebedf0</color>
+
     <color name="black">#000000</color>
 
-    <color name="lectors_list_item_selected">#1a0288d1</color>
+    <color name="lectors_list_item_selected">#1A0288d1</color>
     <color name="lectors_list_item_normal">@android:color/transparent</color>
 
-    <color name="searchView_hint_color">#8Cbdbdbd</color>
+    <color name="searchView_hint_color">#99bdbdbd</color>
+
+    <color name="blue_10">#1A0288d1</color>
+
+    <color name="material_green">#4CAF50</color>
+    <color name="material_teal">#009688</color>
+    <color name="material_red">#F44336</color>
+    <color name="material_purple">#9C27B0</color>
 
 </resources>
 
     <!--
-    Transparency (Add it before hex color)
+    Transparency (Add it before color)
     100% — FF
     95% — F2
     90% — E6

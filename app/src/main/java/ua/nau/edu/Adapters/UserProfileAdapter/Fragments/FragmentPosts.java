@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.gc.materialdesign.views.ProgressBarIndeterminate;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -22,13 +21,12 @@ import java.util.ArrayList;
 import ua.nau.edu.API.APILoaderBuilder;
 import ua.nau.edu.API.APIRefreshBuilder;
 import ua.nau.edu.API.APIStrings;
-import ua.nau.edu.NAU_Guide.LectorsListActivity;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.NAU_Guide.UpdatePostActivity;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
-import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
+import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 
 public class FragmentPosts extends Fragment {
 

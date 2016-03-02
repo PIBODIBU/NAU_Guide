@@ -4,23 +4,28 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.support.v4.app.FragmentTransaction;
+import android.widget.Button;
 
 import ua.nau.edu.Adapters.UserProfileAdapter.Fragments.FragmentInfo;
 import ua.nau.edu.Adapters.UserProfileAdapter.Fragments.FragmentPosts;
 import ua.nau.edu.Adapters.UserProfileAdapter.Fragments.FragmentTimetable;
 import ua.nau.edu.Adapters.UserProfileAdapter.UserProfileAdapter;
 import ua.nau.edu.Enum.Activities;
-import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
+import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 
 public class UserProfileActivity extends BaseNavigationDrawerActivity {
 
     private static final String TAG = "UserProfileActivity";
 
     private SharedPrefUtils sharedPrefUtils;
+
+    public CollapsingToolbarLayout collapsingToolbarLayout;
+    private boolean frIsShow = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,15 +34,9 @@ public class UserProfileActivity extends BaseNavigationDrawerActivity {
 
         sharedPrefUtils = new SharedPrefUtils(this);
 
-        if (!getIntent().getExtras().getString("getMyPage", "").equals("")) {
-            getDrawer(
-                    sharedPrefUtils.getName(),
-                    sharedPrefUtils.getEmail());
-        } else {
-            getDrawerWithBackArrow(
-                    sharedPrefUtils.getName(),
-                    sharedPrefUtils.getEmail());
-        }
+        getDrawerWithBackArrow(
+                sharedPrefUtils.getName(),
+                sharedPrefUtils.getEmail());
 
         new AsyncTask<Void, Void, Void>() {
 
@@ -49,9 +48,9 @@ public class UserProfileActivity extends BaseNavigationDrawerActivity {
             protected void onPreExecute() {
                 super.onPreExecute();
 
-                CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-                //collapsingToolbarLayout.setTitle("Профиль");
-                collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(UserProfileActivity.this, android.R.color.transparent));
+                collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+                //collapsingToolbarLayout.setTitle("BIG BIG BIG BIG TEXT");
+                //collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(UserProfileActivity.this, android.R.color.transparent));
             }
 
             @Override
@@ -79,8 +78,6 @@ public class UserProfileActivity extends BaseNavigationDrawerActivity {
 
         if (getIntent().getStringExtra("action").equals("getMyPage"))
             this.drawer.setSelection(Activities.UserProfileActivity.ordinal());
-
-
     }
 
     @Override

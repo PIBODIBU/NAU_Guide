@@ -63,7 +63,7 @@ dependencies {
     compile 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
     compile 'com.sothree.slidinguppanel:library:3.1.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.github.clans:fab:1.6.1'
+    compile 'com.github.clans:fab:1.6.2'
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.jpardogo.materialtabstrip:library:1.1.0'
     compile 'com.github.jd-alexander:library:1.0.7'

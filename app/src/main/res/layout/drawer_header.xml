@@ -5,5 +5,4 @@
     android:adjustViewBounds="true"
     android:clickable="false"
     android:orientation="vertical"
-    android:scaleType="fitCenter"
-    android:src="@drawable/header_png" />
+    android:scaleType="fitCenter" />

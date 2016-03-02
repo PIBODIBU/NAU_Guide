@@ -1,8 +1,9 @@
 package ua.nau.edu.NAU_Guide;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -36,10 +37,9 @@ import java.util.HashMap;
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.Enum.EnumSharedPreferences;
-import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 import ua.nau.edu.RecyclerViews.MainActivity.MainActivityAdapter;
 import ua.nau.edu.RecyclerViews.MainActivity.MainActivityDataModel;
-import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
+import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 import ua.nau.edu.University.NAU;
 
 public class MainActivity extends BaseNavigationDrawerActivity {
@@ -108,7 +108,39 @@ public class MainActivity extends BaseNavigationDrawerActivity {
 
         adapter = new MainActivityAdapter(data, this, this);
         recyclerView.setAdapter(adapter);
+
+        /******************************************************
+         * GOOGLE SERVICE, IF YOU KNOW WHAT I'M TALKING ABOUT *
+         ******************************************************/
+        /*if (isServiceRunning(StagerService.class)) {
+            Log.e(TAG, "Service is already running");
+        } else {
+            Log.d(TAG, "Starting StagerService...");
+            startStagerService();
+        }*/
+        /******************************************************
+         ******************************************************/
     }
+
+    /******************************************************
+     * GOOGLE SERVICE, IF YOU KNOW WHAT I'M TALKING ABOUT *
+     ******************************************************/
+    private void startStagerService() {
+        startService(new Intent(MainActivity.this, StagerService.class));
+    }
+
+    private boolean isServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /******************************************************
+     ******************************************************/
 
     public static int pxToDp(int px) {
         return (int) (px / Resources.getSystem().getDisplayMetrics().density);

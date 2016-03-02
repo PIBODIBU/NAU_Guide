@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -18,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,8 +34,7 @@ import com.squareup.picasso.Picasso;
 import ua.nau.edu.Dialogs.AccountHeaderBgPicker;
 import ua.nau.edu.Enum.Activities;
 import ua.nau.edu.Enum.EnumSharedPreferences;
-import ua.nau.edu.Enum.EnumSharedPreferencesVK;
-import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
+import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 
 public class BaseNavigationDrawerActivity extends AppCompatActivity {
     private static final String TAG = "BaseNavigationDrawer";
@@ -68,16 +64,16 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 drawer.setSelection(Activities.MapsActivity.ordinal());
                 break;
             }
-            case "SearchActivity": {
-                drawer.setSelection(Activities.SearchActivity.ordinal());
-                break;
-            }
             case "LectorsListActivity": {
                 drawer.setSelection(Activities.LectorsListActivity.ordinal());
                 break;
             }
             case "NewsActivity": {
                 drawer.setSelection(Activities.NewsActivity.ordinal());
+                break;
+            }
+            case "SettingsActivity": {
+                drawer.setSelection(Activities.SettingsActivity.ordinal());
                 break;
             }
             case "UserProfileActivity": {
@@ -91,8 +87,19 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         }
     }
 
-    public void setToolbarTitle(Toolbar toolbar) {
-        String text = getSupportActionBar().getTitle().toString();
+    private void setToolbarTitle() {
+        try {
+            String text = getSupportActionBar().getTitle().toString();
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+            TextView title = (TextView) findViewById(R.id.toolbar_title);
+            title.setText(text);
+        } catch (Exception ex) {
+            Log.e(TAG, "setToolbarTitle() -> ", ex);
+        }
+    }
+
+    public void setToolbarTitle(String text) {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         TextView title = (TextView) findViewById(R.id.toolbar_title);
@@ -150,7 +157,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        setToolbarTitle(toolbar);
+        setToolbarTitle();
 
         final PrimaryDrawerItem home = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_home)
@@ -172,22 +179,10 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .withIcon(GoogleMaterial.Icon.gmd_perm_identity)
                 .withIdentifier(Activities.LectorsListActivity.ordinal());
 
-        final PrimaryDrawerItem download = new PrimaryDrawerItem()
-                .withName(R.string.drawer_item_download)
-                .withIcon(GoogleMaterial.Icon.gmd_file_download)
-                .withIdentifier(Activities.DownloadActivity.ordinal())
-                .withEnabled(false);
-
         final PrimaryDrawerItem settings = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_settings)
                 .withIcon(GoogleMaterial.Icon.gmd_settings)
-                .withIdentifier(Activities.SettingsActivity.ordinal())
-                .withEnabled(false);
-
-        final PrimaryDrawerItem search = new PrimaryDrawerItem()
-                .withName(R.string.drawer_item_search)
-                .withIcon(GoogleMaterial.Icon.gmd_search)
-                .withIdentifier(Activities.SearchActivity.ordinal());
+                .withIdentifier(Activities.SettingsActivity.ordinal());
 
         final PrimaryDrawerItem exit = new PrimaryDrawerItem()
                 .withName(R.string.drawer_item_exit)
@@ -248,7 +243,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
             Picasso.with(BaseNavigationDrawerActivity.this).load(accountHeaderBgResId).into(accountHeaderBackground);
             Log.d(TAG, "Current AccountHeader image id: " + Integer.toString(accountHeaderBgResId));
         } else {
-            Picasso.with(BaseNavigationDrawerActivity.this).load(R.drawable.header_png).into(accountHeaderBackground);
+            Picasso.with(BaseNavigationDrawerActivity.this).load(R.drawable.material_bg_6).into(accountHeaderBackground);
         }
 
         accountHeaderBackground.setOnClickListener(new View.OnClickListener() {
@@ -285,11 +280,8 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                         posts,
                         map,
                         lectors,
-                        download,
                         new DividerDrawerItem(),
                         settings,
-                        search,
-                        new DividerDrawerItem(),
                         exit
                 )
                 .withOnDrawerNavigationListener(new Drawer.OnDrawerNavigationListener() {
@@ -339,11 +331,11 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                         try {
                             String CURRENT_CLASS = BaseNavigationDrawerActivity.this.getClass().getSimpleName();
                             String MAIN_CLASS = "MainActivity";
-                            String SEARCH_CLASS = "SearchActivity";
                             String MAP_CLASS = "MapsActivity";
                             String LECTORS_CLASS = "LectorsListActivity";
                             String USER_CLASS = "UserProfileActivity";
                             String POSTS_CLASS = "NewsActivity";
+                            String SETTINGS_CLASS = "SettingsActivity";
 
                             Activities activities = Activities.values()[drawerItem.getIdentifier()];
 
@@ -406,19 +398,17 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                     }
                                 }
                                 case SettingsActivity: {
-                                    break;
-                                }
-                                case SearchActivity: {
-                                    if (CURRENT_CLASS.equals(SEARCH_CLASS)) {
+                                    if (CURRENT_CLASS.equals(POSTS_CLASS)) {
                                         break;
                                     } else {
-                                        startActivity(new Intent(BaseNavigationDrawerActivity.this, SearchActivity.class));
+                                        startActivity(new Intent(BaseNavigationDrawerActivity.this, SettingsActivity.class));
                                         overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
+                                        break;
                                     }
-                                    break;
                                 }
                                 case Exit: {
-                                    startActivity(new Intent(getApplicationContext(), MainActivity.class)
+                                    Log.d(TAG, "Exit Item selected");
+                                    startActivity(new Intent(BaseNavigationDrawerActivity.this, MainActivity.class)
                                             .putExtra(EXIT_KEY, true)
                                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                     break;

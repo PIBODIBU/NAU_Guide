@@ -1,44 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/scroll"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_below="@+id/tabs">
 
-    <RelativeLayout
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="В разработке"
+        android:textColor="@color/material_text_color"
+        android:textSize="24sp" />
 
-        <RelativeLayout
-            android:id="@+id/block_gerb"
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:layout_margin="8dp"
-            android:background="@color/white" />
-
-        <RelativeLayout
-            android:id="@+id/call_block"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_below="@+id/block_gerb"
-            android:layout_margin="8dp"
-            android:background="@color/white" />
-
-        <RelativeLayout
-            android:id="@+id/web_block"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_below="@+id/call_block"
-            android:layout_margin="8dp"
-            android:background="@color/white" />
-
-        <RelativeLayout
-            android:id="@+id/main_4"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_below="@+id/web_block"
-            android:layout_margin="8dp"
-            android:background="@color/white" />
-
-    </RelativeLayout>
-</ScrollView>
+</RelativeLayout>

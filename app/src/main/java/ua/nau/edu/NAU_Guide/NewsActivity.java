@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -29,7 +30,7 @@ import ua.nau.edu.API.APIUpdateBuilder;
 import ua.nau.edu.API.APIValues;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
-import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
+import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 
 public class NewsActivity extends BaseNavigationDrawerActivity {
 
@@ -98,7 +99,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
 
         if (isLoggedAsLector()) {
             Log.i(TAG, "setUpViews/ is logged in as lector");
-            ButtonFloat FABCreatePost = (ButtonFloat) findViewById(R.id.fab_create_post);
+            FloatingActionButton FABCreatePost = (FloatingActionButton) findViewById(R.id.fab_create_post);
             FABCreatePost.setVisibility(View.VISIBLE);
             FABCreatePost.setOnClickListener(new View.OnClickListener() {
                 @Override

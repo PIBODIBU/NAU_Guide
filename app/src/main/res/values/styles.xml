@@ -1,13 +1,16 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+
+        <item name="windowActionModeOverlay">true</item>
+
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColorSecondary">@color/white</item>
         <item name="android:textColorHint">@color/white</item>
 
         <item name="colorPrimary">@color/colorAppPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/colorAppDark</item>
+        <item name="colorAccent">@color/colorAppAccent</item>
 
         <item name="actionModeStyle">@style/AppTheme.ActionMode</item>
 
@@ -21,6 +24,15 @@
 
     </style>
 
+    <style name="AppTheme.TabLayout" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="tabTextAppearance">@style/AppTheme.TabLayout.Text</item>
+        <item name="tabSelectedTextColor">@color/white</item>
+    </style>
+
+    <style name="AppTheme.TabLayout.Text" parent="TextAppearance.AppCompat.Button">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
 
     <style name="AppTheme.ToolBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:textColorSecondary">@color/black</item>
@@ -32,6 +44,8 @@
 
     <style name="AppTheme.ActionMode">
         <item name="background">@color/colorAppPrimary</item>
+        <item name="android:height">?android:attr/actionBarSize</item>
+        <item name="android:gravity">center_vertical</item>
         <item name="android:background">@color/colorAppPrimary</item>
         <item name="titleTextStyle">@style/AppTheme.ActionMode.Title</item>
     </style>

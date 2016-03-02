@@ -7,7 +7,7 @@
         android:id="@+id/scrollableview"
         android:layout_width="match_parent"
         android:layout_height="1000dp"
-        android:background="@color/grey_bg"
+        android:background="@color/recyclerview_background"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <android.support.v7.widget.CardView

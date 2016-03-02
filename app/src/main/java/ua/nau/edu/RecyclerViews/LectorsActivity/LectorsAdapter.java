@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
-import ua.nau.edu.Systems.CircleTransform;
+import ua.nau.edu.Support.Picasso.CircleTransform;
 
 public class LectorsAdapter extends RecyclerView.Adapter<LectorsAdapter.BaseViewHolder> {
 

@@ -8,16 +8,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,8 +27,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-
-import android.support.design.widget.Snackbar;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -42,6 +42,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -49,66 +50,52 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import ua.nau.edu.Enum.EnumExtras;
-import ua.nau.edu.Enum.EnumMaps;
-import ua.nau.edu.Enum.EnumSharedPreferences;
-import ua.nau.edu.Enum.EnumSharedPreferencesVK;
+import ua.nau.edu.NAU_Guide.Animation;
 import ua.nau.edu.NAU_Guide.BaseNavigationDrawerActivity;
 import ua.nau.edu.NAU_Guide.FloorActivity;
 import ua.nau.edu.NAU_Guide.InfoActivity;
-import ua.nau.edu.NAU_Guide.MainActivity;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.RecyclerViews.MapsActivity.MapsAdapter;
 import ua.nau.edu.RecyclerViews.MapsActivity.MapsDataModel;
-import ua.nau.edu.Systems.Route;
+import ua.nau.edu.Support.GoogleMap.GoogleMapUtils;
+import ua.nau.edu.Support.GoogleMap.RouteDrawer.Route;
+import ua.nau.edu.Support.View.SearchViewUtils;
+import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 import ua.nau.edu.University.NAU;
 
 public class MapsTestActivity extends BaseNavigationDrawerActivity
-        implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, SearchView.OnQueryTextListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+        implements GoogleMap.OnMarkerClickListener, SearchView.OnQueryTextListener {
     public MapsTestActivity() {
     }
 
-    private static final String TAG = "MapsTestActivity";
+    private final String TAG = this.getClass().getSimpleName();
+
+    private SharedPrefUtils sharedPrefUtils;
+
+    private Bundle savedInstanceState;
 
     private int currentMarkerID = -1;
     private String currentMarkerLabel = "";
     private Marker mainActivityMarker = null;
-    private Marker myLocationMarker;
 
     private InputMethodManager methodManager;
     private SharedPreferences settings = null;
-    private SharedPreferences settingsVK = null;
     private SearchView searchView;
     private HashMap<Integer, Marker> markerHashMap = new HashMap<>();
-    private HashMap<Integer, String> nauCorpNamesFull;
-    private HashMap<Integer, String> nauCorpNamesShort;
 
     private RelativeLayout rootView;
 
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private GoogleApiClient googleApiClient;
+    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private NAU university;
     private Route supportRoute = new Route();
     private FloatingActionMenu fab_menu;
 
-    private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
-    private static final String VK_PREFERENCES = EnumSharedPreferencesVK.VK_PREFERENCES.toString();
-    private static final String VK_INFO_KEY = EnumSharedPreferencesVK.VK_INFO_KEY.toString();
-    private static final String VK_EMAIL_KEY = EnumSharedPreferencesVK.VK_EMAIL_KEY.toString();
-
     private static final String CORP_ID_KEY = EnumExtras.CORP_ID_KEY.toString();
     private static final String CORP_LABEL_KEY = EnumExtras.CORP_LABEL_KEY.toString();
-
-    private static final String CURRENT_LATITUDE = EnumMaps.CURRENT_LATITUDE.toString();
-    private static final String CURRENT_LONGTITUDE = EnumMaps.CURRENT_LONGTITUDE.toString();
-
-    /**
-     * GoogleApiClient variables
-     */
-    private static int UPDATE_INTERVAL = 1000; // 5 sec
-    private static int FATEST_INTERVAL = 1000; // 5 sec
-    private static int DISPLACEMENT = 0; // 1 meters
 
     private RecyclerView recyclerView;
     private static MapsAdapter adapter;
@@ -119,116 +106,58 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        sharedPrefUtils = new SharedPrefUtils(this);
+        settings = getSharedPreferences(SharedPrefUtils.APP_PREFERENCES, MODE_PRIVATE);
+
+        if (savedInstanceState != null) {
+            this.savedInstanceState = savedInstanceState;
+        }
 
         university = new NAU(this);
         university.init();
 
 // Get and set system services & Buttons & SharedPreferences & Requests
-        settings = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
-        settingsVK = getSharedPreferences(VK_PREFERENCES, MainActivity.MODE_PRIVATE);
         methodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
 
         rootView = (RelativeLayout) findViewById(R.id.root_view);
-        nauCorpNamesFull = university.getCorpsInfoNameFull();
-        nauCorpNamesShort = university.getCorpsInfoNameShort();
 
+        setUpMapIfNeeded();
+        initFloatingActionMenu();
+        setUpRecyclerView();
+
+        getDrawer(
+                sharedPrefUtils.getName(),
+                sharedPrefUtils.getEmail()
+        );
+    }
+
+    private void setUpRecyclerView() {
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview_user_data);
         recyclerView.setHasFixedSize(true);
-        //recyclerView.addItemDecoration(new DividerItemDecoration(this));
-
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         adapter = new MapsAdapter(data, this);
         recyclerView.setAdapter(adapter);
-
-        getDrawer(
-                settingsVK.getString(VK_INFO_KEY, ""),
-                settingsVK.getString(VK_EMAIL_KEY, "")
-        );
-
-        initGoogleApiClient();
-        setUpMapIfNeeded();
-        initFloatingActionMenu();
     }
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy()/ Disconnecting GoogleApiClient...");
         googleApiClient.disconnect();
         super.onDestroy();
     }
 
-    private void initGoogleApiClient() {
-        if (googleApiClient == null) {
-            googleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
-        googleApiClient.connect();
-    }
-
-    private void createLocationRequest() {
-        LocationRequest mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(UPDATE_INTERVAL);
-        mLocationRequest.setFastestInterval(FATEST_INTERVAL);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setSmallestDisplacement(DISPLACEMENT);
-
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, mLocationRequest, this);
-    }
-
     @Override
-    public void onConnected(Bundle bundle) {
-        Log.d(TAG, "GoogleApiClient/ Connected");
-
-        // TODO Remove debug items
-        Snackbar.make(rootView, "Connected to GoogleApiClient", Snackbar.LENGTH_LONG).show();
-
-        try {
-            myLocationMarker = mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(LocationServices.FusedLocationApi.getLastLocation(googleApiClient).getLatitude(),
-                            LocationServices.FusedLocationApi.getLastLocation(googleApiClient).getLongitude()))
-                    .title("My Location")
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.avatar_default)));
-        } catch (SecurityException ex) {
-            ex.printStackTrace();
+    protected void onSaveInstanceState(Bundle outState) {
+        if (recyclerView.getVisibility() == View.VISIBLE) {
+            outState.putString("SearchViewQuery", searchView.getQuery().toString());
+            outState.putBoolean("RecyclerViewWasVisible", true);
+        } else if (recyclerView.getVisibility() == View.GONE) {
+            outState.putBoolean("RecyclerViewWasVisible", false);
         }
 
-        createLocationRequest();
-    }
 
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.d(TAG, "GoogleApiClient/ ConnectionSuspended");
-
-        // TODO Remove debug items
-        Snackbar.make(rootView, "Connection to GoogleApiClient is suspended", Snackbar.LENGTH_LONG).show();
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.d(TAG, "GoogleApiClient/ Connection failed");
-
-        // TODO Remove debug items
-        Snackbar.make(rootView, "Connection to GoogleApiClient failed", Snackbar.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        Log.d(TAG, "LocationServices/ onLocationChanged(): " + location.getLatitude() + ", " + location.getLongitude());
-
-        // TODO Remove debug items
-        Snackbar.make(rootView, location.getLatitude() + ", " + location.getLongitude(), Snackbar.LENGTH_LONG).show();
-
-        myLocationMarker.remove();
-        myLocationMarker = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                .title("My Location")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -239,67 +168,55 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
     }
 
     @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        try {
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_MENU: {
+                    if (drawer.isDrawerOpen())
+                        drawer.closeDrawer();
+                    else
+                        drawer.openDrawer();
+                    break;
+                }
+                case KeyEvent.KEYCODE_BACK: {
+                    if (drawer.isDrawerOpen()) { // Check if Drawer is opened
+                        drawer.closeDrawer();
+                    } else if (searchView != null) {
+                        if (!searchView.isIconified()) {
+                            Animation.Reveal.revealCloseTopRight(recyclerView);
+                            searchView.onActionViewCollapsed();
+                        } else {
+                            super.onBackPressed();
+                            overridePendingTransition(R.anim.pull_in_left, R.anim.push_out_right);
+                        }
+                    } else {
+                        super.onBackPressed();
+                        overridePendingTransition(R.anim.pull_in_left, R.anim.push_out_right);
+                    }
+
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_maps, menu);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        MenuItem searchItem = menu.findItem(R.id.search);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
-        searchView.setQueryHint(getResources().getString(R.string.maps_search_hint));
-        searchView.setOnQueryTextListener(this);
-
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                searchView.onActionViewCollapsed();
-
-                if (getCurrentFocus() != null) {
-                    methodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-                }
-
-                recyclerView.setVisibility(View.VISIBLE);
-
-                return true;
-            }
-        });
-
-        searchView.setOnSearchClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                recyclerView.setVisibility(View.VISIBLE);
-
-                data.clear();
-
-                if (data.size() == 0) {
-                    for (int i = 1; i <= nauCorpNamesFull.size(); i++) {
-                        data.add(new MapsDataModel(nauCorpNamesFull.get(i), i));
-                    }
-                }
-
-                adapter.setDataSet(data);
-                adapter.notifyDataSetChanged();
-
-                adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
-                    @Override
-                    public void onClick(int itemId) {
-                        recyclerView.setVisibility(View.GONE);
-                        if (getCurrentFocus() != null) {
-                            methodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-                        }
-
-                        Marker currentMarker = markerHashMap.get(itemId);
-
-                        currentMarkerID = getMarkerId(currentMarker);
-                        currentMarkerLabel = university.getCorpsLabel().get(currentMarkerID);
-                        fab_menu.open(true);
-                        currentMarker.showInfoWindow();
-                        mMap.animateCamera(CameraUpdateFactory.newLatLng(currentMarker.getPosition()));
-                    }
-                });
-            }
-        });
+        /**
+         * Setting Up SearchView
+         */
+        setUpSearchView(searchView, searchItem);
 
         return super.onCreateOptionsMenu(menu);
 
@@ -314,53 +231,54 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
     public boolean onQueryTextChange(String newText) {
         Log.d(TAG, "Query changed: " + newText);
 
+        // Clearing ArrayList before adding new items
         data.clear();
 
-        for (int i = 1; i <= nauCorpNamesFull.size(); i++) {
-            String corpNameFull = nauCorpNamesFull.get(i);
-            String corpNameShort = nauCorpNamesShort.get(i);
+        if (!newText.equals("")) {
+            // Searching for results
+            for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
+                if (entry.getValue().toLowerCase().contains(newText.toLowerCase().trim()))
+                    data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
+            }
 
-            if (corpNameFull.toLowerCase().contains(newText.toLowerCase().trim()))
-                data.add(new MapsDataModel(corpNameFull, i));
+            for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameShort().entrySet()) {
+                if (entry.getValue().toLowerCase().contains(newText.toLowerCase().trim()))
+                    data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
+            }
 
-            if (corpNameShort.toLowerCase().contains(newText.toLowerCase().trim()))
-                data.add(new MapsDataModel(corpNameShort, i));
-        }
 
-        if (data.size() == 0) {
-            for (int i = 1; i <= nauCorpNamesFull.size(); i++) {
-                data.add(new MapsDataModel(nauCorpNamesFull.get(i), i));
+            // Nothing was found. Show warning
+            if (data.size() == 0) {
+                // TODO add warning message
+                Snackbar.make(rootView, "Ничего не найдено", Snackbar.LENGTH_LONG).show();
+            }
+        } else {
+            for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
+                data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
             }
         }
 
-        if (data != null) {
-            adapter.setDataSet(data);
-            adapter.notifyDataSetChanged();
+        adapter.setDataSet(data);
+        adapter.notifyDataSetChanged();
 
-            adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
-                @Override
-                public void onClick(int itemId) {
-                    recyclerView.setVisibility(View.GONE);
-                    if (getCurrentFocus() != null) {
-                        methodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-                    }
+        adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int itemId) {
+                // Hide RecyclerView & SearchView & keyboard
+                hideKeyboard();
+                Animation.Reveal.revealCloseTopRight(recyclerView);
+                searchView.onActionViewCollapsed();
 
-                    Marker currentMarker = markerHashMap.get(itemId);
-                    currentMarkerID = getMarkerId(currentMarker);
-                    currentMarkerLabel = university.getCorpsLabel().get(currentMarkerID);
-                    fab_menu.open(true);
-                    currentMarker.showInfoWindow();
-                    mMap.animateCamera(CameraUpdateFactory.newLatLng(currentMarker.getPosition()));
-                }
-            });
-        }
+                // Zooming to marker
+                zoomToMarker(markerHashMap.get(itemId));
+            }
+        });
 
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.location: {
                 zoomToMyLocation();
@@ -369,6 +287,102 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    /**
+     * Setting Up SearchView
+     *
+     * @param searchView SearchView for setup
+     */
+    private void setUpSearchView(final SearchView searchView, MenuItem searchMenu) {
+        searchView.setQueryHint(getResources().getString(R.string.maps_search_hint));
+        searchView.setOnQueryTextListener(this);
+        SearchViewUtils.setHintColor(this, searchView, R.color.searchView_hint_color);
+
+        /**
+         * Restoring saved state of SearchView & RecyclerView
+         */
+        if (savedInstanceState != null) {
+            if (savedInstanceState.getBoolean("RecyclerViewWasVisible", false)) {
+                searchView.onActionViewExpanded();
+                searchView.setQuery(savedInstanceState.getString("SearchViewQuery", ""), false);
+
+                Animation.Reveal.revealOpenTopRight(recyclerView);
+            }
+        }
+
+        /**
+         * SearchView is closing with button (on Toolbar)
+         */
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                Log.d(TAG, "OnCloseListener/ onClose() called");
+
+                // Hide keyboard
+                hideKeyboard();
+
+                // Close RecyclerView & SearchView
+                searchView.onActionViewCollapsed();
+                Animation.Reveal.revealCloseTopRight(recyclerView);
+
+                return true;
+            }
+        });
+
+        /**
+         * SearchView is pressed, opening...
+         */
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Show RecyclerView
+                Animation.Reveal.revealOpenTopRight(recyclerView);
+
+                addDefaultItems();
+
+                // Animating to clicked position
+                adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
+                    @Override
+                    public void onClick(int itemId) {
+                        // Hide RecyclerView & SearchView & keyboard
+                        hideKeyboard();
+                        Animation.Reveal.revealCloseTopRight(recyclerView);
+                        searchView.onActionViewCollapsed();
+
+                        // Zooming to marker
+                        zoomToMarker(markerHashMap.get(itemId));
+                    }
+                });
+
+            }
+        });
+
+    }
+
+    /**
+     * Adding default items to RecyclerView.Adapter
+     */
+    private void addDefaultItems() {
+        data.clear();
+        for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
+            data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
+        }
+        adapter.setDataSet(data);
+        adapter.notifyDataSetChanged();
+
+        adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int itemId) {
+                // Hide RecyclerView & SearchView & keyboard
+                hideKeyboard();
+                Animation.Reveal.revealCloseTopRight(recyclerView);
+                searchView.onActionViewCollapsed();
+
+                // Zooming to marker
+                zoomToMarker(markerHashMap.get(itemId));
+            }
+        });
     }
 
     private void setUpMapIfNeeded() {
@@ -383,78 +397,148 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
                     mMap = googleMap;
 
                     if (mMap != null) {
+                        /*mMap.addCircle(new CircleOptions()
+                                .center(new LatLng(50.437476, 30.428322))
+                                .radius(1000)
+                                .fillColor(ContextCompat.getColor(MapsTestActivity.this, R.color.blue_30))
+                                .strokeColor(ContextCompat.getColor(MapsTestActivity.this, R.color.colorAppPrimary)));*/
+
+                        mMap.addGroundOverlay(new GroundOverlayOptions()
+                                .position(new LatLng(50.437476, 30.428322), 197, 63)
+                                .transparency(0.5f)
+                                .image(BitmapDescriptorFactory.fromResource(R.drawable.map_1)));
+
                         setUpMap();
-
-                        Log.d(TAG, "Setting up GoogleApiClient...");
+                        initGoogleApiClient();
                     }
-
-                    openMarkerFromIntent();
                 }
             });
         }
     }
 
+    /**
+     * Adding custom marker on GoogleMap
+     *
+     * @param i     loop iterator
+     * @param icon  marker's icon resource id
+     * @param title title of icon
+     */
     private void addMarkerCustom(Integer i, int icon, String title) {
         Marker mMapMarker = mMap.addMarker(new MarkerOptions()
                 .position(university.getCorps().get(i))
-                .title(title));
+                .title(title)
+                .icon(BitmapDescriptorFactory.fromResource(icon)));
 
-        mMapMarker.setIcon(BitmapDescriptorFactory.fromResource(icon));
         if (getIntent().getIntExtra("MAINACTIVITY_CORP_ID", -1) == i)
             mainActivityMarker = mMapMarker;
 
         markerHashMap.put(i, mMapMarker);
     }
 
-    private void openMarkerFromIntent() {
-//Запустили активити не из дровера
-        if (mainActivityMarker != null) {
+    /**
+     * Adding custom marker on GoogleMap
+     *
+     * @param i                  loop iterator == merker Id
+     * @param markerOptions      new MarkerOptions for custom Marker
+     * @param markerIdFromIntent Activity was started from button (e.g. on MainActivity), so
+     *                           need to get Id of Marker to open
+     */
+    private void addMarkerCustom(int i, MarkerOptions markerOptions, int markerIdFromIntent) {
+        Marker mMapMarker = mMap.addMarker(markerOptions);
+
+        if (markerIdFromIntent == i) {
+            Log.d(TAG, "addMarkerCustom()/ Intent: " + markerIdFromIntent + " == Iterator: " + i);
+            openMarkerFromIntent(mMapMarker);
+        }
+
+        markerHashMap.put(i, mMapMarker);
+    }
+
+    /**
+     * Activity wasn't started from Drawer
+     * Need to open marker
+     */
+    private void openMarkerFromIntent(Marker marker) {
+        if (marker != null) {
+            Log.d(TAG, "openMarkerFromIntent() opening marker...");
+
             //Записываем id текущего маркера в глобальную переменную
-            currentMarkerID = getMarkerId(mainActivityMarker);
+            currentMarkerID = getMarkerId(marker);
             Log.i("MainActivity", "currentMarkerID =  " + Integer.toString(currentMarkerID));
 
             //Записываем label текущего маркера в глобальную переменную
-            currentMarkerLabel = university.getCorpsLabel().get(getMarkerId(mainActivityMarker));
+            currentMarkerLabel = university.getCorpsLabel().get(getMarkerId(marker));
 
             //Открываем FabMenu
             fab_menu.open(true);
 
             //Manually open the window
-            mainActivityMarker.showInfoWindow();
+            marker.showInfoWindow();
 
             //Animate to center
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(mainActivityMarker.getPosition()));
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+        } else {
+            Log.e(TAG, "openMarkerFromIntent() mainActivityMarker == null");
         }
     }
 
+    /**
+     * Setting Up GoogleMap
+     */
     private void setUpMap() {
-        //Стартовое положение камеры
+        // Camera start position
         LatLng nau = new LatLng(50.437476, 30.428322);
         CameraPosition cameraPosition_start = new CameraPosition.Builder()
                 .target(nau)      // Sets the center of the map to NAU
                 .zoom(15)                   // Sets the zoom
                 .bearing(160)                // Sets the orientation of the camera to east
-                        //.tilt(30)                   // Sets the tilt of the camera to 30 degrees
                 .build();                   // Creates a CameraPosition from the builder
 
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition_start));
 
-        mMap.setMyLocationEnabled(true);
+        try {
+            mMap.setMyLocationEnabled(true);
+        } catch (SecurityException ex) {
+            ex.printStackTrace();
+        }
         mMap.getUiSettings().setMapToolbarEnabled(false);
         mMap.setIndoorEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setCompassEnabled(false);
 
-        //Добавление маркеров на карту из класса НАУ
-        for (int i = 1; i <= 28; i++) {
-            addMarkerCustom(i, university.getCorpsIcon().get(i), university.getCorpsMarkerLabel().get(i));
-        }
+        /**
+         * Adding markers from {@link ua.nau.edu.University.NAU} using {@link android.os.AsyncTask}
+         * Important! Loop needs to be started from 1
+         */
+        new AsyncTask<Void, Void, HashMap<Integer, MarkerOptions>>() {
+            @Override
+            protected void onPostExecute(HashMap<Integer, MarkerOptions> markerOptions) {
+                int markerIdFromIntent = getIntent().getIntExtra("MAINACTIVITY_CORP_ID", -1);
+                for (int i = 1; i <= markerOptions.size(); i++) {
+                    addMarkerCustom(i, markerOptions.get(i), markerIdFromIntent);
+                }
+            }
+
+            @Override
+            protected HashMap<Integer, MarkerOptions> doInBackground(Void... params) {
+                HashMap<Integer, MarkerOptions> markerOptions = new HashMap<>();
+
+                for (int i = 1; i <= university.getHashMapSize(); i++) {
+                    markerOptions.put(i, new MarkerOptions()
+                            .position(university.getCorps().get(i))
+                            .title(university.getCorpsMarkerLabel().get(i))
+                            .icon(BitmapDescriptorFactory.fromResource(university.getCorpsIcon().get(i))));
+                }
+
+                return markerOptions;
+            }
+        }.execute();
 
         //Обработчик нажатия на маркер
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                //Открываем FabMenu
+                // Open FabMenu
                 fab_menu.open(true);
 
                 //Записываем id текущего маркера в глобальную переменную
@@ -492,10 +576,6 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
 
         //Consume the method
         return true;
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
     }
 
     private void initFloatingActionMenu() {
@@ -559,8 +639,6 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
                     startActivity(new Intent(MapsTestActivity.this, InfoActivity.class)
                             .putExtra(CORP_ID_KEY, currentMarkerID)
                             .putExtra(CORP_LABEL_KEY, currentMarkerLabel));
-                    //.putExtra(CURRENT_LATITUDE, mMap.getMyLocation().getLatitude())
-                    //.putExtra(CURRENT_LONGTITUDE, mMap.getMyLocation().getLongitude()));
                 }
             }
         });
@@ -619,8 +697,69 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
         }.execute();
     }
 
+    /**
+     * Zoom camera to marker & show InfoWindow
+     *
+     * @param marker marker for zooming
+     */
+    private void zoomToMarker(Marker marker) {
+        currentMarkerID = getMarkerId(marker);
+        currentMarkerLabel = university.getCorpsLabel().get(currentMarkerID);
+        fab_menu.open(true);
+        marker.showInfoWindow();
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+    }
+
     private LatLng getMyCoordinate() {
         return new LatLng(mMap.getMyLocation().getLatitude(), mMap.getMyLocation().getLongitude());
+    }
+
+    private void initGoogleApiClient() {
+        // Create an instance of GoogleAPIClient.
+        if (googleApiClient == null) {
+            googleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                        @Override
+                        public void onConnected(Bundle bundle) {
+                            Log.d(TAG, "googleApiClient/ onConnected()");
+
+                            LocationRequest mLocationRequest = new LocationRequest();
+                            mLocationRequest.setInterval(1000);
+                            mLocationRequest.setFastestInterval(1000);
+                            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                            mLocationRequest.setSmallestDisplacement(0);
+
+                            try {
+                                LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, mLocationRequest, new LocationListener() {
+                                    @Override
+                                    public void onLocationChanged(Location location) {
+                                        double distance = GoogleMapUtils.getDistanceBetweenPoints(
+                                                new LatLng(location.getLatitude(), location.getLongitude()), new LatLng(50.437476, 30.428322));
+                                        Snackbar.make(rootView, "Distance to NAU == " + distance, Snackbar.LENGTH_SHORT).show();
+                                        Log.d(TAG, "getDistanceBetweenPoints()/ Distance to NAU == " + distance);
+                                    }
+                                });
+                            } catch (SecurityException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onConnectionSuspended(int i) {
+                            Log.d(TAG, "googleApiClient/ onConnectionSuspended()");
+                        }
+                    })
+                    .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                        @Override
+                        public void onConnectionFailed(ConnectionResult connectionResult) {
+                            Log.d(TAG, "googleApiClient/ onConnectionFailed()");
+                        }
+                    })
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+
+        googleApiClient.connect();
     }
 
     public boolean isInternetAvailable() {
@@ -670,7 +809,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
             @Override
             public void onShow(DialogInterface arg) {
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorAppPrimary));
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorAppPrimary));
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
             }
         });
 
@@ -700,20 +839,9 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
         dialog.show();
     }
 
-    public void initNavigationWindow(int markerid) {
-        try {
-            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                    Uri.parse("http://maps.google.com/maps?   saddr=" +
-                            mMap.getMyLocation().getLatitude() + "," +
-                            mMap.getMyLocation().getLongitude() + "&daddr=" +
-                            university.getCorps().get(markerid).latitude + "," + university.getCorps().get(markerid).longitude));
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.addCategory(Intent.CATEGORY_LAUNCHER);
-            intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
-            startActivity(intent);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void hideKeyboard() {
+        if (getCurrentFocus() != null)
+            methodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
     }
 
 }

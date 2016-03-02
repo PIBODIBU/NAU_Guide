@@ -55,6 +55,6 @@
         android:layout_alignTop="@+id/imageView"
         android:layout_marginBottom="-8dp"
         android:layout_marginTop="-16dp"
-        android:background="@drawable/lector_item" />
+        android:background="@drawable/recycler_item" />
 
 </RelativeLayout>

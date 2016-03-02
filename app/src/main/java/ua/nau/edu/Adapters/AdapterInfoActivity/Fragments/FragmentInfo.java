@@ -23,6 +23,7 @@ import ua.nau.edu.Enum.ClipBoardKeys;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.NAU_Guide.InfoActivity;
 import ua.nau.edu.NAU_Guide.R;
+import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 import ua.nau.edu.University.NAU;
 
 /**
@@ -60,10 +61,11 @@ public class FragmentInfo extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        settings = this.getActivity().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-        currentCorp = settings.getInt(CORP_ID_KEY, -1);
+        settings = this.getActivity().getSharedPreferences(SharedPrefUtils.APP_PREFERENCES, Context.MODE_PRIVATE);
 
         supportActivity = (InfoActivity) getActivity();
+
+        currentCorp = supportActivity.getIntent().getExtras().getInt(CORP_ID_KEY, -1);
         clipboard = (ClipboardManager) getActivity().getSystemService(Activity.CLIPBOARD_SERVICE);
 
         setUpLayout(inflater, container);

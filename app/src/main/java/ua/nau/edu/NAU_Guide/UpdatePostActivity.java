@@ -12,12 +12,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import ua.nau.edu.API.APICreateBuilder;
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.API.APIStrings;
 import ua.nau.edu.API.APIUpdateBuilder;
 import ua.nau.edu.API.APIValues;
-import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
+import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 
 public class UpdatePostActivity extends BaseToolbarActivity {
 

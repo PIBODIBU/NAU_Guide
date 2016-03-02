@@ -4,15 +4,11 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.Bundle;
-import android.view.MotionEvent;
-import android.view.View;
 
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGParseException;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-
-import ua.nau.edu.Systems.TouchImageView;
 
 public class FloorActivity extends BaseToolbarActivity {
     public FloorActivity() {

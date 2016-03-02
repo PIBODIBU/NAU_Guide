@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="1dp"
-    android:background="@color/white"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@color/white">
 
     <TextView
         android:id="@+id/textViewName"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center_vertical" />
+        android:background="@drawable/recycler_item"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:textColor="@color/material_text_color" />
 
-</LinearLayout>
+</RelativeLayout>

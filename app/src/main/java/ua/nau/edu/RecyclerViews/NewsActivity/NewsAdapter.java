@@ -2,33 +2,21 @@ package ua.nau.edu.RecyclerViews.NewsActivity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.net.Uri;
-import android.support.v4.widget.TextViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.gc.materialdesign.views.CustomView;
-import com.ms.square.android.expandabletextview.ExpandableTextView;
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -37,9 +25,8 @@ import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 import ua.nau.edu.API.APIValues;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
-import ua.nau.edu.Systems.CircleTransform;
-import ua.nau.edu.Systems.LinkMovementMethodOverride;
-import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
+import ua.nau.edu.Support.Picasso.CircleTransform;
+import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 
 public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -172,18 +159,25 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ImageView authorImage = ((BaseViewHolder) holder).authorImage;
             final ImageButton popUpmenu = ((BaseViewHolder) holder).popUpMenu;
             final Button expandMessage = ((BaseViewHolder) holder).expandMessage;
+            final ImageButton headClick = ((BaseViewHolder) holder).headClick;
 
             postTitle.setText(dataSet.get(listPosition).getAuthor());
             postSubTitle.setText(dataSet.get(listPosition).getCreateTime());
             postMessage.setText(dataSet.get(listPosition).getMessage());
-
             Picasso
                     .with(context)
                     .load(Uri.parse(dataSet.get(listPosition).getAuthorPhotoUrl()))
                     .transform(new CircleTransform())
                     .into(authorImage);
 
-            authorImage.setOnClickListener(new View.OnClickListener() {
+            String title = postTitle.getText().toString();
+            if (title.length() > 20) {
+                String titleSmall = title.substring(0, 20);
+                titleSmall += "...";
+                postTitle.setText(titleSmall);
+            }
+
+            headClick.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     context.startActivity(new Intent(context, UserProfileActivity.class)
@@ -235,62 +229,6 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             postMessage.post(new Runnable() {
                 @Override
                 public void run() {
-                    /**
-                     * Code for drop-arrow instead of "Показать больше..."
-                     *
-                     * XML:
-                     <ImageButton
-                     android:id="@+id/imageButtonExpand"
-                     android:layout_width="36dp"
-                     android:layout_height="36dp"
-                     android:layout_alignParentEnd="true"
-                     android:layout_alignParentRight="true"
-                     android:layout_below="@id/expandable_text_layout"
-                     android:layout_marginEnd="16dp"
-                     android:layout_marginRight="16dp"
-                     android:background="@android:color/transparent"
-                     android:src="@drawable/ic_keyboard_arrow_down_grey_24dp"
-                     android:visibility="gone" />
-                     */
-                    /*if (postMessage.getLineCount() > APIValues.maxLinesBeforeExpand) {
-                        // Item has more, than APIValues.maxLinesBeforeExpand lines
-
-                        expandTextImgBtn.setVisibility(View.VISIBLE);
-
-                        if (!dataSet.get(listPosition).getExpandedState()) {
-                            // Item is collapsed
-
-                            postMessage.setMaxLines(APIValues.maxLinesBeforeExpand);
-                        } else {
-                            // Item is expanded
-
-                            rotateImgBtn(expandTextImgBtn, 180);
-                            postMessage.setMaxLines(9999);
-                        }
-
-                        expandTextImgBtn.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if (!dataSet.get(listPosition).getExpandedState()) {
-                                    // Expanding item
-                                    postMessage.setMaxLines(9999);
-                                    rotateImgBtn(expandTextImgBtn, 180);
-                                    dataSet.get(listPosition).setExpandedState(true);
-                                } else {
-                                    // Collapsing item
-                                    postMessage.setMaxLines(APIValues.maxLinesBeforeExpand);
-                                    rotateImgBtn(expandTextImgBtn, 0);
-                                    dataSet.get(listPosition).setExpandedState(false);
-                                }
-                            }
-                        });
-
-                    } else {
-                        expandTextImgBtn.setVisibility(View.GONE);
-                    }*/
-
-
-                    postMessage.setOnTouchListener(new LinkMovementMethodOverride());
                     if (postMessage.getLineCount() > APIValues.maxLinesBeforeExpand) {
                         // Item has more, than APIValues.maxLinesBeforeExpand lines
 
@@ -352,7 +290,7 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         ImageView authorImage;
         ImageButton popUpMenu;
         Button expandMessage;
-        ImageButton expandTextImgBtn;
+        ImageButton headClick;
 
         public BaseViewHolder(View itemView) {
             super(itemView);
@@ -362,7 +300,7 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.postMessage = (TextView) itemView.findViewById(R.id.post_text_expand);
             this.popUpMenu = (ImageButton) itemView.findViewById(R.id.popup_menu);
             this.expandMessage = (Button) itemView.findViewById(R.id.expand_message);
-
+            this.headClick = (ImageButton) itemView.findViewById(R.id.header_click);
         }
     }
 

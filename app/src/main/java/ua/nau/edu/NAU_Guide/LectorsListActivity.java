@@ -2,7 +2,6 @@ package ua.nau.edu.NAU_Guide;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,8 +25,8 @@ import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsAdapter;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsDataModel;
 import ua.nau.edu.API.APIDialogs;
-import ua.nau.edu.Systems.SearchViewUtils;
-import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
+import ua.nau.edu.Support.View.SearchViewUtils;
+import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 
 
 public class LectorsListActivity extends BaseNavigationDrawerActivity implements SearchView.OnQueryTextListener {

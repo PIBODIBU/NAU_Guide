@@ -2,27 +2,20 @@ package ua.nau.edu.NAU_Guide;
 
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.Toast;
-
-import java.util.ArrayList;
 
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.API.APICreateBuilder;
-import ua.nau.edu.API.APIRefreshBuilder;
 import ua.nau.edu.API.APIStrings;
 import ua.nau.edu.API.APIValues;
-import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
-import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
+import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 
 public class CreatePostActivity extends BaseToolbarActivity {
 

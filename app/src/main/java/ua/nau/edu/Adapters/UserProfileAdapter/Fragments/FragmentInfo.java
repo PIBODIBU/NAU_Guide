@@ -2,16 +2,13 @@ package ua.nau.edu.Adapters.UserProfileAdapter.Fragments;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -29,6 +26,7 @@ import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.json.JSONObject;
 
@@ -37,18 +35,14 @@ import java.util.HashMap;
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.API.APIStrings;
-import ua.nau.edu.Enum.EnumSharedPreferences;
-import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 import ua.nau.edu.NAU_Guide.MainActivity;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
-import ua.nau.edu.Systems.CircleTransform;
-import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
+import ua.nau.edu.Support.Picasso.CircleTransform;
+import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
+import ua.nau.edu.Support.View.CircleImageView;
 
 public class FragmentInfo extends Fragment {
-
-    private static final String URL_GETMYPAGE = "http://nauguide.esy.es/include/getMyPage.php";
-    private static final String URL_GETPAGE = "http://nauguide.esy.es/include/getLector.php";
 
     private static final String TAG = "FragmentInfo";
 
@@ -84,7 +78,7 @@ public class FragmentInfo extends Fragment {
     private void getMyPage() {
         new AsyncTask<String, Void, JSONObject>() {
 
-            ImageView avatarSmall;
+            CircleImageView avatarSmall;
             ImageView avatarBig;
 
             MaterialDialog dialog = APIDialogs.ProgressDialogs.loadingCancelable(supportActivity, new APIDialogs.ProgressDialogs.ProgressDialogCallbackInterface() {
@@ -104,7 +98,7 @@ public class FragmentInfo extends Fragment {
                 dialog.show();
 
                 // Set up Views
-                avatarSmall = (ImageView) supportActivity.findViewById(R.id.imageViewPhoto);
+                avatarSmall = (CircleImageView) supportActivity.findViewById(R.id.imageViewPhoto);
                 avatarBig = (ImageView) supportActivity.findViewById(R.id.reveal_image);
 
                 // Loading default avatar
@@ -120,7 +114,7 @@ public class FragmentInfo extends Fragment {
                 HashMap<String, String> data = new HashMap<>();
                 data.put("token", params[0]);
 
-                String response = apiUtils.sendPostRequestWithParams(URL_GETMYPAGE, data);
+                String response = apiUtils.sendPostRequestWithParams(APIStrings.RequestUrl.GET_MYPAGE, data);
                 if (response.equalsIgnoreCase("error_connection")) {
                     Log.e(TAG, "No Internet avalible");
                     supportActivity.runOnUiThread(new Runnable() {
@@ -166,7 +160,14 @@ public class FragmentInfo extends Fragment {
                         /*
                             Setting Up NAME
                         */
-                        textViewName.setText(result.getString(APIStrings.ResponseKeys.PageLoading.NAME));
+                        //textViewName.setText(result.getString(APIStrings.ResponseKeys.PageLoading.NAME));
+                        String name = result.getString(APIStrings.ResponseKeys.PageLoading.NAME);
+                        /*int spaceCount = 0;
+                        for (int i = 0; i < name.length(); i++)
+                            if (Character.isWhitespace(name.charAt(i))) spaceCount++;
+                        if (spaceCount >= 2)
+                            name = name.substring(0, name.lastIndexOf(' '));*/
+                        supportActivity.collapsingToolbarLayout.setTitle(name);
 
                         /*
                             Setting Up BIOGRAPHY
@@ -187,6 +188,7 @@ public class FragmentInfo extends Fragment {
                                     .networkPolicy(NetworkPolicy.NO_CACHE)
                                     .transform(new CircleTransform())
                                     .into(avatarSmall);
+
                             avatarSmall.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -215,7 +217,7 @@ public class FragmentInfo extends Fragment {
     private void getPage(final String UniqueId) {
         new AsyncTask<String, Void, JSONObject>() {
 
-            ImageView avatarSmall;
+            CircleImageView avatarSmall;
 
             MaterialDialog dialog = APIDialogs.ProgressDialogs.loadingCancelable(supportActivity, new APIDialogs.ProgressDialogs.ProgressDialogCallbackInterface() {
                 @Override
@@ -233,7 +235,7 @@ public class FragmentInfo extends Fragment {
                 dialog.show();
 
                 // Set up Views
-                avatarSmall = (ImageView) supportActivity.findViewById(R.id.imageViewPhoto);
+                avatarSmall = (CircleImageView) supportActivity.findViewById(R.id.imageViewPhoto);
 
                 // Loading default avatar
                 Picasso.with(supportActivity)
@@ -248,7 +250,7 @@ public class FragmentInfo extends Fragment {
                 HashMap<String, String> data = new HashMap<>();
                 data.put("unique_id", params[0]);
 
-                String response = apiUtils.sendPostRequestWithParams(URL_GETPAGE, data);
+                String response = apiUtils.sendPostRequestWithParams(APIStrings.RequestUrl.GET_PAGE, data);
 
                 if (response.equalsIgnoreCase("error_connection")) {
                     supportActivity.runOnUiThread(new Runnable() {
@@ -296,7 +298,14 @@ public class FragmentInfo extends Fragment {
                         /*
                             Setting Up NAME
                         */
-                        textViewName.setText(result.getString(APIStrings.ResponseKeys.PageLoading.NAME));
+                        //textViewName.setText(result.getString(APIStrings.ResponseKeys.PageLoading.NAME));
+                        String name = result.getString(APIStrings.ResponseKeys.PageLoading.NAME);
+                        /*int spaceCount = 0;
+                        for (int i = 0; i < name.length(); i++)
+                            if (Character.isWhitespace(name.charAt(i))) spaceCount++;
+                        if (spaceCount >= 2)
+                            name = name.substring(0, name.lastIndexOf(' '));*/
+                        supportActivity.collapsingToolbarLayout.setTitle(name);
 
                         /*
                             Setting Up BIOGRAPHY

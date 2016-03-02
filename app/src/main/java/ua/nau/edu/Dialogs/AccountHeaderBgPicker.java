@@ -2,7 +2,6 @@ package ua.nau.edu.Dialogs;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -19,7 +18,8 @@ import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
 import java.util.HashMap;
 
 import ua.nau.edu.NAU_Guide.R;
-import ua.nau.edu.Systems.SharedPrefUtils.SharedPrefUtils;
+
+import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 
 public class AccountHeaderBgPicker extends DialogFragment {
 
@@ -44,10 +44,13 @@ public class AccountHeaderBgPicker extends DialogFragment {
         /**
          * SliderLayout setup
          */
-        file_maps.put(0, R.drawable.head_bg_jpg_1);
-        file_maps.put(1, R.drawable.head_bg_jpg_2);
-        file_maps.put(2, R.drawable.head_bg_png_1);
-        file_maps.put(3, R.drawable.header_bg_test);
+        file_maps.put(0, R.drawable.material_bg_1);
+        file_maps.put(1, R.drawable.material_bg_2);
+        file_maps.put(2, R.drawable.material_bg_3);
+        file_maps.put(3, R.drawable.material_bg_4);
+        file_maps.put(4, R.drawable.material_bg_5);
+        file_maps.put(5, R.drawable.material_bg_6);
+        file_maps.put(6, R.drawable.material_bg_7);
 
         for (int i = 0; i < file_maps.size(); i++) {
             DefaultSliderView sliderView = new DefaultSliderView(getActivity());

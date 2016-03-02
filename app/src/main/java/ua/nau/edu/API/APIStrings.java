@@ -33,6 +33,16 @@ public class APIStrings {
          * Required params:
          */
         public static final String GET_POST_TARGETED = "http://nauguide.esy.es/include/getPostTargeted.php";
+
+        /**
+         * Required params:
+         */
+        public static final String GET_MYPAGE = "http://nauguide.esy.es/include/getMyPage.php";
+
+        /**
+         * Required params:
+         */
+        public static final String GET_PAGE = "http://nauguide.esy.es/include/getLector.php";
     }
 
     public static class ImageUrl {
@@ -44,6 +54,7 @@ public class APIStrings {
             public static final String NAME = "name";
             public static final String BIOGRAPHY = "bio";
             public static final String PHOTO_URL = "photo_url";
+            public static final String PHONE_URL = "phone";
         }
     }
 

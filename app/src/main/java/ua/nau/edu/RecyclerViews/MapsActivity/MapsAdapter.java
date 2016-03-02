@@ -1,11 +1,15 @@
 package ua.nau.edu.RecyclerViews.MapsActivity;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -49,7 +53,6 @@ public class MapsAdapter extends RecyclerView.Adapter<MapsAdapter.BaseViewHolder
         TextView textViewName = holder.textViewName;
 
         textViewName.setText(dataSet.get(listPosition).getName());
-
         textViewName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

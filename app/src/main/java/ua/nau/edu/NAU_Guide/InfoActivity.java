@@ -3,6 +3,7 @@ package ua.nau.edu.NAU_Guide;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,14 +20,14 @@ import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.Adapters.AdapterInfoActivity.AdapterInfo;
 
 public class InfoActivity extends BaseToolbarActivity {
-    private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
+
+    private final String TAG = getClass().getSimpleName();
+
     private static final String CORP_ID_KEY = EnumExtras.CORP_ID_KEY.toString();
     private static final String CORP_LABEL_KEY = EnumExtras.CORP_LABEL_KEY.toString();
 
     private static final String CURRENT_LATITUDE = EnumMaps.CURRENT_LATITUDE.toString();
     private static final String CURRENT_LONGTITUDE = EnumMaps.CURRENT_LONGTITUDE.toString();
-
-    private SharedPreferences settings = null;
 
     private ViewPager pager;
     private PagerSlidingTabStrip tabs;
@@ -46,6 +47,8 @@ public class InfoActivity extends BaseToolbarActivity {
 
         tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
         currentCorp = getIntent().getIntExtra(CORP_ID_KEY, -1);
+
+        Log.d(TAG, "currentCorp == " + currentCorp);
 
         if (currentCorp <= 12 && currentCorp != -1) {
             // This is corp
@@ -88,6 +91,8 @@ public class InfoActivity extends BaseToolbarActivity {
     }
 
     private void setUpLayoutCorp() {
+        Log.d(TAG, "setUpLayoutCorp() called");
+
         // Initialize the ViewPager and set an adapter
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new AdapterInfo(getSupportFragmentManager()));
@@ -97,6 +102,8 @@ public class InfoActivity extends BaseToolbarActivity {
     }
 
     private void setUpLayoutCkm() {
+        Log.d(TAG, "setUpLayoutCkm() called");
+
         tabs.setVisibility(View.GONE);
 
     }

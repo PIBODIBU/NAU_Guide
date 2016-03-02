@@ -8,12 +8,17 @@ import io.codetail.animation.ViewAnimationUtils;
 
 public class Animation {
     public static class Reveal {
-        public static void revealOpen(final View view) {
-            int animDuration = 300;
 
-            // get the center for the clipping circle
-            int cx = (view.getLeft() + view.getRight()) / 2;
-            int cy = (view.getTop() + view.getBottom()) / 2;
+        public static int animDuration = 400;
+
+        /* Center of View
+        int cx = (view.getLeft() + view.getRight()) / 2;
+        int cy = (view.getTop() + view.getBottom()) / 2;
+         */
+
+        public static void revealOpenTopRight(final View view) {
+            int cx = view.getRight();
+            int cy = view.getTop();
 
             // get the final radius for the clipping circle
             int dx = Math.max(cx, view.getWidth() - cx);
@@ -32,12 +37,9 @@ public class Animation {
             }
         }
 
-        public static void revealClose(final View view) {
-            int animDuration = 300;
-
-            // get the center for the clipping circle
-            int cx = (view.getLeft() + view.getRight()) / 2;
-            int cy = (view.getTop() + view.getBottom()) / 2;
+        public static void revealCloseTopRight(final View view) {
+            int cx = view.getRight();
+            int cy = view.getTop();
 
             // get the final radius for the clipping circle
             int dx = Math.max(cx, view.getWidth() - cx);

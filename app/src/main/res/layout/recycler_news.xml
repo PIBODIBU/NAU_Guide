@@ -24,7 +24,7 @@
         <RelativeLayout
             android:id="@+id/head"
             android:layout_width="match_parent"
-            android:layout_height="72dp"
+            android:layout_height="82dp"
             android:padding="16dp">
 
             <ImageView
@@ -32,32 +32,48 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp" />
 
-            <TextView
-                android:id="@+id/header_title"
+            <RelativeLayout
+                android:id="@+id/header_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="false"
+                android:layout_alignBottom="@+id/header_image"
                 android:layout_alignTop="@+id/header_image"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
                 android:layout_toEndOf="@+id/header_image"
-                android:layout_toRightOf="@+id/header_image"
-                android:text="Title"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
+                android:layout_toRightOf="@+id/header_image">
 
-            <TextView
-                android:id="@+id/header_subtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/header_title"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_toEndOf="@+id/header_image"
-                android:layout_toRightOf="@+id/header_image"
-                android:text="Subitle"
-                android:textColor="@color/grey"
-                android:textSize="14sp" />
+                <TextView
+                    android:id="@+id/header_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="false"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:text="Title"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/header_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:text="Subitle"
+                    android:textColor="@color/colorTextSecondary"
+                    android:textSize="14sp" />
+            </RelativeLayout>
+
+            <ImageButton
+                android:id="@+id/header_click"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignBottom="@+id/header_image"
+                android:layout_alignEnd="@+id/header_layout"
+                android:layout_alignRight="@+id/header_layout"
+                android:layout_marginEnd="-8dp"
+                android:layout_marginRight="-16dp"
+                android:background="@drawable/recycler_news_item" />
 
             <ImageButton
                 android:id="@+id/popup_menu"
