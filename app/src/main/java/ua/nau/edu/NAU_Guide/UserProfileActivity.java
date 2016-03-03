@@ -2,7 +2,9 @@ package ua.nau.edu.NAU_Guide;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -10,6 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import ua.nau.edu.Adapters.UserProfileAdapter.Fragments.FragmentInfo;
 import ua.nau.edu.Adapters.UserProfileAdapter.Fragments.FragmentPosts;
@@ -24,8 +28,10 @@ public class UserProfileActivity extends BaseNavigationDrawerActivity {
 
     private SharedPrefUtils sharedPrefUtils;
 
+    public CoordinatorLayout rootView;
     public CollapsingToolbarLayout collapsingToolbarLayout;
-    private boolean frIsShow = false;
+    public AppBarLayout mAppBarLayout;
+    private String titleAcivity = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +55,11 @@ public class UserProfileActivity extends BaseNavigationDrawerActivity {
                 super.onPreExecute();
 
                 collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+                rootView = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
                 //collapsingToolbarLayout.setTitle("BIG BIG BIG BIG TEXT");
                 //collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(UserProfileActivity.this, android.R.color.transparent));
+
+                mAppBarLayout = (AppBarLayout) findViewById(R.id.app_bar_layout);
             }
 
             @Override

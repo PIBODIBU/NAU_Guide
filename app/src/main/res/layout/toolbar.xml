@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textColor="@color/white"
-        android:textSize="20dp"
+        android:textSize="@dimen/abc_text_size_title_material_toolbar"
         android:textStyle="bold" />
 
 </android.support.v7.widget.Toolbar>

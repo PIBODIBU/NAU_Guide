@@ -17,9 +17,7 @@ public class APIUpdateBuilder {
     private String TAG;
     private Context context;
     private Activity activity;
-    private boolean withDialog = false;
-
-    private OnResultListener onResultListener;
+    private UpdateCallbacks updateCallbacks;
 
     public APIUpdateBuilder withContext(Context context) {
         this.context = context;
@@ -33,11 +31,6 @@ public class APIUpdateBuilder {
         return this;
     }
 
-    public APIUpdateBuilder withLoadingDialog(boolean withDialog) {
-        this.withDialog = withDialog;
-
-        return this;
-    }
 
     public APIUpdateBuilder withTag(String TAG) {
         this.TAG = TAG;
@@ -47,15 +40,10 @@ public class APIUpdateBuilder {
 
     public void updateMessage(final String REQUEST_URL, final String token, final String message, final int postId) {
         new AsyncTask<String, Void, String>() {
-            MaterialDialog loadingDialog;
-
             @Override
             protected void onPreExecute() {
-                super.onPreExecute();
-                if (withDialog) {
-                    loadingDialog = APIDialogs.ProgressDialogs.loading(context);
-                    loadingDialog.show();
-                }
+                if (updateCallbacks != null)
+                    updateCallbacks.onPrepare();
             }
 
             @Override
@@ -68,38 +56,26 @@ public class APIUpdateBuilder {
 
                 final String response = httpUtils.sendPostRequestWithParams(REQUEST_URL, postData);
 
-                if (response.equalsIgnoreCase("error_connection")) {
-                    Log.e(TAG, "No Internet avalible");
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            APIDialogs.AlertDialogs.internetConnectionErrorWithExit(context);
-                        }
-                    });
-                } else if (response.equalsIgnoreCase("error_server")) {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            APIDialogs.AlertDialogs.serverConnectionErrorWithExit(context);
-                        }
-                    });
-                    Log.e(TAG, BUILDER_TAG + "Server error. Response code != 200");
-                    return null;
+                if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                    return APIHTTPUtils.ERROR_CONNECTION;
+                } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    return APIHTTPUtils.ERROR_SERVER;
+                } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    return APIHTTPUtils.ERROR_CONNECTION_TIMED_OUT;
                 } else {
                     try {
                         JSONObject jsonObject = new JSONObject(response);
                         String errorStatus = jsonObject.getString("error");
 
                         if (errorStatus.equals("true")) {
-                            Log.i(TAG, BUILDER_TAG + "error == true");
+                            Log.e(TAG, BUILDER_TAG + "updateMessage() -> error == true");
                             return errorStatus;
                         } else if (errorStatus.equals("false")) {
-                            Log.i(TAG, BUILDER_TAG + "error == false, post created");
-                            return errorStatus;
+                            Log.i(TAG, BUILDER_TAG + "updateMessage() -> error == false, post created");
                         }
 
-                    } catch (Exception e) {
-                        Log.e(TAG, BUILDER_TAG + "Can't create JSONArray");
+                    } catch (Exception ex) {
+                        Log.e(TAG, BUILDER_TAG + "updateMessage() -> ", ex);
                     }
                 }
                 return null;
@@ -107,33 +83,28 @@ public class APIUpdateBuilder {
 
             @Override
             protected void onPostExecute(final String errorStatus) {
-                super.onPostExecute(errorStatus);
-                if (loadingDialog != null) {
-                    loadingDialog.dismiss();
+                // Handling errors
+                if (errorStatus != null) {
+                    if (updateCallbacks != null)
+                        updateCallbacks.onError();
+                    return;
                 }
 
-                if (errorStatus.equals("true")) {
-                    if (onResultListener != null)
-                        onResultListener.onError("");
-                } else {
-                    if (onResultListener != null)
-                        onResultListener.onPosted(message);
-                }
-
+                if (updateCallbacks != null)
+                    updateCallbacks.onSuccess(message);
             }
         }.execute();
     }
 
-    public void setOnResultListener(OnResultListener onResultListener) {
-        this.onResultListener = onResultListener;
+    public void setUpdateCallbacks(UpdateCallbacks updateCallbacks) {
+        this.updateCallbacks = updateCallbacks;
     }
 
-    public interface OnResultListener {
-        void onPosted(String message);
+    public interface UpdateCallbacks {
+        void onPrepare();
 
-        /**
-         * @param errorMessage
-         */
-        void onError(String errorMessage);
+        void onSuccess(String message);
+
+        void onError();
     }
 }

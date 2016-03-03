@@ -23,6 +23,7 @@ import ua.nau.edu.RecyclerViews.NewsActivity.NewsDataModel;
 
 public class APIRefreshBuilder {
     private static final String BUILDER_TAG = "RefreshBuilder/ ";
+
     private Activity activity;
     private String TAG;
     private Context context;
@@ -34,6 +35,8 @@ public class APIRefreshBuilder {
     private LinearLayoutManager linearLayoutManager;
     private OnRefreshedAllListener onRefreshedAllListener;
     private OnRefreshedTargetedListener onRefreshedTargetedListener;
+
+    private RefresherCallbacks refresherCallbacks;
 
     public APIRefreshBuilder withActivity(Activity activity) {
         this.activity = activity;
@@ -93,10 +96,14 @@ public class APIRefreshBuilder {
         new AsyncTask<String, Void, String>() {
             @Override
             protected void onPreExecute() {
-                super.onPreExecute();
+                swipeRefreshLayout.setRefreshing(true);
                 adapter.setLoading();
                 invalidatePicassoCache();
                 clearDataSet();
+
+                if (refresherCallbacks != null)
+                    refresherCallbacks.onPrepare();
+
                 Log.i(TAG, BUILDER_TAG + "Refreshing items...");
             }
 
@@ -111,23 +118,12 @@ public class APIRefreshBuilder {
 
                 final String response = httpUtils.sendPostRequestWithParams(REQUEST_URL, postData);
 
-                if (response.equalsIgnoreCase("error_connection")) {
-                    Log.e(TAG, BUILDER_TAG + "No Internet avalible");
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            APIDialogs.AlertDialogs.internetConnectionErrorWithExit(context);
-                        }
-                    });
-                } else if (response.equalsIgnoreCase("error_server")) {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            APIDialogs.AlertDialogs.serverConnectionErrorWithExit(context);
-                        }
-                    });
-                    Log.e(TAG, "Server error. Response code != 200");
-                    return null;
+                if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                    return APIHTTPUtils.ERROR_CONNECTION;
+                } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    return APIHTTPUtils.ERROR_SERVER;
+                } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    return APIHTTPUtils.ERROR_CONNECTION_TIMED_OUT;
                 } else {
                     try {
                         int id;
@@ -155,8 +151,8 @@ public class APIRefreshBuilder {
                                 Log.i(TAG, BUILDER_TAG + "Added: [" + id + "] " + author + "   " + createTime);
                             }
                         }
-                    } catch (Exception e) {
-                        Log.e(TAG, BUILDER_TAG + "Can't create JSONArray");
+                    } catch (Exception ex) {
+                        Log.e(TAG, BUILDER_TAG + "refreshItemsAll() -> doInBackground() ->", ex);
                     }
                 }
 
@@ -164,46 +160,40 @@ public class APIRefreshBuilder {
             }
 
             @Override
-            protected void onPostExecute(final String str) {
-                super.onPostExecute(str);
-                if (data != null) {
+            protected void onPostExecute(final String errorStatus) {
+                // Handling errors
+                if (errorStatus != null) {
                     adapter.notifyDataSetChanged();
-                    adapter.setLoaded();
+                    refresherCallbacks.onError();
+                    onItemsLoadComplete();
+                    return;
+                }
+
+                // Set new dataSet
+                if (data != null) {
+                    try {
+                        adapter.notifyDataSetChanged();
+                        adapter.setLoaded();
+                    } catch (Exception ex) {
+                        Log.e(TAG, BUILDER_TAG + "refreshItemsAll() -> onPostExecute() -> ", ex);
+                    }
                 } else {
                     Log.e(TAG, BUILDER_TAG + "data == null");
                 }
 
                 onItemsLoadComplete();
+
+                if (refresherCallbacks != null)
+                    refresherCallbacks.onSuccess();
             }
         }.execute();
 
-        /** OLD OnScrollListener **/
-        /*recyclerView.clearOnScrollListeners();
-        recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(linearLayoutManager) {
-            @Override
-            public void onLoadMore(int current_page) {
-                Log.i(TAG, "From PostsRefreshBuilder / Loading new data... (" + Integer.toString(loadNumber) + ") posts");
-                postsLoader.loadPostsAll(startLoadPosition, loadNumber, REQUEST_URL);
-                startLoadPosition += loadNumber;
+        try {
+            if (onRefreshedAllListener != null) {
+                onRefreshedAllListener.onRefreshedAction();
             }
-        });*/
-
-        /*adapter.setOnLoadMoreListener(new NewsAdapter.OnLoadMoreListener() {
-            @Override
-            public void onLoadMore() {
-                Log.i(TAG, BUILDER_TAG + "onLoadMore called");
-                data.add(null);
-                adapter.notifyItemInserted(data.size() - 1);
-
-                Log.i(TAG, "From PostsRefreshBuilder / Loading new data... (" + Integer.toString(loadNumber) + ") posts");
-                postsLoader.setProgressItemIndex(data.size() - 1);
-                postsLoader.loadPostsAll(startLoadPosition, loadNumber, REQUEST_URL);
-                startLoadPosition += loadNumber;
-            }
-        });*/
-
-        if (onRefreshedAllListener != null) {
-            onRefreshedAllListener.onRefreshedAction();
+        } catch (Exception ex) {
+            Log.e(TAG, BUILDER_TAG + "refreshItemsAll() -> onPostExecute() ->", ex);
         }
     }
 
@@ -211,7 +201,7 @@ public class APIRefreshBuilder {
         new AsyncTask<String, Void, String>() {
             @Override
             protected void onPreExecute() {
-                super.onPreExecute();
+                swipeRefreshLayout.setRefreshing(true);
                 adapter.setLoading();
                 invalidatePicassoCache();
                 clearDataSet();
@@ -230,23 +220,12 @@ public class APIRefreshBuilder {
 
                 final String response = httpUtils.sendPostRequestWithParams(REQUEST_URL, postData);
 
-                if (response.equalsIgnoreCase("error_connection")) {
-                    Log.e(TAG, BUILDER_TAG + "No Internet avalible");
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            APIDialogs.AlertDialogs.internetConnectionErrorWithExit(context);
-                        }
-                    });
-                } else if (response.equalsIgnoreCase("error_server")) {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            APIDialogs.AlertDialogs.serverConnectionErrorWithExit(context);
-                        }
-                    });
-                    Log.e(TAG, "Server error. Response code != 200");
-                    return null;
+                if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                    return APIHTTPUtils.ERROR_CONNECTION;
+                } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    return APIHTTPUtils.ERROR_SERVER;
+                } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    return APIHTTPUtils.ERROR_CONNECTION_TIMED_OUT;
                 } else {
                     try {
                         int id;
@@ -274,8 +253,8 @@ public class APIRefreshBuilder {
                                 Log.i(TAG, BUILDER_TAG + "Added: [" + id + "] " + author + "   " + createTime);
                             }
                         }
-                    } catch (Exception e) {
-                        Log.e(TAG, BUILDER_TAG + "Can't create JSONArray");
+                    } catch (Exception ex) {
+                        Log.e(TAG, BUILDER_TAG + "refreshItemsTargeted() -> doInBackground() ->", ex);
                     }
                 }
 
@@ -283,23 +262,43 @@ public class APIRefreshBuilder {
             }
 
             @Override
-            protected void onPostExecute(final String str) {
-                super.onPostExecute(str);
-                if (data != null) {
+            protected void onPostExecute(final String errorStatus) {
+                // Handling errors
+                if (errorStatus != null) {
                     adapter.notifyDataSetChanged();
-                    adapter.setLoaded();
+                    refresherCallbacks.onError();
+                    onItemsLoadComplete();
+                    return;
+                }
+
+                // Set new dataSet
+                if (data != null) {
+                    try {
+                        adapter.notifyDataSetChanged();
+                        adapter.setLoaded();
+                    } catch (Exception ex) {
+                        Log.e(TAG, BUILDER_TAG + "refreshItemsTargeted() -> onPostExecute() -> ", ex);
+                    }
                 } else {
                     Log.e(TAG, BUILDER_TAG + "data == null");
                 }
 
                 onItemsLoadComplete();
+
+                if (refresherCallbacks != null)
+                    refresherCallbacks.onSuccess();
             }
         }.execute();
 
         if (onRefreshedTargetedListener != null) {
-            onRefreshedTargetedListener.onRefreshedAction();
+            try {
+                onRefreshedTargetedListener.onRefreshedAction();
+            } catch (Exception ex) {
+                Log.e(TAG, BUILDER_TAG + "refreshItemsTargeted() -> onPostExecute() ->", ex);
+            }
         }
     }
+
 
     private void invalidatePicassoCache() {
         for (int i = 0; i < data.size(); i++) {
@@ -342,5 +341,20 @@ public class APIRefreshBuilder {
 
     public interface OnRefreshedTargetedListener {
         void onRefreshedAction();
+    }
+
+    /**
+     * @param refresherCallbacks
+     */
+    public void setRefresherallbacks(RefresherCallbacks refresherCallbacks) {
+        this.refresherCallbacks = refresherCallbacks;
+    }
+
+    public interface RefresherCallbacks {
+        void onPrepare();
+
+        void onSuccess();
+
+        void onError();
     }
 }

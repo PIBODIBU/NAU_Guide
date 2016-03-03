@@ -2,14 +2,6 @@ package ua.nau.edu.API;
 
 import android.util.Log;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,16 +15,21 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
 public class APIHTTPUtils {
+
+    public static String TAG = "APIHTTPUtils";
+    public static String ERROR_SERVER = "error_server";
+    public static String ERROR_CONNECTION = "error_connection";
+    public static String ERROR_CONNECTION_TIMED_OUT = "error_connection_timed_out";
 
     public String sendPostRequestWithParams(String requestURL, HashMap<String, String> postDataParams) {
 
@@ -63,15 +60,17 @@ public class APIHTTPUtils {
                     BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     response = br.readLine();
                 } else {
-                    response = "error_server";
+                    response = ERROR_SERVER;
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (SocketTimeoutException ex) {
+                Log.d(TAG, "sendPostRequestWithParams() -> ", ex);
+                response = ERROR_CONNECTION_TIMED_OUT;
+            } catch (Exception ex) {
+                Log.d(TAG, "sendPostRequestWithParams() -> ", ex);
             }
         } else {
-            response = "error_connection";
+            response = ERROR_CONNECTION;
         }
-
         return response;
     }
 

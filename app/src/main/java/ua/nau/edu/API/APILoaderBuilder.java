@@ -11,6 +11,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.gc.materialdesign.views.ProgressBarIndeterminate;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -28,8 +29,8 @@ public class APILoaderBuilder {
     private ArrayList<NewsDataModel> data;
     private RecyclerView recyclerView;
     private NewsAdapter adapter;
-    private ProgressBarIndeterminate progressBar;
     private int progressItemIndex = -1;
+    private LoaderCallbacks loaderCallbacks = null;
 
     public APILoaderBuilder withContext(Context context) {
         this.context = context;
@@ -67,14 +68,14 @@ public class APILoaderBuilder {
         return this;
     }
 
-    public APILoaderBuilder withProgressBar(ProgressBarIndeterminate progressBar) {
-        this.progressBar = progressBar;
+    public APILoaderBuilder withTag(String TAG) {
+        this.TAG = TAG;
 
         return this;
     }
 
-    public APILoaderBuilder withTag(String TAG) {
-        this.TAG = TAG;
+    public APILoaderBuilder withLoaderCallbacks(LoaderCallbacks loaderCallbacks) {
+        this.loaderCallbacks = loaderCallbacks;
 
         return this;
     }
@@ -85,26 +86,24 @@ public class APILoaderBuilder {
 
     public void loadPostsAll(final int startLoadPosition, final int loadNumber, final String REQUEST_URL) {
         new AsyncTask<String, Void, String>() {
-            MaterialDialog loadingDialog;
             int addedItems = 0;
+            int oldSize;
 
             @Override
             protected void onPreExecute() {
-                super.onPreExecute();
-                if (withDialog) {
-
-                    loadingDialog = APIDialogs.ProgressDialogs.loading(context);
-                    loadingDialog.show();
-                }
-                if (progressBar != null) {
-                    progressBar.setVisibility(View.VISIBLE);
+                oldSize = adapter.getItemCount();
+                if (loaderCallbacks != null) {
+                    loaderCallbacks.onPrepare();
                 }
             }
 
+            /**
+             * @return null if loading was successful, or String error
+             */
             @Override
             protected String doInBackground(String... params) {
                 APIHTTPUtils httpUtils = new APIHTTPUtils();
-                HashMap<String, String> postData = new HashMap<String, String>();
+                HashMap<String, String> postData = new HashMap<>();
                 postData.put("start_post", Integer.toString(startLoadPosition));
                 postData.put("number_of_posts", Integer.toString(loadNumber));
 
@@ -112,23 +111,12 @@ public class APILoaderBuilder {
 
                 final String response = httpUtils.sendPostRequestWithParams(REQUEST_URL, postData);
 
-                if (response.equalsIgnoreCase("error_connection")) {
-                    Log.e(TAG, "No Internet avalible");
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            APIDialogs.AlertDialogs.internetConnectionErrorWithExit(context);
-                        }
-                    });
-                } else if (response.equalsIgnoreCase("error_server")) {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            APIDialogs.AlertDialogs.serverConnectionErrorWithExit(context);
-                        }
-                    });
-                    Log.e(TAG, BUILDER_TAG + "Server error. Response code != 200");
-                    return null;
+                if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                    return APIHTTPUtils.ERROR_CONNECTION;
+                } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    return APIHTTPUtils.ERROR_SERVER;
+                } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    return APIHTTPUtils.ERROR_CONNECTION_TIMED_OUT;
                 } else {
                     try {
                         int id;
@@ -157,32 +145,60 @@ public class APILoaderBuilder {
                                 Log.i(TAG, BUILDER_TAG + "Added: [" + id + "] " + author + "   " + createTime);
                             }
                         }
-                    } catch (Exception e) {
-                        Log.e(TAG, BUILDER_TAG + "Can't create JSONArray");
+                    } catch (Exception ex) {
+                        Log.e(TAG, BUILDER_TAG + "loadPostsAll() -> ", ex);
                     }
                 }
                 return null;
             }
 
             @Override
-            protected void onPostExecute(final String str) {
-                super.onPostExecute(str);
+            protected void onPostExecute(final String response) {
+                // Handling errors
+                if (response != null) {
+                    if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                        if (loaderCallbacks != null) {
+                            loaderCallbacks.onError(APIHTTPUtils.ERROR_SERVER);
+                            return;
+                        }
+                    } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                        if (loaderCallbacks != null) {
+                            loaderCallbacks.onError(APIHTTPUtils.ERROR_CONNECTION);
+                            return;
+                        }
+                    } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                        if (loaderCallbacks != null) {
+                            loaderCallbacks.onError(APIHTTPUtils.ERROR_CONNECTION_TIMED_OUT);
+                            return;
+                        }
+                    }
+                }
+
+                // Remove progress item
                 if (progressItemIndex != -1) {
-                    data.remove(progressItemIndex);
-                    adapter.notifyItemRemoved(progressItemIndex + 1);
+                    try {
+                        data.remove(progressItemIndex);
+                        adapter.notifyItemRemoved(progressItemIndex + 1);
+                    } catch (Exception ex) {
+                        Log.e(TAG, BUILDER_TAG + "onPostExecute() -> ", ex);
+                    }
                 }
+
+                // Set new dataSet
                 if (data != null && addedItems != 0) {
-                    adapter.notifyDataSetChanged();
-                    adapter.setLoaded();
+                    try {
+                        //adapter.notifyDataSetChanged();
+                        adapter.notifyItemRangeInserted(oldSize, addedItems);
+                        adapter.setLoaded();
+                    } catch (Exception ex) {
+                        Log.e(TAG, BUILDER_TAG + "onPostExecute() -> ", ex);
+                    }
                 } else {
-                    Log.i(TAG, BUILDER_TAG + "onPostExecute: dataSet == null");
-                    //activity.finish();
+                    Log.e(TAG, BUILDER_TAG + "onPostExecute: data == null");
                 }
-                if (loadingDialog != null) {
-                    loadingDialog.dismiss();
-                }
-                if (progressBar != null) {
-                    progressBar.setVisibility(View.GONE);
+
+                if (loaderCallbacks != null) {
+                    loaderCallbacks.onSuccess();
                 }
             }
         }.execute();
@@ -190,22 +206,20 @@ public class APILoaderBuilder {
 
     public void loadPostsTargeted(final String REQUEST_URL, final String authorUniqueId, final int startLoadPosition, final int loadNumber) {
         new AsyncTask<String, Void, String>() {
-            //ProgressDialog loadingDialog = null;
-            MaterialDialog loadingDialog;
             int addedItems = 0;
+            int oldSize;
 
             @Override
             protected void onPreExecute() {
-                super.onPreExecute();
-                if (withDialog) {
-
-                    loadingDialog = APIDialogs.ProgressDialogs.loading(context);
-                    loadingDialog.show();
-                }
-                if (progressBar != null) {
-                    progressBar.setVisibility(View.VISIBLE);
+                oldSize = adapter.getItemCount();
+                if (loaderCallbacks != null) {
+                    loaderCallbacks.onPrepare();
                 }
             }
+
+            /**
+             * @return null if loading was successful, or String error
+             */
 
             @Override
             protected String doInBackground(String... params) {
@@ -219,23 +233,12 @@ public class APILoaderBuilder {
 
                 final String response = httpUtils.sendPostRequestWithParams(REQUEST_URL, postData);
 
-                if (response.equalsIgnoreCase("error_connection")) {
-                    Log.e(TAG, "No Internet avalible");
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            APIDialogs.AlertDialogs.internetConnectionErrorWithExit(context);
-                        }
-                    });
-                } else if (response.equalsIgnoreCase("error_server")) {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            APIDialogs.AlertDialogs.serverConnectionErrorWithExit(context);
-                        }
-                    });
-                    Log.e(TAG, BUILDER_TAG + "Server error. Response code != 200");
-                    return null;
+                if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                    return APIHTTPUtils.ERROR_CONNECTION;
+                } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    return APIHTTPUtils.ERROR_SERVER;
+                } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    return APIHTTPUtils.ERROR_CONNECTION_TIMED_OUT;
                 } else {
                     try {
                         int id;
@@ -264,35 +267,74 @@ public class APILoaderBuilder {
                                 Log.i(TAG, BUILDER_TAG + "Added: [" + id + "] " + author + "   " + createTime);
                             }
                         }
-                    } catch (Exception e) {
-                        Log.e(TAG, BUILDER_TAG + "Can't create JSONArray");
+                    } catch (Exception ex) {
+                        Log.e(TAG, BUILDER_TAG + "loadPostsAll() -> ", ex);
                     }
                 }
                 return null;
             }
 
             @Override
-            protected void onPostExecute(final String str) {
-                super.onPostExecute(str);
+            protected void onPostExecute(final String response) {
+                // Handling errors
+                if (response != null) {
+                    if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                        if (loaderCallbacks != null) {
+                            loaderCallbacks.onError(APIHTTPUtils.ERROR_SERVER);
+                            return;
+                        }
+                    } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                        if (loaderCallbacks != null) {
+                            loaderCallbacks.onError(APIHTTPUtils.ERROR_CONNECTION);
+                            return;
+                        }
+                    } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                        if (loaderCallbacks != null) {
+                            loaderCallbacks.onError(APIHTTPUtils.ERROR_CONNECTION_TIMED_OUT);
+                            return;
+                        }
+                    }
+                }
+
+                // Remove progress item
                 if (progressItemIndex != -1) {
-                    data.remove(progressItemIndex);
-                    adapter.notifyItemRemoved(progressItemIndex + 1);
-                    Log.i(TAG, BUILDER_TAG + "Progress Item removed");
+                    try {
+                        data.remove(progressItemIndex);
+                        adapter.notifyItemRemoved(progressItemIndex + 1);
+                    } catch (Exception ex) {
+                        Log.e(TAG, BUILDER_TAG + "onPostExecute() -> ", ex);
+                    }
                 }
+
+                // Set new dataSet
                 if (data != null && addedItems != 0) {
-                    adapter.notifyDataSetChanged();
-                    adapter.setLoaded();
+                    try {
+                        //adapter.notifyDataSetChanged();
+                        adapter.notifyItemRangeInserted(oldSize, addedItems);
+                        adapter.setLoaded();
+                    } catch (Exception ex) {
+                        Log.e(TAG, BUILDER_TAG + "onPostExecute() -> ", ex);
+                    }
                 } else {
-                    Log.i(TAG, BUILDER_TAG + "onPostExecute: dataSet == null");
-                    //activity.finish();
+                    Log.e(TAG, BUILDER_TAG + "onPostExecute: data == null");
                 }
-                if (loadingDialog != null) {
-                    loadingDialog.dismiss();
-                }
-                if (progressBar != null) {
-                    progressBar.setVisibility(View.GONE);
+
+                if (loaderCallbacks != null) {
+                    loaderCallbacks.onSuccess();
                 }
             }
         }.execute();
+    }
+
+    public void setLoaderCallbacks(LoaderCallbacks loaderCallbacks) {
+        this.loaderCallbacks = loaderCallbacks;
+    }
+
+    public interface LoaderCallbacks {
+        void onPrepare();
+
+        void onSuccess();
+
+        void onError(String error);
     }
 }

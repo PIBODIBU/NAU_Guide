@@ -17,9 +17,7 @@ public class APICreateBuilder {
     private String TAG;
     private Context context;
     private Activity activity;
-    private boolean withDialog = false;
-
-    private OnResultListener onResultListener;
+    private CreateCallbacks createCallbacks;
 
     public APICreateBuilder withContext(Context context) {
         this.context = context;
@@ -33,12 +31,6 @@ public class APICreateBuilder {
         return this;
     }
 
-    public APICreateBuilder withLoadingDialog(boolean withDialog) {
-        this.withDialog = withDialog;
-
-        return this;
-    }
-
     public APICreateBuilder withTag(String TAG) {
         this.TAG = TAG;
 
@@ -47,15 +39,11 @@ public class APICreateBuilder {
 
     public void postMessage(final String REQUEST_URL, final String token, final String message) {
         new AsyncTask<String, Void, String>() {
-            MaterialDialog loadingDialog;
-
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                if (withDialog) {
-                    loadingDialog = APIDialogs.ProgressDialogs.loading(context);
-                    loadingDialog.show();
-                }
+                if (createCallbacks != null)
+                    createCallbacks.onPrepare();
             }
 
             @Override
@@ -67,39 +55,26 @@ public class APICreateBuilder {
 
                 final String response = httpUtils.sendPostRequestWithParams(REQUEST_URL, postData);
 
-                if (response.equalsIgnoreCase("error_connection")) {
-                    Log.e(TAG, "No Internet avalible");
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            APIDialogs.AlertDialogs.internetConnectionErrorWithExit(context);
-                        }
-                    });
-                } else if (response.equalsIgnoreCase("error_server")) {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            APIDialogs.AlertDialogs.serverConnectionErrorWithExit(context);
-                        }
-                    });
-                    Log.e(TAG, BUILDER_TAG + "Server error. Response code != 200");
-                    return null;
+                if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                    return APIHTTPUtils.ERROR_CONNECTION;
+                } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    return APIHTTPUtils.ERROR_SERVER;
+                } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    return APIHTTPUtils.ERROR_CONNECTION_TIMED_OUT;
                 } else {
                     try {
                         JSONObject jsonObject = new JSONObject(response);
                         String errorStatus = jsonObject.getString("error");
 
                         if (errorStatus.equals("true")) {
-                            Log.i(TAG, BUILDER_TAG + "error == true");
-                            return errorStatus;
-                        } else if (errorStatus.equals("false")) {
-                            Log.i(TAG, BUILDER_TAG + "error == false, post created");
+                            Log.e(TAG, BUILDER_TAG + "postMessage() -> error == true");
                             return errorStatus;
                         }
-
-
-                    } catch (Exception e) {
-                        Log.e(TAG, BUILDER_TAG + "Can't create JSONArray");
+                        if (errorStatus.equals("false")) {
+                            Log.i(TAG, BUILDER_TAG + "postMessage() -> error == false, post created");
+                        }
+                    } catch (Exception ex) {
+                        Log.e(TAG, BUILDER_TAG + "postMessage() -> ", ex);
                     }
                 }
                 return null;
@@ -107,33 +82,28 @@ public class APICreateBuilder {
 
             @Override
             protected void onPostExecute(final String errorStatus) {
-                super.onPostExecute(errorStatus);
-                if (loadingDialog != null) {
-                    loadingDialog.dismiss();
+                // Handling errors
+                if (errorStatus != null) {
+                    if (createCallbacks != null)
+                        createCallbacks.onError();
+                    return;
                 }
 
-                if (errorStatus.equals("true")) {
-                    if (onResultListener != null)
-                        onResultListener.onError("");
-                } else {
-                    if (onResultListener != null)
-                        onResultListener.onPosted(message);
-                }
-
+                if (createCallbacks != null)
+                    createCallbacks.onSuccess(message);
             }
         }.execute();
     }
 
-    public void setOnResultListener(OnResultListener onResultListener) {
-        this.onResultListener = onResultListener;
+    public void setCreateCallbacks(CreateCallbacks createCallbacks) {
+        this.createCallbacks = createCallbacks;
     }
 
-    public interface OnResultListener {
-        void onPosted(String message);
+    public interface CreateCallbacks {
+        void onPrepare();
 
-        /**
-         * @param errorMessage
-         */
-        void onError(String errorMessage);
+        void onSuccess(String message);
+
+        void onError();
     }
 }

@@ -11,6 +11,8 @@ import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.API.APICreateBuilder;
 import ua.nau.edu.API.APIStrings;
@@ -47,21 +49,28 @@ public class CreatePostActivity extends BaseToolbarActivity {
     }
 
     private void setUpAPI() {
+        final MaterialDialog loadingDialog = APIDialogs.ProgressDialogs.loading(this);
         apiCreateBuilder = new APICreateBuilder()
                 .withActivity(this)
                 .withContext(this)
-                .withLoadingDialog(true)
                 .withTag(TAG);
 
-        apiCreateBuilder.setOnResultListener(new APICreateBuilder.OnResultListener() {
+        apiCreateBuilder.setCreateCallbacks(new APICreateBuilder.CreateCallbacks() {
             @Override
-            public void onPosted(String message) {
+            public void onPrepare() {
+                loadingDialog.show();
+            }
+
+            @Override
+            public void onSuccess(String message) {
+                loadingDialog.dismiss();
                 setResult(APIValues.RESULT_OK);
                 finish();
             }
 
             @Override
-            public void onError(String errorMessage) {
+            public void onError() {
+                loadingDialog.dismiss();
                 setResult(APIValues.RESULT_ERROR);
                 finish();
             }
@@ -112,6 +121,15 @@ public class CreatePostActivity extends BaseToolbarActivity {
     }
 
     private void actionBeforeExit() {
+        if (message == null) {
+            finish();
+            return;
+        } else {
+            if (isMessageEmpty()) {
+                finish();
+                return;
+            }
+        }
         final AlertDialog closeDialog = new AlertDialog.Builder(this)
                 .setTitle("Внимание")
                 .setMessage("Все данные будут утеряны. Вы уверены, что хотите выйти?")
@@ -134,7 +152,7 @@ public class CreatePostActivity extends BaseToolbarActivity {
             @Override
             public void onShow(DialogInterface dialog) {
                 closeDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(CreatePostActivity.this, R.color.colorAppPrimary));
-                closeDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(CreatePostActivity.this, R.color.colorAppPrimary));
+                closeDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(CreatePostActivity.this, R.color.black));
             }
         });
 
@@ -142,7 +160,7 @@ public class CreatePostActivity extends BaseToolbarActivity {
     }
 
     private boolean isMessageEmpty() {
-        return message.equals("");
+        return message.trim().equals("");
     }
 
     private boolean isValidLength() {

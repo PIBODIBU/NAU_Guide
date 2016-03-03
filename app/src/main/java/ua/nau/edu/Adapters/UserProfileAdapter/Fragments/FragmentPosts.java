@@ -1,11 +1,15 @@
 package ua.nau.edu.Adapters.UserProfileAdapter.Fragments;
 
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,13 +18,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+import ua.nau.edu.API.APIDeleteBuilder;
+import ua.nau.edu.API.APIDialogs;
+import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.API.APILoaderBuilder;
 import ua.nau.edu.API.APIRefreshBuilder;
 import ua.nau.edu.API.APIStrings;
+import ua.nau.edu.API.APIValues;
+import ua.nau.edu.NAU_Guide.CreatePostActivity;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.NAU_Guide.UpdatePostActivity;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
@@ -40,8 +50,9 @@ public class FragmentPosts extends Fragment {
     private static RecyclerView recyclerView;
     private ArrayList<NewsDataModel> data = new ArrayList<NewsDataModel>();
     private APILoaderBuilder postsLoaderWithoutDialog;
-    private APILoaderBuilder postsLoaderWithDialog;
-    private APIRefreshBuilder APIRefreshBuilder;
+    private APILoaderBuilder apiLoaderBuilder;
+    private APIRefreshBuilder apiRefreshBuilder;
+    private APIDeleteBuilder apiDeleteBuilder;
     private UserProfileActivity supportActivity;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
@@ -59,13 +70,14 @@ public class FragmentPosts extends Fragment {
         sharedPrefUtils = new SharedPrefUtils(supportActivity);
 
         setUpRecyclerView();
-        setUpPostsLoaders();
-        setUpPostsRefreshers();
         setUpSwipeRefreshLayout();
+        setUpPostsLoaders();
+        setUpPostsDelete();
+        setUpPostsRefreshers();
 
         Log.i(TAG, "onCreateView: Loading first " + loadNumber + " posts...");
         Log.i(TAG, "onCreateView: Loading first unique id: " + getActivity().getIntent().getExtras().getString("uniqueId"));
-        postsLoaderWithDialog.loadPostsTargeted(APIStrings.RequestUrl.GET_POST_TARGETED,
+        apiLoaderBuilder.loadPostsTargeted(APIStrings.RequestUrl.GET_POST_TARGETED,
                 authorUniqueId,
                 startLoadPosition,
                 loadNumber);
@@ -85,29 +97,104 @@ public class FragmentPosts extends Fragment {
     }
 
     private void setUpPostsLoaders() {
-        postsLoaderWithDialog = new APILoaderBuilder()
+        final MaterialDialog loadingDialog = APIDialogs.ProgressDialogs.loading(supportActivity);
+
+        apiLoaderBuilder = new APILoaderBuilder()
                 .withContext(supportActivity)
                 .withAdapter(adapter)
-                .withLoadingDialog(true)
                 .withTag(TAG)
                 .withRecycler(recyclerView)
                 .withActivity(supportActivity)
                 .withDataSet(data);
+
+        apiLoaderBuilder.setLoaderCallbacks(new APILoaderBuilder.LoaderCallbacks() {
+            @Override
+            public void onPrepare() {
+                loadingDialog.show();
+            }
+
+            @Override
+            public void onSuccess() {
+                loadingDialog.dismiss();
+            }
+
+            @Override
+            public void onError(String error) {
+                loadingDialog.dismiss();
+                if (error.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                    APIDialogs.AlertDialogs.internetConnectionError(supportActivity);
+                } else if (error.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    APIDialogs.AlertDialogs.serverConnectionError(supportActivity);
+                } else if (error.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION_TIMED_OUT)) {
+                    APIDialogs.AlertDialogs.serverConnectionError(supportActivity);
+                }
+            }
+        });
 
         postsLoaderWithoutDialog = new APILoaderBuilder()
                 .withContext(supportActivity)
                 .withAdapter(adapter)
                 .withLoadingDialog(false)
-                        //.withProgressBar(progressBar)
                 .withTag(TAG)
                 .withRecycler(recyclerView)
                 .withActivity(supportActivity)
                 .withDataSet(data);
+        postsLoaderWithoutDialog.setLoaderCallbacks(new APILoaderBuilder.LoaderCallbacks() {
+            @Override
+            public void onPrepare() {
+            }
+
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onError(String error) {
+                if (error.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                    APIDialogs.AlertDialogs.internetConnectionError(supportActivity);
+                } else if (error.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    APIDialogs.AlertDialogs.serverConnectionError(supportActivity);
+                } else if (error.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION_TIMED_OUT)) {
+                    APIDialogs.AlertDialogs.serverConnectionError(supportActivity);
+                }
+            }
+        });
+    }
+
+    private void setUpPostsDelete() {
+        final MaterialDialog loadingDialog = APIDialogs.ProgressDialogs.loading(supportActivity);
+
+        apiDeleteBuilder = new APIDeleteBuilder()
+                .withActivity(supportActivity)
+                .withContext(supportActivity)
+                .withLoadingDialog(true)
+                .withTag(TAG)
+                .withRecyclerView(recyclerView)
+                .withDataSet(data)
+                .withAdapter(adapter);
+
+        apiDeleteBuilder.setDeleteCallbacks(new APIDeleteBuilder.DeleteCallbacks() {
+            @Override
+            public void onPrepare() {
+                loadingDialog.show();
+            }
+
+            @Override
+            public void onSuccess() {
+                loadingDialog.dismiss();
+                Snackbar.make(supportActivity.rootView, "Удалено", Snackbar.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError() {
+                loadingDialog.dismiss();
+                APIDialogs.AlertDialogs.errorWhileDeletingPost(supportActivity);
+            }
+        });
     }
 
     private void setUpPostsRefreshers() {
-        mSwipeRefreshLayout = (SwipeRefreshLayout) FragmentView.findViewById(R.id.swipeLayoutContainer);
-        APIRefreshBuilder = new APIRefreshBuilder()
+        apiRefreshBuilder = new APIRefreshBuilder()
                 .withContext(supportActivity)
                 .withAdapter(adapter)
                 .withTag(TAG)
@@ -118,7 +205,7 @@ public class FragmentPosts extends Fragment {
                 .withPostsLoaderBuilder(postsLoaderWithoutDialog)
                 .withLinearLayoutManager(layoutManager);
 
-        APIRefreshBuilder.setOnRefreshedTargetedListener(new APIRefreshBuilder.OnRefreshedTargetedListener() {
+        apiRefreshBuilder.setOnRefreshedTargetedListener(new APIRefreshBuilder.OnRefreshedTargetedListener() {
             @Override
             public void onRefreshedAction() {
                 startLoadPosition = loadNumber;
@@ -142,9 +229,26 @@ public class FragmentPosts extends Fragment {
                 });
             }
         });
+
+        apiRefreshBuilder.setRefresherallbacks(new APIRefreshBuilder.RefresherCallbacks() {
+            @Override
+            public void onPrepare() {
+
+            }
+
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onError() {
+                APIDialogs.AlertDialogs.errorWhileUpdatingMessage(supportActivity);
+            }
+        });
     }
 
     private void setUpSwipeRefreshLayout() {
+        mSwipeRefreshLayout = (SwipeRefreshLayout) FragmentView.findViewById(R.id.swipeLayoutContainer);
         mSwipeRefreshLayout.setColorSchemeResources(
                 R.color.colorAppPrimary
                 /*R.color.flashy_blue,
@@ -154,7 +258,7 @@ public class FragmentPosts extends Fragment {
             @Override
             public void onRefresh() {
                 // Refreshing items
-                APIRefreshBuilder.refreshItemsTargeted(APIStrings.RequestUrl.GET_POST_TARGETED, authorUniqueId, loadNumber);
+                apiRefreshBuilder.refreshItemsTargeted(APIStrings.RequestUrl.GET_POST_TARGETED, authorUniqueId, loadNumber);
 
             }
         });
@@ -170,19 +274,6 @@ public class FragmentPosts extends Fragment {
 
         adapter = new NewsAdapter(data, supportActivity, recyclerView, sharedPrefUtils);
         recyclerView.setAdapter(adapter);
-
-        /**
-         * OLD OnScrollListener
-         */
-        /*recyclerView.clearOnScrollListeners();
-        recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
-            @Override
-            public void onLoadMore(int current_page) {
-                Log.i(NewsActivity.TAG, "onLoadMore called: Loading new data... (" + Integer.toString(loadNumber) + ") posts");
-                postsLoaderWithoutDialog.loadPostsAll(startLoadPosition, loadNumber, APIStrings.RequestUrl.GET_POST_TARGETED);
-                startLoadPosition += loadNumber;
-            }
-        });*/
 
         adapter.setOnLoadMoreListener(new NewsAdapter.OnLoadMoreListener() {
             @Override
@@ -201,13 +292,81 @@ public class FragmentPosts extends Fragment {
             }
         });
 
+        adapter.setOnDeleteMessageAction(new NewsAdapter.OnDeleteMessageAction() {
+            @Override
+            public void onDeleteCalled(final int postId, final int deletePosition) {
+                final AlertDialog deleteDialog = new AlertDialog.Builder(supportActivity)
+                        .setTitle("Удалить?")
+                        .setMessage("Это действия нельзя отменить. Вы точно хотите удалить сообщение?")
+                        .setCancelable(false)
+                        .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                apiDeleteBuilder.deletePost(APIStrings.RequestUrl.DELETE_POST, sharedPrefUtils.getToken(), postId, deletePosition);
+                            }
+                        })
+                        .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).create();
+
+                deleteDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialog) {
+                        deleteDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(supportActivity, R.color.colorAppPrimary));
+                        deleteDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(supportActivity, R.color.black));
+                    }
+                });
+
+                deleteDialog.show();
+            }
+        });
+
         adapter.setOnUpdateMessageAction(new NewsAdapter.OnUpdateMessageAction() {
             @Override
             public void onUpdateCalled(int postId, String message) {
-                startActivity(new Intent(supportActivity, UpdatePostActivity.class)
+                /*startActivity(new Intent(supportActivity, UpdatePostActivity.class)
                         .putExtra("postId", postId)
-                        .putExtra("message", message));
+                        .putExtra("message", message));*/
+
+                startActivityForResult(new Intent(supportActivity, UpdatePostActivity.class)
+                                .putExtra("postId", postId)
+                                .putExtra("message", message),
+                        UpdatePostActivity.REQUEST_CODE);
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case CreatePostActivity.REQUEST_CODE: {
+                if (resultCode == APIValues.RESULT_OK) {
+                    Snackbar.make(supportActivity.rootView, "Отправлено", Snackbar.LENGTH_LONG).show();
+                    apiRefreshBuilder.refreshItemsTargeted(APIStrings.RequestUrl.GET_POST_TARGETED, authorUniqueId, loadNumber);
+                } else if (resultCode == APIValues.RESULT_ERROR) {
+                    APIDialogs.AlertDialogs.errorWhilePostingMessage(supportActivity);
+                }
+                break;
+            }
+
+            case UpdatePostActivity.REQUEST_CODE: {
+                if (resultCode == APIValues.RESULT_OK) {
+                    Snackbar.make(supportActivity.rootView, "Обновлено", Snackbar.LENGTH_LONG).show();
+                    apiRefreshBuilder.refreshItemsTargeted(APIStrings.RequestUrl.GET_POST_TARGETED, authorUniqueId, loadNumber);
+                } else if (resultCode == APIValues.RESULT_ERROR) {
+                    APIDialogs.AlertDialogs.errorWhileUpdatingMessage(supportActivity);
+                }
+                break;
+            }
+
+            default: {
+
+            }
+        }
     }
 }

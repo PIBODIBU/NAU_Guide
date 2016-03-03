@@ -3,14 +3,10 @@ package ua.nau.edu.API;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.gc.materialdesign.widgets.SnackBar;
 
 import org.json.JSONObject;
 
@@ -29,7 +25,7 @@ public class APIDeleteBuilder {
     private RecyclerView.Adapter adapter;
     private ArrayList<NewsDataModel> dataSet;
 
-    private OnResultListener onResultListener;
+    private DeleteCallbacks deleteCallbacks;
 
     public APIDeleteBuilder withContext(Context context) {
         this.context = context;
@@ -80,10 +76,7 @@ public class APIDeleteBuilder {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                if (withDialog) {
-                    loadingDialog = APIDialogs.ProgressDialogs.loading(context);
-                    loadingDialog.show();
-                }
+                deleteCallbacks.onPrepare();
             }
 
             @Override
@@ -94,25 +87,14 @@ public class APIDeleteBuilder {
                 postData.put("post_id", Integer.toString(postId));
 
                 final String response = httpUtils.sendPostRequestWithParams(REQUEST_URL, postData);
-                Log.i(TAG, "server response: " + response);
+                Log.i(TAG, BUILDER_TAG + "server response: " + response);
 
-                if (response.equalsIgnoreCase("error_connection")) {
-                    Log.e(TAG, "No Internet avalible");
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            APIDialogs.AlertDialogs.internetConnectionErrorWithExit(context);
-                        }
-                    });
-                } else if (response.equalsIgnoreCase("error_server")) {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            APIDialogs.AlertDialogs.serverConnectionErrorWithExit(context);
-                        }
-                    });
-                    Log.e(TAG, BUILDER_TAG + "Server error. Response code != 200");
-                    return null;
+                if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                    return APIHTTPUtils.ERROR_CONNECTION;
+                } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    return APIHTTPUtils.ERROR_SERVER;
+                } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    return APIHTTPUtils.ERROR_CONNECTION_TIMED_OUT;
                 } else {
                     try {
                         JSONObject jsonObject = new JSONObject(response);
@@ -121,14 +103,12 @@ public class APIDeleteBuilder {
                         if (errorStatus.equals("true")) {
                             Log.i(TAG, BUILDER_TAG + "error == true");
                             return errorStatus;
-                        } else if (errorStatus.equals("false")) {
-                            Log.i(TAG, BUILDER_TAG + "error == false, post deleted");
-                            return errorStatus;
                         }
-
-
-                    } catch (Exception e) {
-                        Log.e(TAG, BUILDER_TAG + "Can't create JSONArray");
+                        if (errorStatus.equals("false")) {
+                            Log.i(TAG, BUILDER_TAG + "error == false, post deleted");
+                        }
+                    } catch (Exception ex) {
+                        Log.e(TAG, BUILDER_TAG + "deletePost() -> doInBackground() -> ", ex);
                     }
                 }
                 return null;
@@ -136,36 +116,37 @@ public class APIDeleteBuilder {
 
             @Override
             protected void onPostExecute(final String errorStatus) {
-                super.onPostExecute(errorStatus);
-                if (loadingDialog != null) {
-                    loadingDialog.dismiss();
+                // Handling errors
+                if (errorStatus != null) {
+                    if (deleteCallbacks != null)
+                        deleteCallbacks.onError();
+                    return;
                 }
 
-                if (errorStatus.equals("true")) {
-                    if (onResultListener != null)
-                        onResultListener.onError("");
-                } else {
+                // Set new dataSet
+                try {
                     dataSet.remove(deletePosition);
                     adapter.notifyItemRemoved(deletePosition);
                     adapter.notifyItemRangeChanged(deletePosition, dataSet.size());
-
-                    if (onResultListener != null)
-                        onResultListener.onDeleted();
+                } catch (Exception ex) {
+                    Log.e(TAG, BUILDER_TAG + "deletePost() -> onPostExecute() -> ", ex);
                 }
+                if (deleteCallbacks != null)
+                    deleteCallbacks.onSuccess();
+
             }
         }.execute();
     }
 
-    public void setOnResultListener(OnResultListener onResultListener) {
-        this.onResultListener = onResultListener;
+    public void setDeleteCallbacks(DeleteCallbacks deleteCallbacks) {
+        this.deleteCallbacks = deleteCallbacks;
     }
 
-    public interface OnResultListener {
-        void onDeleted();
+    public interface DeleteCallbacks {
+        void onPrepare();
 
-        /**
-         * @param errorMessage
-         */
-        void onError(String errorMessage);
+        void onSuccess();
+
+        void onError();
     }
 }

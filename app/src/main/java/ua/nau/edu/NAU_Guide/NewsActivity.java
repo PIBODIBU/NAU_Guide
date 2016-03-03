@@ -16,13 +16,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.gc.materialdesign.views.ButtonFloat;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 import ua.nau.edu.API.APIDeleteBuilder;
 import ua.nau.edu.API.APIDialogs;
+import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.API.APILoaderBuilder;
 import ua.nau.edu.API.APIRefreshBuilder;
 import ua.nau.edu.API.APIStrings;
@@ -39,10 +40,11 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
     private static NewsAdapter adapter;
     private LinearLayoutManager layoutManager;
     private static RecyclerView recyclerView;
+    private FloatingActionButton FABCreatePost;
     private ArrayList<NewsDataModel> data = new ArrayList<NewsDataModel>();
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private LinearLayout linearLayoutMain;
+    private LinearLayout rootView;
 
     private APILoaderBuilder postsLoaderWithoutDialog;
     private APILoaderBuilder postsLoaderWithDialog;
@@ -74,8 +76,6 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
         Log.i(TAG, "onCreate: Loading first " + loadNumber + " posts...");
         postsLoaderWithDialog.loadPostsAll(startLoadPosition, loadNumber, APIStrings.RequestUrl.GET_POST_ALL);
         startLoadPosition += loadNumber;
-
-
     }
 
     @Override
@@ -95,21 +95,20 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
     }
 
     private void setUpViews() {
-        linearLayoutMain = (LinearLayout) findViewById(R.id.main_layout);
+        FABCreatePost = (FloatingActionButton) findViewById(R.id.fab_create_post);
+        rootView = (LinearLayout) findViewById(R.id.main_layout);
 
         if (isLoggedAsLector()) {
-            Log.i(TAG, "setUpViews/ is logged in as lector");
-            FloatingActionButton FABCreatePost = (FloatingActionButton) findViewById(R.id.fab_create_post);
+            Log.i(TAG, "setUpViews() -> is logged in as lector");
             FABCreatePost.setVisibility(View.VISIBLE);
             FABCreatePost.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //startActivity(new Intent(NewsActivity.this, CreatePostActivity.class));
                     startActivityForResult(new Intent(NewsActivity.this, CreatePostActivity.class), CreatePostActivity.REQUEST_CODE);
                 }
             });
         } else {
-            Log.i(TAG, "setUpViews/ is NOT logged in as lector");
+            Log.i(TAG, "setUpViews() -> is NOT logged in as lector");
         }
     }
 
@@ -120,28 +119,20 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
         switch (requestCode) {
             case CreatePostActivity.REQUEST_CODE: {
                 if (resultCode == APIValues.RESULT_OK) {
-
-                    Snackbar.make(linearLayoutMain, "Отправлено", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(rootView, "Отправлено", Snackbar.LENGTH_LONG).show();
                     refreshAllPosts();
-
                 } else if (resultCode == APIValues.RESULT_ERROR) {
-
                     APIDialogs.AlertDialogs.errorWhilePostingMessage(this);
-
                 }
                 break;
             }
 
             case UpdatePostActivity.REQUEST_CODE: {
                 if (resultCode == APIValues.RESULT_OK) {
-
-                    Snackbar.make(linearLayoutMain, "Обновлено", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(rootView, "Обновлено", Snackbar.LENGTH_LONG).show();
                     refreshAllPosts();
-
                 } else if (resultCode == APIValues.RESULT_ERROR) {
-
                     APIDialogs.AlertDialogs.errorWhileUpdatingMessage(this);
-
                 }
                 break;
             }
@@ -150,11 +141,9 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
 
             }
         }
-
     }
 
     private void refreshAllPosts() {
-        mSwipeRefreshLayout.setRefreshing(true);
         apiRefreshBuilder.refreshItemsAll(APIStrings.RequestUrl.GET_POST_ALL, loadNumber);
     }
 
@@ -165,14 +154,39 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
     }
 
     private void setUpPostsLoaders() {
+        final MaterialDialog loadingDialog = APIDialogs.ProgressDialogs.loading(this);
+
         postsLoaderWithDialog = new APILoaderBuilder()
                 .withContext(NewsActivity.this)
                 .withAdapter(adapter)
-                .withLoadingDialog(true)
                 .withTag(TAG)
                 .withRecycler(recyclerView)
                 .withActivity(this)
                 .withDataSet(data);
+
+        postsLoaderWithDialog.setLoaderCallbacks(new APILoaderBuilder.LoaderCallbacks() {
+            @Override
+            public void onPrepare() {
+                loadingDialog.show();
+            }
+
+            @Override
+            public void onSuccess() {
+                loadingDialog.dismiss();
+            }
+
+            @Override
+            public void onError(String error) {
+                loadingDialog.dismiss();
+                if (error.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                    APIDialogs.AlertDialogs.internetConnectionError(NewsActivity.this);
+                } else if (error.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    APIDialogs.AlertDialogs.serverConnectionError(NewsActivity.this);
+                } else if (error.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION_TIMED_OUT)) {
+                    APIDialogs.AlertDialogs.serverConnectionError(NewsActivity.this);
+                }
+            }
+        });
 
         postsLoaderWithoutDialog = new APILoaderBuilder()
                 .withContext(NewsActivity.this)
@@ -182,9 +196,31 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                 .withRecycler(recyclerView)
                 .withActivity(this)
                 .withDataSet(data);
+        postsLoaderWithoutDialog.setLoaderCallbacks(new APILoaderBuilder.LoaderCallbacks() {
+            @Override
+            public void onPrepare() {
+            }
+
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onError(String error) {
+                if (error.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                    APIDialogs.AlertDialogs.internetConnectionError(NewsActivity.this);
+                } else if (error.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    APIDialogs.AlertDialogs.serverConnectionError(NewsActivity.this);
+                } else if (error.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION_TIMED_OUT)) {
+                    APIDialogs.AlertDialogs.serverConnectionError(NewsActivity.this);
+                }
+            }
+        });
     }
 
     private void setUpPostsDelete() {
+        final MaterialDialog loadingDialog = APIDialogs.ProgressDialogs.loading(this);
+
         apiDeleteBuilder = new APIDeleteBuilder()
                 .withActivity(this)
                 .withContext(this)
@@ -194,14 +230,21 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                 .withDataSet(data)
                 .withAdapter(adapter);
 
-        apiDeleteBuilder.setOnResultListener(new APIDeleteBuilder.OnResultListener() {
+        apiDeleteBuilder.setDeleteCallbacks(new APIDeleteBuilder.DeleteCallbacks() {
             @Override
-            public void onDeleted() {
-                Snackbar.make(linearLayoutMain, "Удалено", Snackbar.LENGTH_LONG).show();
+            public void onPrepare() {
+                loadingDialog.show();
             }
 
             @Override
-            public void onError(String errorMessage) {
+            public void onSuccess() {
+                loadingDialog.dismiss();
+                Snackbar.make(rootView, "Удалено", Snackbar.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError() {
+                loadingDialog.dismiss();
                 APIDialogs.AlertDialogs.errorWhileDeletingPost(NewsActivity.this);
             }
         });
@@ -239,6 +282,22 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                         startLoadPosition += loadNumber;
                     }
                 });
+            }
+        });
+
+        apiRefreshBuilder.setRefresherallbacks(new APIRefreshBuilder.RefresherCallbacks() {
+            @Override
+            public void onPrepare() {
+
+            }
+
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onError() {
+                APIDialogs.AlertDialogs.errorWhileUpdatingMessage(NewsActivity.this);
             }
         });
     }
@@ -319,7 +378,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                     @Override
                     public void onShow(DialogInterface dialog) {
                         deleteDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(NewsActivity.this, R.color.colorAppPrimary));
-                        deleteDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(NewsActivity.this, R.color.colorAppPrimary));
+                        deleteDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(NewsActivity.this, R.color.black));
                     }
                 });
 

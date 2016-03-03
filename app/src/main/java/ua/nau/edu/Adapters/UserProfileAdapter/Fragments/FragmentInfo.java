@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -35,11 +36,13 @@ import java.util.HashMap;
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.API.APIStrings;
+import ua.nau.edu.API.APIValues;
 import ua.nau.edu.NAU_Guide.MainActivity;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
 import ua.nau.edu.Support.Picasso.CircleTransform;
 import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
+import ua.nau.edu.Support.System.Utils;
 import ua.nau.edu.Support.View.CircleImageView;
 
 public class FragmentInfo extends Fragment {
@@ -154,19 +157,14 @@ public class FragmentInfo extends Fragment {
                     try {
                         final String PHOTO_URL = result.getString(APIStrings.ResponseKeys.PageLoading.PHOTO_URL);
 
-                        TextView textViewName = (TextView) supportActivity.findViewById(R.id.textViewName);
                         ExpandableTextView expTv1 = (ExpandableTextView) supportActivity.findViewById(R.id.bio_text_expand);
+                        TextView textViewName = (TextView) supportActivity.findViewById(R.id.expandable_text);
 
                         /*
                             Setting Up NAME
                         */
                         //textViewName.setText(result.getString(APIStrings.ResponseKeys.PageLoading.NAME));
                         String name = result.getString(APIStrings.ResponseKeys.PageLoading.NAME);
-                        /*int spaceCount = 0;
-                        for (int i = 0; i < name.length(); i++)
-                            if (Character.isWhitespace(name.charAt(i))) spaceCount++;
-                        if (spaceCount >= 2)
-                            name = name.substring(0, name.lastIndexOf(' '));*/
                         supportActivity.collapsingToolbarLayout.setTitle(name);
 
                         /*
@@ -176,6 +174,9 @@ public class FragmentInfo extends Fragment {
                         if (!result.getString(APIStrings.ResponseKeys.PageLoading.BIOGRAPHY).equals("")) {
                             cardBio.setVisibility(View.VISIBLE);
                             expTv1.setText(result.getString(APIStrings.ResponseKeys.PageLoading.BIOGRAPHY));
+                            if (textViewName.getLineCount() < APIValues.maxLinesBeforeExpand) {
+                                textViewName.setPadding(0, 0, 0, (int) Utils.convertDpToPixel(8, supportActivity));
+                            }
                         }
 
                         /*
@@ -201,8 +202,8 @@ public class FragmentInfo extends Fragment {
                             });
                         }
 
-                    } catch (Throwable t) {
-                        Log.e(TAG, "Could not parse malformed JSON: " + result);
+                    } catch (Exception ex) {
+                        Log.e(TAG, "getMyPage() ->  onPostExecute() -> ", ex);
                     }
 
                     dialog.dismiss();
@@ -300,11 +301,6 @@ public class FragmentInfo extends Fragment {
                         */
                         //textViewName.setText(result.getString(APIStrings.ResponseKeys.PageLoading.NAME));
                         String name = result.getString(APIStrings.ResponseKeys.PageLoading.NAME);
-                        /*int spaceCount = 0;
-                        for (int i = 0; i < name.length(); i++)
-                            if (Character.isWhitespace(name.charAt(i))) spaceCount++;
-                        if (spaceCount >= 2)
-                            name = name.substring(0, name.lastIndexOf(' '));*/
                         supportActivity.collapsingToolbarLayout.setTitle(name);
 
                         /*

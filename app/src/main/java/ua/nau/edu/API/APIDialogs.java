@@ -71,7 +71,28 @@ public class APIDialogs {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
-                            context.startActivity(new Intent(context, MainActivity.class));
+                        }
+                    })
+                    .setCancelable(false);
+            final AlertDialog dialog = builder.create();
+            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                @Override
+                public void onShow(DialogInterface arg) {
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(context, R.color.colorAppPrimary));
+                }
+            });
+            dialog.show();
+        }
+
+        public static void serverConnectionError(final Context context) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder
+                    .setTitle("Ошибка")
+                    .setMessage("Невозможно соединиться с сервером. Пожалуйста, попробуйте позже.")
+                    .setPositiveButton("Ок", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
                         }
                     })
                     .setCancelable(false);

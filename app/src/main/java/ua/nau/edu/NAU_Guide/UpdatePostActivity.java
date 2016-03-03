@@ -12,6 +12,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.API.APIStrings;
 import ua.nau.edu.API.APIUpdateBuilder;
@@ -57,21 +59,29 @@ public class UpdatePostActivity extends BaseToolbarActivity {
     }
 
     private void setUpAPI() {
+        final MaterialDialog loadingDialog = APIDialogs.ProgressDialogs.loading(this);
+
         apiUpdateBuilder = new APIUpdateBuilder()
                 .withActivity(this)
                 .withContext(this)
-                .withLoadingDialog(true)
                 .withTag(TAG);
 
-        apiUpdateBuilder.setOnResultListener(new APIUpdateBuilder.OnResultListener() {
+        apiUpdateBuilder.setUpdateCallbacks(new APIUpdateBuilder.UpdateCallbacks() {
             @Override
-            public void onPosted(String message) {
+            public void onPrepare() {
+                loadingDialog.show();
+            }
+
+            @Override
+            public void onSuccess(String message) {
+                loadingDialog.dismiss();
                 setResult(APIValues.RESULT_OK);
                 finish();
             }
 
             @Override
-            public void onError(String errorMessage) {
+            public void onError() {
+                loadingDialog.dismiss();
                 setResult(APIValues.RESULT_ERROR);
                 finish();
             }
@@ -126,6 +136,13 @@ public class UpdatePostActivity extends BaseToolbarActivity {
     }
 
     private void actionBeforeExit() {
+        messageNew = messageEditText.getText().toString().trim();
+
+        if (messageNew.equals(messageToEdit)) {
+            finish();
+            return;
+        }
+
         final AlertDialog closeDialog = new AlertDialog.Builder(this)
                 .setTitle("Внимание")
                 .setMessage("Все данные будут утеряны. Вы уверены, что хотите выйти?")
@@ -148,7 +165,7 @@ public class UpdatePostActivity extends BaseToolbarActivity {
             @Override
             public void onShow(DialogInterface dialog) {
                 closeDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(UpdatePostActivity.this, R.color.colorAppPrimary));
-                closeDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(UpdatePostActivity.this, R.color.colorAppPrimary));
+                closeDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(UpdatePostActivity.this, R.color.black));
             }
         });
 
