@@ -5,7 +5,6 @@
     <item
         android:id="@+id/logOut"
         android:gravity="center"
-        android:icon="@drawable/ic_exit_to_app_white_24dp"
         android:title="Выйти"
         app:showAsAction="never" />
 

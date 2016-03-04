@@ -46,6 +46,7 @@ import java.util.Map;
 
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.Enum.EnumExtras;
+import ua.nau.edu.Enum.EnumMaps;
 import ua.nau.edu.NAU_Guide.Debug.MapsDistanceDataModel;
 import ua.nau.edu.RecyclerViews.MapsActivity.MapsAdapter;
 import ua.nau.edu.RecyclerViews.MapsActivity.MapsDataModel;
@@ -87,6 +88,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
     private static final String CORP_ID_KEY = EnumExtras.CORP_ID_KEY.toString();
     private static final String CORP_LABEL_KEY = EnumExtras.CORP_LABEL_KEY.toString();
+    private static final String CURRENT_LATITUDE = EnumMaps.CURRENT_LATITUDE.toString();
+    private static final String CURRENT_LONGTITUDE = EnumMaps.CURRENT_LONGTITUDE.toString();
 
     private RecyclerView recyclerView;
     private static MapsAdapter adapter;
@@ -641,7 +644,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
                     startActivity(new Intent(activityContext, InfoActivity.class)
                             .putExtra(CORP_ID_KEY, currentMarkerID)
-                            .putExtra(CORP_LABEL_KEY, currentMarkerLabel));
+                            .putExtra(CORP_LABEL_KEY, currentMarkerLabel)
+                            .putExtra(CURRENT_LATITUDE, getMyCoordinate().latitude)
+                            .putExtra(CURRENT_LONGTITUDE, getMyCoordinate().longitude));
 
                 }
             }
@@ -686,7 +691,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
     }
 
-    private LatLng getMyCoordinate() {
+    public LatLng getMyCoordinate() {
         Location currentLocation = null;
 
         try {

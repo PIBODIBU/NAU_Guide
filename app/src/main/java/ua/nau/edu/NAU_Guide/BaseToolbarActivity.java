@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,8 +15,12 @@ import android.widget.Toast;
 import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 
 public class BaseToolbarActivity extends AppCompatActivity {
+
+    private static final String TAG = "BaseToolbarActivity";
+
     private InputMethodManager MethodManager;
     private SharedPrefUtils sharedPrefUtils;
+    private TextView title;
 
     private int menuId = -1;
 
@@ -25,13 +30,18 @@ public class BaseToolbarActivity extends AppCompatActivity {
     public void getToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        String text = getSupportActionBar().getTitle().toString();
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        TextView title = (TextView) findViewById(R.id.toolbar_title);
-        title.setText(text);
+        title = (TextView) findViewById(R.id.toolbar_title);
+
+        try {
+            title.setText(getSupportActionBar().getTitle().toString());
+        } catch (Exception ex) {
+            Log.e(TAG, "getToolbar() -> ", ex);
+        }
     }
 
     @Override
@@ -52,15 +62,15 @@ public class BaseToolbarActivity extends AppCompatActivity {
         return true;
     }
 
-    public void toastShowShort(String TEXT) {
-        Toast.makeText(BaseToolbarActivity.this, TEXT, Toast.LENGTH_SHORT).show();
+    public void setToolbarTitle(String titleText) {
+        try {
+            title.setText(titleText);
+        } catch (Exception ex) {
+            Log.e(TAG, "setToolbarTitle() -> ", ex);
+        }
     }
 
-    public void toastShowLong(String TEXT) {
-        Toast.makeText(BaseToolbarActivity.this, TEXT, Toast.LENGTH_LONG).show();
-    }
-
-    void setMenuId(int menu) {
+    public void setMenuId(int menu) {
         this.menuId = menu;
     }
 

@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
@@ -90,6 +92,32 @@ public class LoginActivity extends BaseToolbarActivity {
         editTextUserName = (TextInputLayout) findViewById(R.id.username);
         editTextPassword = (TextInputLayout) findViewById(R.id.password);
 
+        if (editTextUserName.getEditText() != null) {
+            editTextUserName.getEditText().setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if (!hasFocus) {
+                        if (!isUsernameValid(editTextUserName.getEditText().getText().toString())) {
+                            editTextUserName.setError("Введите логин");
+                        }
+                    }
+                }
+            });
+        }
+
+        if (editTextPassword.getEditText() != null) {
+            editTextPassword.getEditText().setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if (!hasFocus) {
+                        if (!isPasswordValid(editTextPassword.getEditText().getText().toString())) {
+                            editTextPassword.setError("Введите пароль");
+                        }
+                    }
+                }
+            });
+        }
+
         if (savedInstanceState != null) {
             if (editTextUserName.getEditText() != null)
                 editTextUserName.getEditText().setText(savedInstanceState.getString("username"));
@@ -99,9 +127,26 @@ public class LoginActivity extends BaseToolbarActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putString("username", editTextUserName.getEditText().getText().toString());
-        outState.putString("password", editTextPassword.getEditText().getText().toString());
+        try {
+            outState.putString("username", editTextUserName.getEditText().getText().toString());
+            outState.putString("password", editTextPassword.getEditText().getText().toString());
+        } catch (Exception ex) {
+            Log.e(TAG, "onSaveInstanceState() -> ", ex);
+        }
         super.onSaveInstanceState(outState);
     }
 
@@ -198,10 +243,6 @@ public class LoginActivity extends BaseToolbarActivity {
         Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
     }
 
-    public void toastShowShort(String TEXT) {
-        Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_SHORT).show();
-    }
-
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.login_skip: {
@@ -235,16 +276,19 @@ public class LoginActivity extends BaseToolbarActivity {
             ex.printStackTrace();
         }
 
-        Log.d(TAG, "username == " + username + " password == " + password);
+        Log.d(TAG, "login() -> \nUsername: " + username + "\nPassword:" + password);
 
-        if (isUsernameValid(username) && isPasswordValid(password)) {
+        if (!isUsernameValid(username)) {
+            editTextUserName.setError("Введите логин");
+        } else if (!isPasswordValid(password)) {
+            editTextPassword.setError("Введите пароль");
+        } else {
             userLogin(username, password);
         }
     }
 
     private boolean isUsernameValid(String username) {
         if (username.equals("")) {
-            editTextUserName.setError("Введите логин");
             return false;
         } else {
             editTextUserName.setError("");
@@ -254,7 +298,6 @@ public class LoginActivity extends BaseToolbarActivity {
 
     private boolean isPasswordValid(String password) {
         if (password.equals("")) {
-            editTextPassword.setError("Введите пароль");
             return false;
         } else {
             editTextPassword.setError("");
@@ -305,7 +348,7 @@ public class LoginActivity extends BaseToolbarActivity {
                         }
                     } catch (Throwable t) {
                         loadingDialog.dismiss();
-                        Log.e("LoginLectorActivty", "Could not parse malformed JSON: \"" + response + "\"");
+                        Log.e(TAG, "Could not parse malformed JSON: \"" + response + "\"");
                     }
                 } else {
                     loadingDialog.dismiss();
@@ -320,11 +363,11 @@ public class LoginActivity extends BaseToolbarActivity {
         FileName = "user_avatar.png";
         PROFILE_PHOTO_LOCATION = FilePath + "/" + FileName;
 
-        /*************************************************
-         *  IMPORTANT! ADD THIS AFTER EACH SUCCESS LOGIN *
-         *                                               */
+        /**********************************************************************************
+         *                 IMPORTANT! ADD THIS AFTER EACH SUCCESS LOGIN                   *
+         *                                                                                */
         sharedPrefUtils.performLogin(name, email, uniqueId, token, PROFILE_PHOTO_LOCATION);
-        /*************************************************/
+        /**********************************************************************************/
 
         loadAvatar(photoUrl, FilePath, FileName, new CircleTransform(), new AvatarLoadingCallbacks() {
             @Override
@@ -435,6 +478,17 @@ public class LoginActivity extends BaseToolbarActivity {
         if (view != null) {
             ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
                     hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (editTextUserName.getEditText().hasFocus()) {
+            editTextUserName.getEditText().clearFocus();
+        } else if (editTextPassword.getEditText().hasFocus()) {
+            editTextPassword.getEditText().clearFocus();
+        } else {
+            super.onBackPressed();
         }
     }
 

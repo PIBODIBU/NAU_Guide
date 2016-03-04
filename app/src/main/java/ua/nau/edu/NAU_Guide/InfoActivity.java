@@ -1,23 +1,29 @@
 package ua.nau.edu.NAU_Guide;
 
-import android.content.SharedPreferences;
+import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.astuetz.PagerSlidingTabStrip;
+import com.gc.materialdesign.views.CustomView;
 import com.google.android.gms.maps.model.LatLng;
+import com.squareup.picasso.Picasso;
 
+import ua.nau.edu.Enum.ClipBoardKeys;
 import ua.nau.edu.Enum.EnumExtras;
 import ua.nau.edu.Enum.EnumMaps;
-import ua.nau.edu.Enum.EnumSharedPreferences;
-import ua.nau.edu.Adapters.AdapterInfoActivity.AdapterInfo;
+import ua.nau.edu.Support.View.CircleImageView;
+import ua.nau.edu.University.NAU;
 
 public class InfoActivity extends BaseToolbarActivity {
 
@@ -29,8 +35,30 @@ public class InfoActivity extends BaseToolbarActivity {
     private static final String CURRENT_LATITUDE = EnumMaps.CURRENT_LATITUDE.toString();
     private static final String CURRENT_LONGTITUDE = EnumMaps.CURRENT_LONGTITUDE.toString();
 
-    private ViewPager pager;
-    private PagerSlidingTabStrip tabs;
+    private ClipboardManager clipboard;
+    private NAU university;
+
+
+    private CollapsingToolbarLayout collapsingToolbarLayout;
+
+    private TextView GerbBlock_head;
+    private TextView GerbBlock_subhead;
+    private ImageView GerbBlock_gerbImage;
+
+    private CustomView CallBlock_buttonCall;
+    private CustomView CallBlock_buttonCopy;
+    private TextView CallBlock_textPhoneNumber;
+
+    private CustomView WebBlock_buttonGo;
+    private CustomView WebBlock_buttonCopy;
+    private TextView WebBlock_textUrl;
+
+    private CustomView NavBlock_buttonGo;
+    private CustomView NavBlock_buttonCopy;
+    private TextView NavBlock_textSubhead;
+
+    private CircleImageView headCirclePhoto;
+
 
     private int currentCorp = -1;
 
@@ -42,38 +70,19 @@ public class InfoActivity extends BaseToolbarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-        setActivityLabel();
         getToolbar();
+        setToolbarTitle(getIntent().getStringExtra(CORP_LABEL_KEY));
 
-        tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
         currentCorp = getIntent().getIntExtra(CORP_ID_KEY, -1);
+        Log.d(TAG, "currentCorp: " + currentCorp);
 
-        Log.d(TAG, "currentCorp == " + currentCorp);
+        clipboard = (ClipboardManager) getSystemService(Activity.CLIPBOARD_SERVICE);
+        university = new NAU(this);
+        university.init();
 
-        if (currentCorp <= 12 && currentCorp != -1) {
-            // This is corp
-            setUpLayoutCorp();
-        } else if (currentCorp == 13) {
-            //This is CKM
-            setUpLayoutCkm();
-        } else if (currentCorp == 14) {
-            //This is Bistro
-            setUpLayoutBistro();
-        } else if (currentCorp == 15) {
-            // This is MED Center
-            setUpLayoutMed();
-        } else if (currentCorp == 16) {
-            // This is Sport
-            setUpLayoutSport();
-        } else if (currentCorp <= 27 && currentCorp >= 17) {
-            //This is host
-            setUpLayoutHost();
-        } else if (currentCorp == 28) {
-            //This is library
-            setUpLayoutLibrary();
-        } else {
-            setUpLayoutDefault();
-        }
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+
+        setUpLayoutCorp();
 
     }
 
@@ -91,71 +100,122 @@ public class InfoActivity extends BaseToolbarActivity {
     }
 
     private void setUpLayoutCorp() {
-        Log.d(TAG, "setUpLayoutCorp() called");
+        /*** VIEWS ***/
+        GerbBlock_head = (TextView) findViewById(R.id.gerb_text_head);
+        GerbBlock_subhead = (TextView) findViewById(R.id.gerb_text_subhead);
+        GerbBlock_gerbImage = (ImageView) findViewById(R.id.gerb_image);
 
-        // Initialize the ViewPager and set an adapter
-        pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(new AdapterInfo(getSupportFragmentManager()));
+        CallBlock_buttonCall = (CustomView) findViewById(R.id.call_button_call);
+        CallBlock_buttonCopy = (CustomView) findViewById(R.id.call_button_copy);
+        CallBlock_textPhoneNumber = (TextView) findViewById(R.id.call_text_subhead);
 
-        // Bind the tabs to the ViewPager
-        tabs.setViewPager(pager);
+        WebBlock_buttonGo = (CustomView) findViewById(R.id.web_button_go);
+        WebBlock_buttonCopy = (CustomView) findViewById(R.id.web_button_copy);
+        WebBlock_textUrl = (TextView) findViewById(R.id.web_text_subhead);
+
+        NavBlock_buttonGo = (CustomView) findViewById(R.id.nav_button_go);
+        NavBlock_buttonCopy = (CustomView) findViewById(R.id.nav_button_copy);
+        NavBlock_textSubhead = (TextView) findViewById(R.id.nav_text_subhead);
+
+        headCirclePhoto = (CircleImageView) findViewById(R.id.head_photo);
+
+        /** Set TextView's **/
+        try {
+            String label = university.getCorpsMarkerLabel().get(currentCorp);
+            String nameShort = university.getCorpsInfoNameShort().get(currentCorp);
+            String nameFull = university.getCorpsInfoNameFull().get(currentCorp);
+            String number = university.getCorpsInfoPhone().get(currentCorp);
+            String url = university.getCorpsInfoUrl().get(currentCorp);
+            int imageId = university.getCorpsGerb().get(currentCorp);
+
+            Picasso
+                    .with(this)
+                    .load(imageId)
+                    .into(headCirclePhoto);
+
+            collapsingToolbarLayout.setTitle(label);
+
+            GerbBlock_head.setText(nameShort);
+            GerbBlock_subhead.setText(nameFull);
+            GerbBlock_gerbImage.setImageResource(imageId);
+
+            CallBlock_textPhoneNumber.setText(number);
+
+            WebBlock_textUrl.setText(url);
+
+            NavBlock_textSubhead.setText("Please, wait...");
+
+        } catch (Exception ex) {
+            Log.e(TAG, "setUpLayoutCorp() -> ", ex);
+        }
+
+        /** Click Listeners **/
+        CallBlock_buttonCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Use Intent.ACTION_CALL for direct call
+                startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + CallBlock_textPhoneNumber.getText().toString().trim())));
+            }
+        });
+        CallBlock_buttonCopy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClipData clip = ClipData.newPlainText(ClipBoardKeys.CallNumber.toString(), CallBlock_textPhoneNumber.getText().toString().trim());
+                clipboard.setPrimaryClip(clip);
+
+                Toast.makeText(getApplicationContext(), getResources().getString(R.string.Text_copied), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        WebBlock_buttonGo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(WebBlock_textUrl.getText().toString()));
+                startActivity(browserIntent);
+            }
+        });
+        WebBlock_buttonCopy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClipData clip = ClipData.newPlainText(ClipBoardKeys.CorpUrl.toString(), WebBlock_textUrl.getText().toString().trim());
+                clipboard.setPrimaryClip(clip);
+
+                Toast.makeText(getApplicationContext(), getResources().getString(R.string.Text_copied), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        NavBlock_buttonGo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initNavigationWindow(getMyCoordinate(), university.getCorps().get(currentCorp));
+            }
+        });
     }
 
-    private void setUpLayoutCkm() {
-        Log.d(TAG, "setUpLayoutCkm() called");
-
-        tabs.setVisibility(View.GONE);
-
-    }
-
-    private void setUpLayoutBistro() {
-        tabs.setVisibility(View.GONE);
-
-    }
-
-    private void setUpLayoutMed() {
-        tabs.setVisibility(View.GONE);
-
-    }
-
-    private void setUpLayoutSport() {
-        tabs.setVisibility(View.GONE);
-
-    }
-
-    private void setUpLayoutHost() {
-        tabs.setVisibility(View.GONE);
-
-    }
-
-    private void setUpLayoutLibrary() {
-        tabs.setVisibility(View.GONE);
-
-    }
-
-    private void setUpLayoutDefault() {
-        tabs.setVisibility(View.GONE);
-
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;
     }
 
-    public void toastShowLong(String TEXT) {
-        Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
-    }
-
-    public void toastShowShort(String TEXT) {
-        Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_SHORT).show();
-    }
-
-    public void setActivityLabel() {
-        this.setTitle(getIntent().getStringExtra(CORP_LABEL_KEY));
-    }
-
     public LatLng getMyCoordinate() {
         return new LatLng(getIntent().getDoubleExtra(CURRENT_LATITUDE, 1.0), getIntent().getDoubleExtra(CURRENT_LONGTITUDE, 1.0));
     }
+
+    public void initNavigationWindow(LatLng currCoordinate, LatLng destCoordinate) {
+        try {
+            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                    Uri.parse("http://maps.google.com/maps?   saddr=" +
+                            currCoordinate.latitude + "," +
+                            currCoordinate.longitude + "&daddr=" +
+                            destCoordinate.latitude + "," + destCoordinate.longitude));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addCategory(Intent.CATEGORY_LAUNCHER);
+            intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+            startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

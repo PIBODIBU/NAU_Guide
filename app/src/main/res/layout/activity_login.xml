@@ -4,7 +4,7 @@
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_bg"
+    android:background="@color/white"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
     tools:context=".LoginActivity">
@@ -25,44 +25,44 @@
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/username"
-        style="@style/AppTheme.TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/nau_logo"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        app:errorEnabled="true">
+        android:hint="Логин"
+        app:errorEnabled="true"
+        app:theme="@style/AppTheme.TextInputLayout">
 
         <android.support.v7.widget.AppCompatEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Логин"
             android:inputType="text"
             android:maxLines="1"
             android:textColor="@color/black"
-            android:theme="@style/AppTheme.TextInputLayout.EditText" />
+            app:theme="@style/AppTheme.TextInputLayout.EditText" />
 
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/password"
-        style="@style/AppTheme.TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/username"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="8dp"
-        app:errorEnabled="true">
+        android:hint="Пароль"
+        app:errorEnabled="true"
+        app:theme="@style/AppTheme.TextInputLayout">
 
         <android.support.v7.widget.AppCompatEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Пароль"
             android:inputType="textPassword"
             android:maxLines="1"
             android:textColor="@color/black"
-            android:theme="@style/AppTheme.TextInputLayout.EditText" />
+            app:theme="@style/AppTheme.TextInputLayout.EditText" />
 
     </android.support.design.widget.TextInputLayout>
 

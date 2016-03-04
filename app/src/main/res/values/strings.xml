@@ -32,7 +32,7 @@
     <string name="med">Медцентр</string>
     <string name="sport">Спорткомплекс</string>
     <string name="bistro">Бистро</string>
-    <string name="host">Общага</string>
+    <string name="host">Общежитие</string>
     <string name="library">Библиотека</string>
 
     <string name="VK_bad_token">Неправильный access token</string>

@@ -30,7 +30,6 @@ import ua.nau.edu.University.NAU;
  * Created by Roman on 27.11.2015.
  */
 public class FragmentInfo extends Fragment {
-    private static final String APP_PREFERENCES = EnumSharedPreferences.APP_PREFERENCES.toString();
     private static final String CORP_ID_KEY = EnumSharedPreferences.CORP_ID_KEY.toString();
 
     private SharedPreferences settings = null;

@@ -133,6 +133,16 @@ public class NAU extends University {
 
         CorpsLabel.put(13, context.getApplicationContext().getResources().getString(R.string.ckm));
 
+        CorpsInfoNameShort.put(13, "ЦКМ");
+
+        CorpsInfoNameFull.put(13, "Центр культури та мистецтв");
+
+        CorpsGerb.put(13, R.drawable.gerb_ckm);
+
+        CorpsInfoPhone.put(13, "(044) 123-45-67");
+
+        CorpsInfoUrl.put(13, "http://mysupersite.com");
+
 /** BISTRO **/
         Corps.put(14, new LatLng(50.440893, 30.431773));
 
@@ -141,6 +151,16 @@ public class NAU extends University {
         CorpsMarkerLabel.put(14, context.getApplicationContext().getResources().getString(R.string.bistro));
 
         CorpsLabel.put(14, context.getApplicationContext().getResources().getString(R.string.bistro));
+
+        CorpsInfoNameShort.put(14, "Бiстро");
+
+        CorpsInfoNameFull.put(14, "Студентська їдальня");
+
+        CorpsGerb.put(14, R.drawable.gerb_bistro);
+
+        CorpsInfoPhone.put(14, "(044) 123-45-67");
+
+        CorpsInfoUrl.put(14, "http://mysupersite.com");
 
 /** MED CENTER **/
         Corps.put(15, new LatLng(50.440592, 30.433082));
@@ -151,6 +171,16 @@ public class NAU extends University {
 
         CorpsLabel.put(15, context.getApplicationContext().getResources().getString(R.string.med));
 
+        CorpsInfoNameShort.put(15, "Медцентр");
+
+        CorpsInfoNameFull.put(15, "Медичний центр НАУ");
+
+        CorpsGerb.put(15, R.drawable.gerb_med);
+
+        CorpsInfoPhone.put(15, "(044) 123-45-67");
+
+        CorpsInfoUrl.put(15, "http://mysupersite.com");
+
 /** SPORT **/
         Corps.put(16, new LatLng(50.436868, 30.422972));
 
@@ -159,6 +189,16 @@ public class NAU extends University {
         CorpsMarkerLabel.put(16, context.getResources().getString(R.string.sport));
 
         CorpsLabel.put(16, context.getResources().getString(R.string.sport));
+
+        CorpsInfoNameShort.put(16, "Спорткомплект");
+
+        CorpsInfoNameFull.put(16, "Спортивний комлпекс НАУ");
+
+        CorpsGerb.put(16, R.drawable.gerb_sport);
+
+        CorpsInfoPhone.put(16, "(044) 123-45-67");
+
+        CorpsInfoUrl.put(16, "http://mysupersite.com");
 
 /** HOSTEL **/
         Corps.put(17, new LatLng(50.440152, 30.435087)); // 1
@@ -189,6 +229,16 @@ public class NAU extends University {
             CorpsMarkerLabel.put(i, context.getResources().getString(R.string.host) + " " + Integer.toString(i - 16));
 
             CorpsLabel.put(i, context.getResources().getString(R.string.host) + " " + Integer.toString(i - 16));
+
+            CorpsInfoNameShort.put(i, "Общежитие");
+
+            CorpsInfoNameFull.put(i, "Общежитие НАУ № " + Integer.toString(i - 16));
+
+            CorpsGerb.put(i, R.drawable.gerb_host);
+
+            CorpsInfoPhone.put(i, "(044) 123-45-67");
+
+            CorpsInfoUrl.put(i, "http://mysupersite.com");
         }
 
 /** LIBRARY **/
@@ -199,6 +249,16 @@ public class NAU extends University {
         CorpsMarkerLabel.put(28, context.getApplicationContext().getResources().getString(R.string.library));
 
         CorpsLabel.put(28, context.getApplicationContext().getResources().getString(R.string.library));
+
+        CorpsInfoNameShort.put(28, "Библиотека");
+
+        CorpsInfoNameFull.put(28, "Библиотека Национального Авиационного Университета");
+
+        CorpsGerb.put(28, R.drawable.gerb_library);
+
+        CorpsInfoPhone.put(28, "(044) 406-78-57");
+
+        CorpsInfoUrl.put(28, "http://lib.nau.edu.ua");
 
 /** SIZE **/
         hashMapSize = CorpsIcon.size();
