@@ -19,4 +19,5 @@ public class APIValues {
 
     // Activity finished with errors & without job done (e.g. server/connection error)
     public static int RESULT_ERROR = -1;
+
 }

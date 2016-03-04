@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.gc.materialdesign.views.CustomView;
 import com.google.android.gms.maps.model.LatLng;
+import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Picasso;
 
 import ua.nau.edu.Enum.ClipBoardKeys;
@@ -58,6 +59,7 @@ public class InfoActivity extends BaseToolbarActivity {
     private TextView NavBlock_textSubhead;
 
     private CircleImageView headCirclePhoto;
+    private ExpandableTextView historyExpandText;
 
 
     private int currentCorp = -1;
@@ -118,6 +120,7 @@ public class InfoActivity extends BaseToolbarActivity {
         NavBlock_textSubhead = (TextView) findViewById(R.id.nav_text_subhead);
 
         headCirclePhoto = (CircleImageView) findViewById(R.id.head_photo);
+        historyExpandText = (ExpandableTextView) findViewById(R.id.history_text_expand);
 
         /** Set TextView's **/
         try {
@@ -144,6 +147,8 @@ public class InfoActivity extends BaseToolbarActivity {
             WebBlock_textUrl.setText(url);
 
             NavBlock_textSubhead.setText("Please, wait...");
+
+            historyExpandText.setText(getString(R.string.lorem_ipsum));
 
         } catch (Exception ex) {
             Log.e(TAG, "setUpLayoutCorp() -> ", ex);

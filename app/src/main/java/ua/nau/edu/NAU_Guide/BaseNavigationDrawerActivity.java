@@ -502,4 +502,10 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         MethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         sharedPrefUtils = new SharedPrefUtils(this);
     }
+
+    @Override
+    protected void onPostResume() {
+        getCurrentSelection();
+        super.onPostResume();
+    }
 }

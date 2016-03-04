@@ -5,30 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/recyclerview_background">
-    <!--
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/toolbar" />
-      -->
-
-    <!--
-    <com.astuetz.PagerSlidingTabStrip
-        android:id="@+id/tabs"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_below="@+id/toolbar"
-        android:background="@color/colorAppPrimary"
-        app:pstsDividerColor="@color/grey_light"
-        app:pstsShouldExpand="true" />
-        -->
-
-    <!--
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/tabs" />
-        -->
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar_layout"
@@ -197,7 +173,7 @@
                         android:textSize="14sp" />
 
                     <com.ms.square.android.expandabletextview.ExpandableTextView
-                        android:id="@+id/bio_text_expand"
+                        android:id="@+id/history_text_expand"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignLeft="@+id/history_subhead"
@@ -213,7 +189,6 @@
                             android:id="@+id/expandable_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:paddingBottom="8dp"
                             android:textColor="@color/black"
                             android:textSize="14sp" />
 

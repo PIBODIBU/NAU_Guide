@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="0dp"
-        android:background="@drawable/rounded_corner"
+        android:background="@color/white"
         android:paddingBottom="8dp">
 
         <TextView
@@ -26,9 +26,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
             android:text="HEAD"
-            android:textColor="@color/black"
+            android:textColor="@color/colorTextPrimary"
             android:textSize="24sp" />
 
         <TextView
@@ -38,11 +39,13 @@
             android:layout_alignLeft="@+id/textViewName"
             android:layout_alignStart="@+id/textViewName"
             android:layout_below="@+id/textViewName"
+            android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="4dp"
             android:layout_toLeftOf="@+id/imageView"
+            android:layout_toStartOf="@+id/imageView"
             android:text="SUBHEAD"
-            android:textColor="@color/black"
+            android:textColor="@color/colorTextSecondary"
             android:textSize="14sp" />
 
         <com.gc.materialdesign.views.ButtonFlat
@@ -53,6 +56,7 @@
             android:layout_alignParentStart="true"
             android:layout_below="@+id/imageView"
             android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:background="@color/colorAppPrimary"
             android:text="На карту" />
@@ -63,6 +67,7 @@
             android:layout_height="80dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
+            android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginTop="16dp" />
 

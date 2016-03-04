@@ -82,7 +82,6 @@ public class FragmentInfo extends Fragment {
         new AsyncTask<String, Void, JSONObject>() {
 
             CircleImageView avatarSmall;
-            ImageView avatarBig;
 
             MaterialDialog dialog = APIDialogs.ProgressDialogs.loadingCancelable(supportActivity, new APIDialogs.ProgressDialogs.ProgressDialogCallbackInterface() {
                 @Override
@@ -102,7 +101,6 @@ public class FragmentInfo extends Fragment {
 
                 // Set up Views
                 avatarSmall = (CircleImageView) supportActivity.findViewById(R.id.imageViewPhoto);
-                avatarBig = (ImageView) supportActivity.findViewById(R.id.reveal_image);
 
                 // Loading default avatar
                 Picasso.with(supportActivity)
@@ -385,9 +383,8 @@ public class FragmentInfo extends Fragment {
             avatarBig = (ImageView) mainLayout.findViewById(R.id.reveal_image);
 
             dialogBuilder
+                    .setCancelable(true)
                     .setView(mainLayout);
-
-            setCancelable(true);
 
             dialog = dialogBuilder.create();
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));

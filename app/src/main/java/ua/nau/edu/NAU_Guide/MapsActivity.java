@@ -511,6 +511,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setCompassEnabled(false);
 
+        if (sharedPrefUtils.getMapLayer() != -1)
+            mMap.setMapType(sharedPrefUtils.getMapLayer());
+
         /**
          * Adding markers from {@link ua.nau.edu.University.NAU} using {@link android.os.AsyncTask}
          * Important! Loop needs to be started from 1

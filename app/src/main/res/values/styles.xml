@@ -25,6 +25,7 @@
 
     </style>
 
+
     <style name="AppTheme.TabLayout" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="tabTextAppearance">@style/AppTheme.TabLayout.Text</item>
         <item name="tabSelectedTextColor">@color/white</item>
