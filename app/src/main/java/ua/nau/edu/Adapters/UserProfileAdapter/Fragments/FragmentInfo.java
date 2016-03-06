@@ -356,7 +356,7 @@ public class FragmentInfo extends Fragment {
 
     public static class AvatarDialog extends DialogFragment {
 
-        private static final String TAG = "FragmentInfo";
+        private static final String TAG = "AvatarDialog";
 
         private AlertDialog.Builder dialogBuilder;
         private AlertDialog dialog;

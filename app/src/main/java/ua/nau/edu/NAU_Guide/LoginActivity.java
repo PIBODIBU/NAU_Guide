@@ -175,7 +175,8 @@ public class LoginActivity extends BaseToolbarActivity {
                                 users_full.first_name + " " + users_full.last_name,
                                 VKAccessToken.currentToken().email,
                                 PROFILE_PHOTO_LOCATION,
-                                users_full.id);
+                                users_full.id,
+                                users_full.photo_200);
 
                         loadAvatar(users_full.photo_200, FilePath, FileName, new AvatarLoadingCallbacks() {
                             @Override
@@ -366,7 +367,7 @@ public class LoginActivity extends BaseToolbarActivity {
         /**********************************************************************************
          *                 IMPORTANT! ADD THIS AFTER EACH SUCCESS LOGIN                   *
          *                                                                                */
-        sharedPrefUtils.performLogin(name, email, uniqueId, token, PROFILE_PHOTO_LOCATION);
+        sharedPrefUtils.performLogin(name, email, uniqueId, token, PROFILE_PHOTO_LOCATION, photoUrl);
         /**********************************************************************************/
 
         loadAvatar(photoUrl, FilePath, FileName, new CircleTransform(), new AvatarLoadingCallbacks() {

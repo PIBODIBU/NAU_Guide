@@ -261,7 +261,7 @@ public class NAU extends University {
         CorpsInfoUrl.put(28, "http://lib.nau.edu.ua");
 
 /** SIZE **/
-        hashMapSize = CorpsIcon.size();
+        hashMapSize = Corps.size();
         corpsNum = CorpsGerb.size();
 
         this.setCorps(Corps);

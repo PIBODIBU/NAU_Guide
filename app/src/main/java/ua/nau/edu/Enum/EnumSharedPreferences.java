@@ -15,5 +15,11 @@ public enum EnumSharedPreferences {
     UNIQUE_ID,
     EXIT,
     ACCOUNTHEADER_BG_IMAGE,
-    MAP_LAYER_KEY
+    MAP_LAYER_KEY,
+    VK_PREFERENCES,
+    VK_INFO_KEY,
+    PROFILE_PHOTO_URL_KEY,
+    VK_EMAIL_KEY,
+    VK_SIGNED_KEY,
+    VK_ID_KEY,
 }

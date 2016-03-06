@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import ua.nau.edu.Enum.EnumSharedPreferences;
-import ua.nau.edu.Enum.EnumSharedPreferencesVK;
 
 public class SharedPrefUtils {
 
@@ -22,34 +21,36 @@ public class SharedPrefUtils {
     public static final String FIRST_LAUNCH = EnumSharedPreferences.FIRST_LAUNCH.toString();
     public static final String TOKEN_KEY = EnumSharedPreferences.TOKEN_KEY.toString();
     public static final String UNIQUE_ID = EnumSharedPreferences.UNIQUE_ID.toString();
-    public static final String VK_PREFERENCES = EnumSharedPreferencesVK.VK_PREFERENCES.toString();
-    public static final String VK_INFO_KEY = EnumSharedPreferencesVK.VK_INFO_KEY.toString();
-    public static final String VK_PHOTO_KEY = EnumSharedPreferencesVK.VK_PHOTO_KEY.toString();
-    public static final String VK_NAME_KEY = EnumSharedPreferencesVK.VK_INFO_KEY.toString();
-    public static final String VK_EMAIL_KEY = EnumSharedPreferencesVK.VK_EMAIL_KEY.toString();
-    public static final String VK_SIGNED_KEY = EnumSharedPreferencesVK.VK_SIGNED_KEY.toString();
-    public static final String VK_ID_KEY = EnumSharedPreferencesVK.VK_ID_KEY.toString();
+    public static final String VK_PREFERENCES = EnumSharedPreferences.VK_PREFERENCES.toString();
+    public static final String VK_INFO_KEY = EnumSharedPreferences.VK_INFO_KEY.toString();
+    public static final String PROFILE_PHOTO_URL_KEY = EnumSharedPreferences.PROFILE_PHOTO_URL_KEY.toString();
+    public static final String VK_NAME_KEY = EnumSharedPreferences.VK_INFO_KEY.toString();
+    public static final String VK_EMAIL_KEY = EnumSharedPreferences.VK_EMAIL_KEY.toString();
+    public static final String VK_SIGNED_KEY = EnumSharedPreferences.VK_SIGNED_KEY.toString();
+    public static final String VK_ID_KEY = EnumSharedPreferences.VK_ID_KEY.toString();
     public static final String PROFILE_PHOTO_LOCATION_KEY = EnumSharedPreferences.PROFILE_PHOTO_LOCATION_KEY.toString();
     public static final String EXIT_KEY = EnumSharedPreferences.EXIT.toString();
     public static final String ACCOUNTHEADER_BG_IMAGE = EnumSharedPreferences.ACCOUNTHEADER_BG_IMAGE.toString();
     public static final String MAP_LAYER_KEY = EnumSharedPreferences.MAP_LAYER_KEY.toString();
 
-    public void performLogin(String name, String email, String uniqueId, String token, String photoLocation) {
+    public void performLogin(String name, String email, String uniqueId, String token, String photoLocation, String photoUrl) {
         setSignedState(true);
         setToken(token);
         setName(name);
         setEmail(email);
         setUniqueId(uniqueId);
         setProfilePhotoLocation(photoLocation);
+        setProfilePhotoUrl(photoUrl);
     }
 
 
-    public void performLoginVK(String name, String email, String photoLocation, int id) {
+    public void performLoginVK(String name, String email, String photoLocation, int id, String photoUrl) {
         setSignedState(true);
         setName(name);
         setEmail(email);
         setProfilePhotoLocation(photoLocation);
         setVKId(id);
+        setProfilePhotoUrl(photoUrl);
     }
 
 
@@ -141,6 +142,14 @@ public class SharedPrefUtils {
 
     public void setProfilePhotoLocation(String location) {
         sharedPrefs.edit().putString(PROFILE_PHOTO_LOCATION_KEY, location).apply();
+    }
+
+    public String getProfilePhotoUrl() {
+        return sharedPrefs.getString(PROFILE_PHOTO_URL_KEY, "");
+    }
+
+    public void setProfilePhotoUrl(String url) {
+        sharedPrefs.edit().putString(PROFILE_PHOTO_URL_KEY, url).apply();
     }
 
 }

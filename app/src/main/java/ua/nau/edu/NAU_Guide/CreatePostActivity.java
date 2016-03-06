@@ -71,8 +71,9 @@ public class CreatePostActivity extends BaseToolbarActivity {
             @Override
             public void onError() {
                 loadingDialog.dismiss();
-                setResult(APIValues.RESULT_ERROR);
-                finish();
+                APIDialogs.AlertDialogs.errorWhilePostingMessage(CreatePostActivity.this);
+                /*setResult(APIValues.RESULT_ERROR);
+                finish();*/
             }
         });
     }

@@ -61,9 +61,9 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
 
                 Log.i("NewsAdapterTest", "totalItemCount = "
-                                + Integer.toString(totalItemCount)
-                                + "    lastVisibleItem= " + Integer.toString(lastVisibleItem)
-                                + "  loading: " + loading
+                        + Integer.toString(totalItemCount)
+                        + "    lastVisibleItem= " + Integer.toString(lastVisibleItem)
+                        + "  loading: " + loading
                 );
 
                 if (!loading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
@@ -96,9 +96,9 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
 
                 Log.i("NewsAdapterTest", "totalItemCount = "
-                                + Integer.toString(totalItemCount)
-                                + "    lastVisibleItem= " + Integer.toString(lastVisibleItem)
-                                + "  loading: " + loading
+                        + Integer.toString(totalItemCount)
+                        + "    lastVisibleItem= " + Integer.toString(lastVisibleItem)
+                        + "  loading: " + loading
                 );
 
                 if (!loading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
@@ -161,8 +161,8 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             final Button expandMessage = ((BaseViewHolder) holder).expandMessage;
             final ImageButton headClick = ((BaseViewHolder) holder).headClick;
 
-            postTitle.setText(dataSet.get(listPosition).getAuthor());
-            postSubTitle.setText(dataSet.get(listPosition).getCreateTime());
+            postTitle.setText(dataSet.get(listPosition).getAuthor().trim());
+            postSubTitle.setText(dataSet.get(listPosition).getCreateTime().trim());
             postMessage.setText(dataSet.get(listPosition).getMessage());
             Picasso
                     .with(context)

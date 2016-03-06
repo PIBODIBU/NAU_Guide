@@ -128,7 +128,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     }
 
     private void setUpRecyclerView() {
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerview_user_data);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerview_search);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);

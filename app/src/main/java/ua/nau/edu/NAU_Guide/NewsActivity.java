@@ -81,7 +81,8 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
     @Override
     protected void onDestroy() {
         for (int i = 0; i < data.size(); i++) {
-            Picasso.with(this).invalidate(Uri.parse(data.get(i).getAuthorPhotoUrl()));
+            if (data.get(i) != null)
+                Picasso.with(this).invalidate(Uri.parse(data.get(i).getAuthorPhotoUrl()));
         }
 
         super.onDestroy();

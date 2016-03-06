@@ -1,20 +1,30 @@
 package ua.nau.edu.NAU_Guide;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.BottomSheetDialog;
+import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,9 +34,13 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.interfaces.OnCheckedChangeListener;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.ExpandableDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ToggleDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.squareup.picasso.Picasso;
@@ -97,6 +111,19 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         } catch (Exception ex) {
             Log.e(TAG, "setToolbarTitle() -> ", ex);
         }
+    }
+
+    public void getSecondDrawer(@NonNull Drawer.OnDrawerItemClickListener onDrawerItemClickListener) {
+        new DrawerBuilder()
+                .withActivity(BaseNavigationDrawerActivity.this)
+                .withTranslucentStatusBar(true)
+                .addDrawerItems(
+                        new PrimaryDrawerItem()
+                                .withIcon(GoogleMaterial.Icon.gmd_map)
+                                .withName("Show people")
+                                .withOnDrawerItemClickListener(onDrawerItemClickListener))
+                .withDrawerGravity(Gravity.END)
+                .append(drawer);
     }
 
     public void setToolbarTitle(String text) {
@@ -411,6 +438,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                                     startActivity(new Intent(BaseNavigationDrawerActivity.this, MainActivity.class)
                                             .putExtra(EXIT_KEY, true)
                                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                    finish();
                                     break;
                                 }
                                 default: {
@@ -441,15 +469,6 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 case KeyEvent.KEYCODE_BACK: {
                     if (drawer.isDrawerOpen()) { // Check if Drawer is opened
                         drawer.closeDrawer();
-                    } else if (searchView != null) { // Check if there is SearchView on Toolbar
-
-                        // SearchView behavior handling
-                        if (!searchView.isIconified()) {
-                            searchView.onActionViewCollapsed();
-                        } else {
-                            super.onBackPressed();
-                        }
-
                     } else {
                         super.onBackPressed();
                     }
@@ -460,38 +479,6 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return true;
-    }
-
-    public void toastShowShort(String TEXT) {
-        Toast.makeText(BaseNavigationDrawerActivity.this, TEXT, Toast.LENGTH_SHORT).show();
-    }
-
-    public void toastShowLong(String TEXT) {
-        Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
-    }
-
-    public void setMenuId(int menu) {
-        this.menuId = menu;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-
-        if (menuId != -1)
-            inflater.inflate(menuId, menu);
-        else
-            inflater.inflate(R.menu.menu_default, menu);
-
-        try {
-            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-            searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         return true;
     }
 
