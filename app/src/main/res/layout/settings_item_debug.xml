@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:choiceMode="singleChoice"
-        android:divider="@drawable/listview_divider"
+        android:divider="@drawable/divider"
         android:dividerHeight="1dp"
         android:listSelector="@drawable/recycler_item" />
 

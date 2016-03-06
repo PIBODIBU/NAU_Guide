@@ -45,7 +45,7 @@
             android:layout_toLeftOf="@+id/imageView"
             android:layout_toStartOf="@+id/imageView"
             android:text="SUBHEAD"
-            android:textColor="@color/colorTextSecondary"
+            android:textColor="@color/colorTextPrimary"
             android:textSize="14sp" />
 
         <com.gc.materialdesign.views.ButtonFlat

@@ -1,2 +1,1 @@
-include ':app', ':vksdk_library', ':MaterialDesign'
-project(':MaterialDesign').projectDir = new File('MaterialDesignLibrary/MaterialDesign')
+include ':app', ':vksdk_library'

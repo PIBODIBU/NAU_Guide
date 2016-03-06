@@ -337,7 +337,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                             String POSTS_CLASS = "NewsActivity";
                             String SETTINGS_CLASS = "SettingsActivity";
 
-                            Activities activities = Activities.values()[drawerItem.getIdentifier()];
+                            Activities activities = Activities.values()[(int) drawerItem.getIdentifier()];
 
                             switch (activities) {
                                 case MainActivity: {

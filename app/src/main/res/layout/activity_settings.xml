@@ -2,8 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:background="@color/recyclerview_background"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/recyclerview_background">
 
     <LinearLayout
         android:id="@+id/root_view"
@@ -42,13 +42,15 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:paddingBottom="@dimen/settings_title_padding_bottom"
+                        android:paddingEnd="@dimen/settings_title_padding_right"
+                        android:paddingLeft="@dimen/settings_title_padding_left"
+                        android:paddingRight="@dimen/settings_title_padding_right"
+                        android:paddingStart="@dimen/settings_title_padding_left"
+                        android:paddingTop="@dimen/settings_title_padding_top"
                         android:text="Карта"
-                        android:textColor="@color/colorAppPrimary" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/colorDivider" />
+                        android:textColor="@color/colorAppPrimary"
+                        android:textStyle="bold" />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -121,6 +123,42 @@
 
                     </RelativeLayout>
 
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp">
+
+                        <TextView
+                            android:id="@+id/itemMapMy_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Мое местоположение"
+                            android:textColor="@color/colorTextPrimary"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            android:id="@+id/textViewMapMy"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/itemMapMy_title"
+                            android:layout_marginEnd="4dp"
+                            android:layout_marginRight="4dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_toLeftOf="@+id/itemMapMy"
+                            android:layout_toStartOf="@+id/itemMapMy"
+                            android:text="Показавать мое месторасположение на карте"
+                            android:textColor="@color/colorTextSecondary"
+                            android:textSize="14sp" />
+
+                        <android.support.v7.widget.AppCompatCheckBox
+                            android:id="@+id/itemMapMy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_alignParentRight="true"
+                            app:buttonTint="@color/colorAppPrimary" />
+
+                    </RelativeLayout>
 
                 </LinearLayout>
             </android.support.v7.widget.CardView>
@@ -145,13 +183,15 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:paddingBottom="@dimen/settings_title_padding_bottom"
+                        android:paddingEnd="@dimen/settings_title_padding_right"
+                        android:paddingLeft="@dimen/settings_title_padding_left"
+                        android:paddingRight="@dimen/settings_title_padding_right"
+                        android:paddingStart="@dimen/settings_title_padding_left"
+                        android:paddingTop="@dimen/settings_title_padding_top"
                         android:text="Debug"
-                        android:textColor="@color/colorAppPrimary" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/colorDivider" />
+                        android:textColor="@color/colorAppPrimary"
+                        android:textStyle="bold" />
 
                     <RelativeLayout
                         android:layout_width="match_parent"

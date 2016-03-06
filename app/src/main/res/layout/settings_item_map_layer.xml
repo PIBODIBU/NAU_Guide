@@ -1,17 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="16dp"
+    android:background="@color/white"
     android:orientation="vertical">
 
-    <ListView
-        android:id="@+id/listView"
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="8dp"
+        android:text="Выберите слой для отображения на карте:" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:choiceMode="singleChoice"
-        android:divider="@drawable/listview_divider"
-        android:dividerHeight="1dp"
-        android:listSelector="@drawable/recycler_item" />
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp">
 
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/button_0"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Без карты"
+                android:textColor="@color/colorTextPrimary"
+                app:buttonTint="@color/grey" />
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/button_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Схема"
+                android:textColor="@color/colorTextPrimary"
+                app:buttonTint="@color/grey" />
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/button_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Спутник"
+                android:textColor="@color/colorTextPrimary"
+                app:buttonTint="@color/grey" />
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/button_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ландшафт"
+                android:textColor="@color/colorTextPrimary"
+                app:buttonTint="@color/grey" />
+
+            <android.support.v7.widget.AppCompatRadioButton
+                android:id="@+id/button_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Гибридная"
+                android:textColor="@color/colorTextPrimary"
+                app:buttonTint="@color/grey" />
+
+        </RadioGroup>
+    </LinearLayout>
 </LinearLayout>

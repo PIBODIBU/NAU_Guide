@@ -112,10 +112,13 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity implements
 
                             if (!name.equals("") && !uniqueId.equals("") && !photoUrl.equals("")) {
                                 data.add(new LectorsDataModel(name, uniqueId, photoUrl, institute));
+                                Log.d(TAG, "id: " + i + " Name: " + name);
+                            } else {
+                                Log.e(TAG, "Cannot add, something == \"\" ");
                             }
                         }
                     } catch (Exception e) {
-                        Log.e("LectorsListActivity", "Can't create JSONArray");
+                        Log.e(TAG, "Can't create JSONArray");
                     }
                 }
 

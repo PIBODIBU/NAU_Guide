@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ua.nau.edu.Support.View.ImprovedSwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:isl="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipeLayoutContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    isl:scrollableChildId="@+id/recyclerview_fragment_user_posts"
     tools:context=".UserProfileActivity">
 
     <RelativeLayout
@@ -21,14 +22,5 @@
             android:paddingBottom="8dp"
             android:scrollbars="vertical" />
 
-        <com.gc.materialdesign.views.ProgressBarIndeterminate
-            android:id="@+id/progressBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="false"
-            android:background="@color/colorAppPrimary"
-            android:visibility="gone" />
-
     </RelativeLayout>
-</android.support.v4.widget.SwipeRefreshLayout>
+</ua.nau.edu.Support.View.ImprovedSwipeLayout>

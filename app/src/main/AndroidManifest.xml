@@ -8,8 +8,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
@@ -33,7 +31,7 @@
     <application
         android:name="ua.nau.edu.Support.System.MultiDexSystem"
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:theme="@style/AppTheme">
@@ -44,8 +42,6 @@
         <meta-data
             android:name="com.indooratlas.android.sdk.API_SECRET"
             android:value="7Qu2UL)9hRtg3Af%95y!kM)J64%Yd3Y7J7)ZeLgEvJnHUyVmH7iBgZORrwrOij6jajRLTf4Hmgc8X9wZFtWdcCq8oVAVkU%k3rTpM6a(GAA8l2tn58fVeC6D2Z2epc9a" />
-
-        <uses-sdk tools:node="replace" />
 
         <activity
             android:name=".MainActivity"

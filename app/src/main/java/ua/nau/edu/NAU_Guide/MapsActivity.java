@@ -167,6 +167,11 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         super.onResume();
 
         //setUpMapIfNeeded();
+
+        if (mMap != null) {
+            if (sharedPrefUtils.getMapLayer() != -1)
+                mMap.setMapType(sharedPrefUtils.getMapLayer());
+        }
     }
 
     @Override
