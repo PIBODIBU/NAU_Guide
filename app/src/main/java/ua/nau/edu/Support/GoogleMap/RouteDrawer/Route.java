@@ -282,7 +282,7 @@ public class Route {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            progressDialog.hide();
+            progressDialog.dismiss();
             if (result != null) {
                 drawPath(result, steps, iconId);
             }

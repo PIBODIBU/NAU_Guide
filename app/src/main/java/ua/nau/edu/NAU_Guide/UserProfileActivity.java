@@ -6,14 +6,11 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.support.v4.app.FragmentTransaction;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import ua.nau.edu.Adapters.UserProfileAdapter.Fragments.FragmentInfo;
 import ua.nau.edu.Adapters.UserProfileAdapter.Fragments.FragmentPosts;
@@ -30,8 +27,7 @@ public class UserProfileActivity extends BaseNavigationDrawerActivity {
 
     public CoordinatorLayout rootView;
     public CollapsingToolbarLayout collapsingToolbarLayout;
-    public AppBarLayout mAppBarLayout;
-    private String titleAcivity = "";
+    public AppBarLayout appBarLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +40,13 @@ public class UserProfileActivity extends BaseNavigationDrawerActivity {
                 sharedPrefUtils.getName(),
                 sharedPrefUtils.getEmail());
 
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_layout);
+        rootView = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+
+        //collapsingToolbarLayout.setTitle("BIG BIG BIG BIG TEXT");
+        //collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(UserProfileActivity.this, android.R.color.transparent));
+
         new AsyncTask<Void, Void, Void>() {
 
             TabLayout tabs;
@@ -54,12 +57,6 @@ public class UserProfileActivity extends BaseNavigationDrawerActivity {
             protected void onPreExecute() {
                 super.onPreExecute();
 
-                collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-                rootView = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
-                //collapsingToolbarLayout.setTitle("BIG BIG BIG BIG TEXT");
-                //collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(UserProfileActivity.this, android.R.color.transparent));
-
-                mAppBarLayout = (AppBarLayout) findViewById(R.id.app_bar_layout);
             }
 
             @Override

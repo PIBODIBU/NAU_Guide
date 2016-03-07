@@ -26,6 +26,12 @@
     </style>
 
 
+    <style name="AppTheme.AppCompatRadioButton" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">@color/grey</item>
+        <item name="colorControlActivated">@color/colorAppPrimary</item>
+    </style>
+
+
     <style name="AppTheme.TabLayout" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="tabTextAppearance">@style/AppTheme.TabLayout.Text</item>
         <item name="tabSelectedTextColor">@color/white</item>
@@ -46,22 +52,13 @@
 
     <style name="AppTheme.ActionMode">
         <item name="background">@color/colorAppPrimary</item>
-        <item name="android:height">?android:attr/actionBarSize</item>
-        <item name="android:gravity">center</item>
-        <item name="android:background">@color/colorAppPrimary</item>
+        <item name="height">?attr/actionBarSize</item>
         <item name="titleTextStyle">@style/TextAppearance.AppCompat.Title</item>
     </style>
 
-
     <style name="AppTheme.ActionMode.Title">
-        <item name="android:textColor">@android:color/transparent</item>
+        <item name="android:textColor">@color/white</item>
         <item name="android:textStyle">bold</item>
-    </style>
-
-
-    <style name="DarkText">
-        <item name="android:textColor">@color/black</item>
-        <item name="android:textColorSecondary">@color/colorAppPrimary</item>
     </style>
 
 

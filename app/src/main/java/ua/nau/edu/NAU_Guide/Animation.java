@@ -60,7 +60,7 @@ public class Animation {
             view.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    view.setVisibility(View.GONE);
+                    view.setVisibility(View.INVISIBLE);
                 }
             }, animDuration);
         }

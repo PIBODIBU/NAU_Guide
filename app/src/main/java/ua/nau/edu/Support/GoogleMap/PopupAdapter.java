@@ -55,18 +55,6 @@ public class PopupAdapter implements InfoWindowAdapter {
 
         titleTV.setText(title);
 
-        if (!TextUtils.isEmpty(snippet)) {
-            PeopleMarkerModel markerModel = MapsTestActivity.peopleMarkers.get(MapsTestActivity.getMarkerId(marker));
-
-            snippetTV.setVisibility(View.VISIBLE);
-            avatarSmall.setVisibility(View.VISIBLE);
-
-            snippetTV.setText(snippet);
-            avatarSmall.setImageBitmap(markerModel.getPhotoSmall());
-        } else {
-            snippetTV.setVisibility(View.GONE);
-            avatarSmall.setVisibility(View.GONE);
-        }
 
         return popup;
     }

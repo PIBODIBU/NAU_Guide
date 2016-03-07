@@ -83,15 +83,7 @@ public class FragmentInfo extends Fragment {
 
             CircleImageView avatarSmall;
 
-            MaterialDialog dialog = APIDialogs.ProgressDialogs.loadingCancelable(supportActivity, new APIDialogs.ProgressDialogs.ProgressDialogCallbackInterface() {
-                @Override
-                public void onCancel() {
-                    dialog.dismiss();
-                    startActivity(new Intent(supportActivity, MainActivity.class)
-                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                    supportActivity.finish();
-                }
-            });
+            MaterialDialog dialog = APIDialogs.ProgressDialogs.loading(supportActivity);
 
             @Override
             protected void onPreExecute() {
@@ -218,14 +210,7 @@ public class FragmentInfo extends Fragment {
 
             CircleImageView avatarSmall;
 
-            MaterialDialog dialog = APIDialogs.ProgressDialogs.loadingCancelable(supportActivity, new APIDialogs.ProgressDialogs.ProgressDialogCallbackInterface() {
-                @Override
-                public void onCancel() {
-                    Log.d(TAG, "Dialog canceled");
-                    dialog.dismiss();
-                    supportActivity.finish();
-                }
-            });
+            MaterialDialog dialog = APIDialogs.ProgressDialogs.loading(supportActivity);
 
             @Override
             protected void onPreExecute() {

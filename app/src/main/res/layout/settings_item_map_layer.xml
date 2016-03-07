@@ -9,9 +9,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingTop="8dp"
+        android:padding="16dp"
         android:text="Выберите слой для отображения на карте:" />
 
     <LinearLayout
@@ -34,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:text="Без карты"
                 android:textColor="@color/colorTextPrimary"
-                app:buttonTint="@color/grey" />
+                app:theme="@style/AppTheme.AppCompatRadioButton" />
 
             <android.support.v7.widget.AppCompatRadioButton
                 android:id="@+id/button_1"
@@ -42,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:text="Схема"
                 android:textColor="@color/colorTextPrimary"
-                app:buttonTint="@color/grey" />
+                app:theme="@style/AppTheme.AppCompatRadioButton" />
 
             <android.support.v7.widget.AppCompatRadioButton
                 android:id="@+id/button_2"
@@ -50,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:text="Спутник"
                 android:textColor="@color/colorTextPrimary"
-                app:buttonTint="@color/grey" />
+                app:theme="@style/AppTheme.AppCompatRadioButton" />
 
             <android.support.v7.widget.AppCompatRadioButton
                 android:id="@+id/button_3"
@@ -58,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:text="Ландшафт"
                 android:textColor="@color/colorTextPrimary"
-                app:buttonTint="@color/grey" />
+                app:theme="@style/AppTheme.AppCompatRadioButton" />
 
             <android.support.v7.widget.AppCompatRadioButton
                 android:id="@+id/button_4"
@@ -66,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:text="Гибридная"
                 android:textColor="@color/colorTextPrimary"
-                app:buttonTint="@color/grey" />
+                app:theme="@style/AppTheme.AppCompatRadioButton" />
 
         </RadioGroup>
     </LinearLayout>

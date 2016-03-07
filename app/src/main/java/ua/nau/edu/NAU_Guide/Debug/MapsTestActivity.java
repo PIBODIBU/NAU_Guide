@@ -5,21 +5,16 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.text.Html;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -28,7 +23,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -45,19 +39,12 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import ua.nau.edu.API.APIDialogs;
-import ua.nau.edu.Dialogs.AvatarBigDialog;
 import ua.nau.edu.Enum.EnumExtras;
 import ua.nau.edu.Enum.EnumMaps;
 import ua.nau.edu.NAU_Guide.Animation;
@@ -67,14 +54,9 @@ import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.RecyclerViews.MapsActivity.MapsAdapter;
 import ua.nau.edu.RecyclerViews.MapsActivity.MapsDataModel;
 import ua.nau.edu.Support.GoogleMap.GoogleMapUtils;
-import ua.nau.edu.Support.GoogleMap.PeopleMarkerModel;
-import ua.nau.edu.Support.GoogleMap.PopupAdapter;
 import ua.nau.edu.Support.GoogleMap.RouteDrawer.Route;
-import ua.nau.edu.Support.Picasso.CircleTransform;
-import ua.nau.edu.Support.Picasso.PicassoMarker;
 import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 import ua.nau.edu.Support.System.HardwareChecks;
-import ua.nau.edu.Support.System.Utils;
 import ua.nau.edu.Support.View.SearchViewUtils;
 import ua.nau.edu.University.NAU;
 
@@ -102,8 +84,8 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
     private RelativeLayout rootView;
 
     private GoogleApiClient googleApiClient;
-    private GoogleMap googleMap; // Might be null if Google Play services APK is not available.
-    private static NAU university;
+    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private NAU university;
     private Route supportRoute = new Route();
     private FloatingActionMenu fab_menu;
 
@@ -118,7 +100,6 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
     private ArrayList<MapsDataModel> data = new ArrayList<>();
 
     private boolean isSnackBarDistanceShowing = false;
-    public static FragmentManager fm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +114,6 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
 
         university = new NAU(this);
         university.init();
-        fm = getSupportFragmentManager();
 
 // Get and set system services & Buttons & SharedPreferences & Requests
         methodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
@@ -148,87 +128,6 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
                 sharedPrefUtils.getName(),
                 sharedPrefUtils.getEmail()
         );
-        getSecondDrawer(new Drawer.OnDrawerItemClickListener() {
-            @Override
-            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                addPeopleOnMap();
-                return true;
-            }
-        });
-    }
-
-    public static HashMap<Integer, PeopleMarkerModel> peopleMarkers = new HashMap<>();
-
-    private void addPeopleOnMap() {
-        googleMap.setInfoWindowAdapter(new PopupAdapter(this, getLayoutInflater()));
-        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
-                if (!TextUtils.isEmpty(marker.getSnippet())) {
-                    Log.d(TAG,
-                            "id: " + peopleMarkers.get(getMarkerId(marker)).getUserId());
-
-                    startActivity(new Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse(String.format("vkontakte://profile/%d", peopleMarkers.get(getMarkerId(marker)).getUserId()))
-                    ));
-                }
-            }
-        });
-
-
-        /** Marker 1 **/
-        final Marker marker = googleMap.addMarker(new MarkerOptions()
-                .title(sharedPrefUtils.getName())
-                .position(getMyCoordinate())
-                .snippet(sharedPrefUtils.getEmail())
-                .anchor(0.5f, 1)
-                .icon(null));
-
-        PicassoMarker markerTarget = new PicassoMarker(marker);
-        markerTarget.setLoadingCallBacks(new PicassoMarker.LoadingCallBacks() {
-            @Override
-            public void onLoaded(Bitmap bitmap) {
-                peopleMarkers.put(getMarkerId(marker), new PeopleMarkerModel(getMarkerId(marker), Integer.toString(sharedPrefUtils.getVKId()), bitmap));
-            }
-        });
-        Picasso
-                .with(this)
-                .load(Uri.parse(sharedPrefUtils.getProfilePhotoUrl()))
-                .transform(new CircleTransform())
-                .memoryPolicy(MemoryPolicy.NO_CACHE)
-                .networkPolicy(NetworkPolicy.NO_CACHE)
-                .resize((int) Utils.convertDpToPixel(40f, this), (int) Utils.convertDpToPixel(40f, this))
-                .into(markerTarget);
-        /** **/
-
-
-        /** Marker 2 **/
-        final Marker marker_1 = googleMap.addMarker(new MarkerOptions()
-                .title("Пономарь Александр")
-                .position(new LatLng(50.523211, 30.497486))
-                .snippet("emailsani@email.com")
-                .anchor(0.5f, 1)
-                .icon(null));
-
-        PicassoMarker markerTarget_1 = new PicassoMarker(marker_1);
-        markerTarget.setLoadingCallBacks(new PicassoMarker.LoadingCallBacks() {
-            @Override
-            public void onLoaded(Bitmap bitmap) {
-                peopleMarkers.put(getMarkerId(marker_1), new PeopleMarkerModel(getMarkerId(marker_1), Integer.toString(18765882), bitmap));
-            }
-        });
-        Picasso
-                .with(this)
-                .load(Uri.parse("https://pp.vk.me/c628829/v628829882/23e0c/wflRIm9Puyw.jpg"))
-                .transform(new CircleTransform())
-                .memoryPolicy(MemoryPolicy.NO_CACHE)
-                .networkPolicy(NetworkPolicy.NO_CACHE)
-                .resize((int) Utils.convertDpToPixel(40f, this), (int) Utils.convertDpToPixel(40f, this))
-                .into(markerTarget_1);
-        /** **/
-
-
     }
 
     private void setUpRecyclerView() {
@@ -272,9 +171,9 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
 
         //setUpMapIfNeeded();
 
-        if (googleMap != null) {
+        if (mMap != null) {
             if (sharedPrefUtils.getMapLayer() != -1)
-                googleMap.setMapType(sharedPrefUtils.getMapLayer());
+                mMap.setMapType(sharedPrefUtils.getMapLayer());
         }
     }
 
@@ -513,15 +412,15 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
     private void setUpMapIfNeeded() {
         Log.i(TAG, "setUpMapIfNeeded called");
 
-        if (googleMap == null) {
+        if (mMap == null) {
             MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
 
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
-                    MapsTestActivity.this.googleMap = googleMap;
+                    mMap = googleMap;
 
-                    if (MapsTestActivity.this.googleMap != null) {
+                    if (mMap != null) {
                         setUpMap();
                         initGoogleApiClient();
                     }
@@ -538,7 +437,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
      * @param title title of icon
      */
     private void addMarkerCustom(Integer i, int icon, String title) {
-        Marker mMapMarker = googleMap.addMarker(new MarkerOptions()
+        Marker mMapMarker = mMap.addMarker(new MarkerOptions()
                 .position(university.getCorps().get(i))
                 .title(title)
                 .icon(BitmapDescriptorFactory.fromResource(icon)));
@@ -558,7 +457,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
      *                           need to get Id of Marker to open
      */
     private void addMarkerCustom(int i, MarkerOptions markerOptions, int markerIdFromIntent) {
-        Marker mMapMarker = googleMap.addMarker(markerOptions);
+        Marker mMapMarker = mMap.addMarker(markerOptions);
 
         if (markerIdFromIntent == i) {
             Log.d(TAG, "addMarkerCustom()/ Intent: " + markerIdFromIntent + " == Iterator: " + i);
@@ -590,7 +489,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
             marker.showInfoWindow();
 
             //Animate to center
-            googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
         } else {
             Log.e(TAG, "openMarkerFromIntent() mainActivityMarker == null");
         }
@@ -608,20 +507,20 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
                 .bearing(160)               // Sets the orientation of the camera to east
                 .build();                   // Creates a CameraPosition from the builder
 
-        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition_start));
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition_start));
 
         try {
-            googleMap.setMyLocationEnabled(true);
+            mMap.setMyLocationEnabled(true);
         } catch (SecurityException ex) {
             ex.printStackTrace();
         }
-        googleMap.getUiSettings().setMapToolbarEnabled(false);
-        googleMap.setIndoorEnabled(true);
-        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-        googleMap.getUiSettings().setCompassEnabled(false);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.setIndoorEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mMap.getUiSettings().setCompassEnabled(false);
 
         if (sharedPrefUtils.getMapLayer() != -1)
-            googleMap.setMapType(sharedPrefUtils.getMapLayer());
+            mMap.setMapType(sharedPrefUtils.getMapLayer());
 
         /**
          * Adding markers from {@link ua.nau.edu.University.NAU} using {@link android.os.AsyncTask}
@@ -652,7 +551,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
         }.execute();
 
         //Обработчик нажатия на маркер
-        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 // Open FabMenu
@@ -668,7 +567,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
             }
         });
 
-        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
                 if (fab_menu.isOpened()) {
@@ -678,6 +577,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
                 }
             }
         });
+
     }
 
     @Override
@@ -689,7 +589,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
         marker.showInfoWindow();
 
         //Animate to center
-        googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
 
         //Consume the method
         return true;
@@ -703,47 +603,23 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
         FloatingActionButton fab_route = (FloatingActionButton) findViewById(R.id.fab_route);
 
         fab_route.setOnClickListener(new View.OnClickListener() {
-            @Override
             public void onClick(View v) {
-                new AsyncTask<Void, Void, Void>() {
-                    @Override
-                    protected void onPreExecute() {
-                        super.onPreExecute();
-                        Toast.makeText(activityContext, "Получение маршрута", Toast.LENGTH_SHORT).show();
-                    }
+                if (HardwareChecks.isInternetAvailable()) {
+                    supportRoute.clearPath();
 
-                    @Override
-                    protected Void doInBackground(Void... params) {
-                        if (!currentMarkerLabel.equals("") && currentMarkerID != 0 && currentMarkerID > 0 && currentMarkerID <= university.getHashMapSize()) {
-                            if (HardwareChecks.isInternetAvailable()) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        supportRoute.clearPath();
+                    supportRoute.drawRoute(mMap, activityContext, getMyCoordinate(), university.getCorps().get(currentMarkerID),
+                            Route.TRANSPORT_WALKING, false, Route.LANGUAGE_RUSSIAN, R.drawable.ic_place_black_24dp);
 
-                                        supportRoute.drawRoute(googleMap, activityContext, getMyCoordinate(), university.getCorps().get(currentMarkerID),
-                                                Route.TRANSPORT_WALKING, false, Route.LANGUAGE_RUSSIAN, R.drawable.ic_place_black_24dp);
+                    CameraPosition currentPosition = new CameraPosition.Builder()
+                            .target(getMyCoordinate())
+                            .bearing(180)
+                            .zoom(13f)
+                            .build();
+                    mMap.moveCamera(CameraUpdateFactory.newCameraPosition(currentPosition));
 
-                                        CameraPosition currentPosition = new CameraPosition.Builder()
-                                                .target(getMyCoordinate())
-                                                .bearing(180)
-                                                .zoom(13f)
-                                                .build();
-                                        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(currentPosition));
-                                    }
-                                });
-                            } else {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        APIDialogs.AlertDialogs.internetConnectionError(activityContext);
-                                    }
-                                });
-                            }
-                        }
-                        return null;
-                    }
-                }.execute();
+                } else {
+                    APIDialogs.AlertDialogs.internetConnectionError(activityContext);
+                }
             }
         });
 
@@ -773,7 +649,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
         });
     }
 
-    public static int getMarkerId(Marker marker) {
+    private int getMarkerId(Marker marker) {
         String s = marker.getId();
         s = s.substring(1, s.length());
         Integer i = Integer.parseInt(s, 10);
@@ -781,14 +657,10 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
         return i;
     }
 
-    public static int getNAUSize() {
-        return university.getHashMapSize();
-    }
-
     private void zoomToMyLocation() {
         if (HardwareChecks.isWifiEnabled(this)) {
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(getMyCoordinate(), 16);
-            googleMap.animateCamera(cameraUpdate);
+            mMap.animateCamera(cameraUpdate);
         } else {
             APIDialogs.AlertDialogs.wifiDisabled(this);
         }
@@ -804,7 +676,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
         currentMarkerLabel = university.getCorpsLabel().get(currentMarkerID);
         fab_menu.open(true);
         marker.showInfoWindow();
-        googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
     }
 
     public LatLng getMyCoordinate() {

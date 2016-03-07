@@ -248,12 +248,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                     data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
             }
 
-            for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameShort().entrySet()) {
-                if (entry.getValue().toLowerCase().contains(newText.toLowerCase().trim()))
-                    data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
-            }
-
-
             // Nothing was found. Show warning
             if (data.size() == 0) {
                 // TODO add warning message
@@ -599,47 +593,23 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         FloatingActionButton fab_route = (FloatingActionButton) findViewById(R.id.fab_route);
 
         fab_route.setOnClickListener(new View.OnClickListener() {
-            @Override
             public void onClick(View v) {
-                new AsyncTask<Void, Void, Void>() {
-                    @Override
-                    protected void onPreExecute() {
-                        super.onPreExecute();
-                        Toast.makeText(activityContext, "Получение маршрута", Toast.LENGTH_SHORT).show();
-                    }
+                if (HardwareChecks.isInternetAvailable()) {
+                    supportRoute.clearPath();
 
-                    @Override
-                    protected Void doInBackground(Void... params) {
-                        if (!currentMarkerLabel.equals("") && currentMarkerID != 0 && currentMarkerID > 0 && currentMarkerID <= university.getHashMapSize()) {
-                            if (HardwareChecks.isInternetAvailable()) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        supportRoute.clearPath();
+                    supportRoute.drawRoute(mMap, activityContext, getMyCoordinate(), university.getCorps().get(currentMarkerID),
+                            Route.TRANSPORT_WALKING, false, Route.LANGUAGE_RUSSIAN, R.drawable.ic_place_black_24dp);
 
-                                        supportRoute.drawRoute(mMap, activityContext, getMyCoordinate(), university.getCorps().get(currentMarkerID),
-                                                Route.TRANSPORT_WALKING, false, Route.LANGUAGE_RUSSIAN, R.drawable.ic_place_black_24dp);
+                    CameraPosition currentPosition = new CameraPosition.Builder()
+                            .target(getMyCoordinate())
+                            .bearing(180)
+                            .zoom(13f)
+                            .build();
+                    mMap.moveCamera(CameraUpdateFactory.newCameraPosition(currentPosition));
 
-                                        CameraPosition currentPosition = new CameraPosition.Builder()
-                                                .target(getMyCoordinate())
-                                                .bearing(180)
-                                                .zoom(13f)
-                                                .build();
-                                        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(currentPosition));
-                                    }
-                                });
-                            } else {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        APIDialogs.AlertDialogs.internetConnectionError(activityContext);
-                                    }
-                                });
-                            }
-                        }
-                        return null;
-                    }
-                }.execute();
+                } else {
+                    APIDialogs.AlertDialogs.internetConnectionError(activityContext);
+                }
             }
         });
 

@@ -1,46 +1,27 @@
 package ua.nau.edu.NAU_Guide;
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.interfaces.OnCheckedChangeListener;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.ExpandableDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
-import com.mikepenz.materialdrawer.model.ToggleDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.squareup.picasso.Picasso;
@@ -56,9 +37,8 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
     protected DrawerBuilder drawerBuilder = null;
     protected Drawer drawer = null;
     private InputMethodManager MethodManager = null;
-    private SearchView searchView;
     private boolean wasInputActive = false;
-    private int menuId = -1;
+    private int drawerItemsCount = 0;
 
     private static final String EXIT_KEY = EnumSharedPreferences.EXIT.toString();
     private static String profilePhotoLocation;
@@ -101,31 +81,15 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         }
     }
 
-    private void setToolbarTitle() {
-        try {
-            String text = getSupportActionBar().getTitle().toString();
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
+    /**
+     * Public methods used for setting up Drawer
+     */
 
-            TextView title = (TextView) findViewById(R.id.toolbar_title);
-            title.setText(text);
-        } catch (Exception ex) {
-            Log.e(TAG, "setToolbarTitle() -> ", ex);
-        }
-    }
-
-    public void getSecondDrawer(@NonNull Drawer.OnDrawerItemClickListener onDrawerItemClickListener) {
-        new DrawerBuilder()
-                .withActivity(BaseNavigationDrawerActivity.this)
-                .withTranslucentStatusBar(true)
-                .addDrawerItems(
-                        new PrimaryDrawerItem()
-                                .withIcon(GoogleMaterial.Icon.gmd_map)
-                                .withName("Show people")
-                                .withOnDrawerItemClickListener(onDrawerItemClickListener))
-                .withDrawerGravity(Gravity.END)
-                .append(drawer);
-    }
-
+    /**
+     * Set Toolbar title
+     *
+     * @param text new Toolbar title
+     */
     public void setToolbarTitle(String text) {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -133,11 +97,17 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         title.setText(text);
     }
 
+    /**
+     * Init base NavigationDrawer
+     *
+     * @param ACCOUNT_NAME  name for Drawer header
+     * @param ACCOUNT_EMAIL email for Drawer header
+     */
     public void getDrawer(String ACCOUNT_NAME, String ACCOUNT_EMAIL) {
         // Creating DrawerBuilder
         setUpDrawerBuilder(ACCOUNT_NAME, ACCOUNT_EMAIL);
 
-        Log.i("Drawer", "getDrawer");
+        Log.i("Drawer", "getDrawerMap");
 
         // Creating Drawer from DrawerBuilder
         setUpDrawer();
@@ -146,6 +116,13 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         getCurrentSelection();
     }
 
+    /**
+     * Init base NavigationDrawer with back arrow instead of hamburger icon.
+     * Don't forget to implement back arrow logic
+     *
+     * @param ACCOUNT_NAME  name for Drawer header
+     * @param ACCOUNT_EMAIL email for Drawer header
+     */
     public void getDrawerWithBackArrow(String ACCOUNT_NAME, String ACCOUNT_EMAIL) {
         // Creating DrawerBuilder
         setUpDrawerBuilder(ACCOUNT_NAME, ACCOUNT_EMAIL);
@@ -163,19 +140,51 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
         getCurrentSelection();
     }
 
-    public void setUpDrawer() {
-        if (drawerBuilder != null) {
-            final PrimaryDrawerItem myPage = new PrimaryDrawerItem()
-                    .withName(R.string.drawer_item_mypage)
-                    .withIcon(GoogleMaterial.Icon.gmd_grade)
-                    .withIdentifier(Activities.UserProfileActivity.ordinal());
 
-            drawer = drawerBuilder.build();
-            drawer.getRecyclerView().setVerticalScrollBarEnabled(false);
+    /**
+     * Private methods used for implementing base Drawer logic
+     */
+
+    /**
+     * Check if user is logged in. If true -> add new DrawerItem to NavigationDrawer (My page)
+     * Building NavigationDrawer from Drawer.Builder
+     */
+    private void setUpDrawer() {
+        if (drawerBuilder != null) {
+            Log.d(TAG, "setUpDrawer() -> Building Drawer from Drawer.Builder");
+
+            drawer = drawerBuilder.build(); // Building Drawer
+            drawer.getRecyclerView().setVerticalScrollBarEnabled(false); // remove ScrollBar from RecyclerView
 
             if (!sharedPrefUtils.getToken().equals("")) {
+                Log.d(TAG, "setUpDrawer() -> User is logged in, adding new DrawerItem to Drawer");
+
+                final PrimaryDrawerItem myPage = new PrimaryDrawerItem()
+                        .withName(R.string.drawer_item_mypage)
+                        .withIcon(GoogleMaterial.Icon.gmd_grade)
+                        .withIdentifier(Activities.UserProfileActivity.ordinal());
+
                 drawer.addItemAtPosition(myPage, 2);
             }
+        } else {
+            Log.e(TAG, "setUpDrawer() -> DrawerBuilder is null");
+        }
+    }
+
+    /**
+     * Set default ToolbarTitle - Activity label
+     */
+    private void setToolbarTitle() {
+        try {
+            String titleText = getSupportActionBar().getTitle().toString();
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+            TextView title = (TextView) findViewById(R.id.toolbar_title);
+            title.setText(titleText);
+
+            Log.d(TAG, "setToolbarTitle() -> New Toolbar title: " + titleText);
+        } catch (Exception ex) {
+            Log.e(TAG, "setToolbarTitle() -> ", ex);
         }
     }
 
@@ -452,6 +461,7 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                         return false;
                     }
                 });
+        drawerItemsCount += 7;
     }
 
     @Override

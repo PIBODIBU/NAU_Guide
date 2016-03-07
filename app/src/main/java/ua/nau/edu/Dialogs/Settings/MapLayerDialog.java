@@ -50,7 +50,6 @@ public class MapLayerDialog extends AppCompatDialogFragment {
 
         dialogBuilder
                 .setTitle("Слой карты")
-                .setCancelable(false)
                 .setView(rootView)
                 .setPositiveButton("Ок", new DialogInterface.OnClickListener() {
                     @Override
@@ -64,6 +63,8 @@ public class MapLayerDialog extends AppCompatDialogFragment {
                         dialog.dismiss();
                     }
                 });
+        setCancelable(false);
+
         dialog = dialogBuilder.create();
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
