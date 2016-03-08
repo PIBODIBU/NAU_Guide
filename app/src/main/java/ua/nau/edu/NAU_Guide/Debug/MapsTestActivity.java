@@ -578,6 +578,10 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
             }
         });
 
+        mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(50.437476, 30.428322))
+                .title("SVG Marker")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_svg)));
     }
 
     @Override

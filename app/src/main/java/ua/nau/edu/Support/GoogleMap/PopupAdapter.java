@@ -2,20 +2,15 @@ package ua.nau.edu.Support.GoogleMap;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.model.Marker;
 
-import ua.nau.edu.Dialogs.AvatarBigDialog;
-import ua.nau.edu.NAU_Guide.Debug.MapsTestActivity;
 import ua.nau.edu.NAU_Guide.R;
 
 public class PopupAdapter implements InfoWindowAdapter {

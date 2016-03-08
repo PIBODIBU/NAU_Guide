@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+
+    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
+        android:id="@+id/progressBar_det"
+        style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal.NoPadding"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:indeterminate="true"
+        android:tint="@color/colorAppAccent"
+        android:visibility="invisible"
+        app:mpb_progressStyle="horizontal"
+        app:mpb_useIntrinsicPadding="false" />
+
+    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
+        android:id="@+id/progressBar_indet"
+        style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal.NoPadding"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:indeterminate="true"
+        android:tint="@color/colorAppAccent"
+        android:visibility="invisible"
+        app:mpb_progressStyle="horizontal"
+        app:mpb_useIntrinsicPadding="false" />
+
+    <TextView
+        android:id="@+id/version_current"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/progressBar_indet"
+        android:layout_marginTop="8dp"
+        android:padding="8dp"
+        android:text="Current version: "
+        android:textColor="@color/colorTextPrimary"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/version_available"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/version_current"
+        android:padding="8dp"
+        android:text="Available version: "
+        android:textColor="@color/colorTextPrimary"
+        android:textSize="18sp" />
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/update_check"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorAppPrimary"
+        android:text="Check for update TEST"
+        android:textSize="20sp" />
+
+</RelativeLayout>

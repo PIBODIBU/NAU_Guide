@@ -12,16 +12,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
-        android:layout_marginBottom="16dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/transparent"
+        android:background="@color/white"
         android:gravity="top"
         android:inputType="textMultiLine"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:scrollbarStyle="outsideOverlay"
         android:scrollbars="vertical"
         android:text=""
-        android:textColor="@color/black"
+        android:textColor="@color/colorTextPrimary"
         android:theme="@style/AppTheme.EditText" />
 
 </RelativeLayout>

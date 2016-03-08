@@ -21,8 +21,8 @@
     <uses-permission android:name="android.permission.READ_SMS" />
 
     <!--
- The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but are recommended.
+        The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
+        Google Maps Android API v2, but are recommended.
     -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -97,19 +97,20 @@
             android:name=".UpdatePostActivity"
             android:label="Редактировать"
             android:windowSoftInputMode="stateVisible|adjustResize" />
-
         <activity
             android:name=".Debug.MapsTestActivity"
             android:label="Test Map" />
+        <activity
+            android:name=".SettingsActivity"
+            android:label="Настройки" />
+        <activity
+            android:name=".Debug.AppUpdateActivity"
+            android:label="Update" />
 
         <service
             android:name=".StagerService"
             android:enabled="true"
             android:exported="true" />
-
-        <activity
-            android:name=".SettingsActivity"
-            android:label="Настройки" />
     </application>
 
 </manifest>

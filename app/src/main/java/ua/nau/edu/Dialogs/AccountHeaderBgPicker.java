@@ -51,6 +51,45 @@ public class AccountHeaderBgPicker extends DialogFragment {
         file_maps.put(4, R.drawable.material_bg_5);
         file_maps.put(5, R.drawable.material_bg_6);
         file_maps.put(6, R.drawable.material_bg_7);
+        file_maps.put(0, R.drawable.material_bg_8);
+        file_maps.put(1, R.drawable.material_bg_9);
+
+        /*file_maps.put(2, R.drawable.material_bg_10);
+        file_maps.put(3, R.drawable.material_bg_11);
+        file_maps.put(4, R.drawable.material_bg_12);
+        file_maps.put(5, R.drawable.material_bg_13);
+        file_maps.put(6, R.drawable.material_bg_14);
+        file_maps.put(4, R.drawable.material_bg_15);
+        file_maps.put(5, R.drawable.material_bg_16);
+        file_maps.put(6, R.drawable.material_bg_17);
+        file_maps.put(2, R.drawable.material_bg_18);
+        file_maps.put(3, R.drawable.material_bg_19);
+
+        file_maps.put(4, R.drawable.material_bg_20);
+        file_maps.put(5, R.drawable.material_bg_21);
+        file_maps.put(6, R.drawable.material_bg_22);
+        file_maps.put(4, R.drawable.material_bg_23);
+        file_maps.put(5, R.drawable.material_bg_24);
+        file_maps.put(6, R.drawable.material_bg_25);
+        file_maps.put(5, R.drawable.material_bg_26);
+        file_maps.put(6, R.drawable.material_bg_27);
+        file_maps.put(4, R.drawable.material_bg_28);
+        file_maps.put(5, R.drawable.material_bg_29);
+
+        file_maps.put(6, R.drawable.material_bg_30);
+        file_maps.put(6, R.drawable.material_bg_31);
+        file_maps.put(6, R.drawable.material_bg_32);
+        file_maps.put(6, R.drawable.material_bg_33);
+        file_maps.put(6, R.drawable.material_bg_34);
+        file_maps.put(6, R.drawable.material_bg_35);
+        file_maps.put(6, R.drawable.material_bg_36);
+        file_maps.put(6, R.drawable.material_bg_37);
+        file_maps.put(6, R.drawable.material_bg_38);
+        file_maps.put(6, R.drawable.material_bg_39);
+
+        file_maps.put(6, R.drawable.material_bg_40);
+        file_maps.put(6, R.drawable.material_bg_41);
+        file_maps.put(6, R.drawable.material_bg_42);*/
 
         for (int i = 0; i < file_maps.size(); i++) {
             DefaultSliderView sliderView = new DefaultSliderView(getActivity());

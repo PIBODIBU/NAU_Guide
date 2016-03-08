@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import ua.nau.edu.NAU_Guide.Debug.AppUpdateActivity;
 import ua.nau.edu.NAU_Guide.Debug.MapsTestActivity;
 import ua.nau.edu.NAU_Guide.R;
 
@@ -26,7 +27,7 @@ public class DebugListDialog extends DialogFragment implements AdapterView.OnIte
     private View rootView;
     private AlertDialog dialog;
 
-    private String[] listItems = {"MapsTestActivity", "Test item 1", "Test item 2", "Test item 3"};
+    private String[] listItems = {"MapsTestActivity", "AppUpdateActivity", "Test item 2", "Test item 3"};
     private ListView listView;
 
     public DebugListDialog init(Context context, LinearLayout parentRootView) {
@@ -65,6 +66,11 @@ public class DebugListDialog extends DialogFragment implements AdapterView.OnIte
             case 0: {
                 dialog.dismiss();
                 startActivity(new Intent(context, MapsTestActivity.class));
+                break;
+            }
+            case 1: {
+                dialog.dismiss();
+                startActivity(new Intent(context, AppUpdateActivity.class));
                 break;
             }
             default: {

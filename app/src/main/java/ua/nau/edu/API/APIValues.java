@@ -1,8 +1,8 @@
 package ua.nau.edu.API;
 
 public class APIValues {
-    // Max string length while posting message on wall
-    public static final int maxMessageLength = 300;
+    // Max string length for posting message on wall
+    public static final int maxMessageLength = 2000;
 
     // Max lines count before show button "Expand text..."
     public static int maxLinesBeforeExpand = 4;
