@@ -1,10 +1,10 @@
-package ua.nau.edu.RecyclerViews.MapsActivity;
+package ua.nau.edu.RecyclerViews.MapsActivity.Search;
 
-public class MapsDataModel {
+public class MapsSearchDataModel {
     String name;
     int id;
 
-    public MapsDataModel(String name, int id) {
+    public MapsSearchDataModel(String name, int id) {
         this.name = name;
         this.id = id;
     }

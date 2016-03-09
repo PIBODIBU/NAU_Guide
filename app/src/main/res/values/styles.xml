@@ -25,6 +25,21 @@
 
     </style>
 
+    <style name="AppTheme.MaterialDialogSheet" parent="@android:style/Theme.Dialog">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowAnimationStyle">@style/AppTheme.MaterialDialogSheet.MaterialDialogSheetAnimation</item>
+    </style>
+
+    <style name="AppTheme.MaterialDialogSheet.MaterialDialogSheetAnimation">
+        <item name="android:windowEnterAnimation">@anim/popup_show</item>
+        <item name="android:windowExitAnimation">@anim/popup_hide</item>
+    </style>
+
 
     <style name="AppTheme.AppCompatRadioButton" parent="Theme.AppCompat.Light">
         <item name="colorControlNormal">@color/grey</item>
@@ -75,6 +90,7 @@
         <item name="android:textColorHighlight">@color/colorAppPrimary</item>
         <item name="android:textColorLink">@color/colorAppPrimary</item>
     </style>
+
 
     <style name="AppTheme.TextInputLayout.EditText">// EditText in TextInputLayout
         <item name="android:textSize">15sp</item>

@@ -5,16 +5,23 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetDialog;
+import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -22,7 +29,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.RelativeLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -39,6 +48,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,21 +57,23 @@ import java.util.Map;
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.Enum.EnumExtras;
 import ua.nau.edu.Enum.EnumMaps;
-import ua.nau.edu.NAU_Guide.Animation;
+import ua.nau.edu.Support.View.Animation;
 import ua.nau.edu.NAU_Guide.BaseNavigationDrawerActivity;
 import ua.nau.edu.NAU_Guide.InfoActivity;
 import ua.nau.edu.NAU_Guide.R;
-import ua.nau.edu.RecyclerViews.MapsActivity.MapsAdapter;
-import ua.nau.edu.RecyclerViews.MapsActivity.MapsDataModel;
+import ua.nau.edu.RecyclerViews.MapsActivity.Search.MapsSearchAdapter;
+import ua.nau.edu.RecyclerViews.MapsActivity.Search.MapsSearchDataModel;
 import ua.nau.edu.Support.GoogleMap.GoogleMapUtils;
 import ua.nau.edu.Support.GoogleMap.RouteDrawer.Route;
 import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 import ua.nau.edu.Support.System.HardwareChecks;
+import ua.nau.edu.Support.System.Utils;
+import ua.nau.edu.Support.View.ColorAnimator;
 import ua.nau.edu.Support.View.SearchViewUtils;
 import ua.nau.edu.University.NAU;
 
 public class MapsTestActivity extends BaseNavigationDrawerActivity
-        implements GoogleMap.OnMarkerClickListener, SearchView.OnQueryTextListener {
+        implements SearchView.OnQueryTextListener {
     public MapsTestActivity() {
     }
 
@@ -81,7 +93,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
     private SearchView searchView;
     private HashMap<Integer, Marker> markerHashMap = new HashMap<>();
 
-    private RelativeLayout rootView;
+    private CoordinatorLayout rootView;
 
     private GoogleApiClient googleApiClient;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -95,11 +107,13 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
     private static final String CURRENT_LONGTITUDE = EnumMaps.CURRENT_LONGTITUDE.toString();
 
     private RecyclerView recyclerView;
-    private static MapsAdapter adapter;
+    private static MapsSearchAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
-    private ArrayList<MapsDataModel> data = new ArrayList<>();
+    private ArrayList<MapsSearchDataModel> dataSearch = new ArrayList<>();
 
     private boolean isSnackBarDistanceShowing = false;
+
+    private BottomSheetBehavior bottomSheetBehavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +132,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
 // Get and set system services & Buttons & SharedPreferences & Requests
         methodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
 
-        rootView = (RelativeLayout) findViewById(R.id.root_view);
+        rootView = (CoordinatorLayout) findViewById(R.id.root_view);
 
         setUpMapIfNeeded();
         initFloatingActionMenu();
@@ -136,7 +150,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        adapter = new MapsAdapter(data, this);
+        adapter = new MapsSearchAdapter(dataSearch, this);
         recyclerView.setAdapter(adapter);
     }
 
@@ -242,36 +256,36 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
         Log.d(TAG, "Query changed: " + newText);
 
         // Clearing ArrayList before adding new items
-        data.clear();
+        dataSearch.clear();
 
         if (!newText.equals("")) {
             // Searching for results
             for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
                 if (entry.getValue().toLowerCase().contains(newText.toLowerCase().trim()))
-                    data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
+                    dataSearch.add(new MapsSearchDataModel(entry.getValue(), entry.getKey()));
             }
 
             for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameShort().entrySet()) {
                 if (entry.getValue().toLowerCase().contains(newText.toLowerCase().trim()))
-                    data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
+                    dataSearch.add(new MapsSearchDataModel(entry.getValue(), entry.getKey()));
             }
 
 
             // Nothing was found. Show warning
-            if (data.size() == 0) {
+            if (dataSearch.size() == 0) {
                 // TODO add warning message
                 Snackbar.make(rootView, "Ничего не найдено", Snackbar.LENGTH_LONG).show();
             }
         } else {
             for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
-                data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
+                dataSearch.add(new MapsSearchDataModel(entry.getValue(), entry.getKey()));
             }
         }
 
-        adapter.setDataSet(data);
+        adapter.setDataSet(dataSearch);
         adapter.notifyDataSetChanged();
 
-        adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
+        adapter.setOnItemClickListener(new MapsSearchAdapter.OnItemClickListener() {
             @Override
             public void onClick(int itemId) {
                 // Hide RecyclerView & SearchView & keyboard
@@ -362,7 +376,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
                 addDefaultSearchViewItems();
 
                 // Animating to clicked position
-                adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
+                adapter.setOnItemClickListener(new MapsSearchAdapter.OnItemClickListener() {
                     @Override
                     public void onClick(int itemId) {
                         // Hide RecyclerView & SearchView & keyboard
@@ -384,18 +398,18 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
      * Adding default items to RecyclerView.Adapter
      */
     private void addDefaultSearchViewItems() {
-        data.clear();
+        dataSearch.clear();
 
         HashMap<Integer, String> corpsNames = university.getCorpsInfoNameFull();
         for (int entryId = 1; entryId <= corpsNames.size(); entryId++) {
-            data.add(new MapsDataModel(corpsNames.get(entryId), entryId));
+            dataSearch.add(new MapsSearchDataModel(corpsNames.get(entryId), entryId));
             Log.d(TAG, "adding search item with/" + "i: " + entryId);
         }
 
-        adapter.setDataSet(data);
+        adapter.setDataSet(dataSearch);
         adapter.notifyDataSetChanged();
 
-        adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
+        adapter.setOnItemClickListener(new MapsSearchAdapter.OnItemClickListener() {
             @Override
             public void onClick(int itemId) {
                 // Hide RecyclerView & SearchView & keyboard
@@ -555,7 +569,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
             @Override
             public boolean onMarkerClick(Marker marker) {
                 // Open FabMenu
-                fab_menu.open(true);
+                //fab_menu.open(true);
 
                 //Записываем id текущего маркера в глобальную переменную
                 currentMarkerID = getMarkerId(marker);
@@ -563,7 +577,17 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
                 //Записываем label текущего маркера в глобальную переменную
                 currentMarkerLabel = university.getCorpsLabel().get(getMarkerId(marker));
 
-                return false;
+                // Open BottomSheetDialog instead of Fab menu
+                openBottomSheet();
+                Log.d(TAG, "onMarkerClick() -> MarkerId: " + currentMarkerID + " MarkerLabel: " + currentMarkerLabel);
+
+                //Manually open the window
+                marker.showInfoWindow();
+
+                //Animate to center
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+
+                return true;
             }
         });
 
@@ -575,28 +599,106 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
                     currentMarkerID = -1;
                     currentMarkerLabel = "";
                 }
+                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                } else if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                }
             }
         });
 
-        mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(50.437476, 30.428322))
-                .title("SVG Marker")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_svg)));
+        /**
+         * Bottom Sheet block
+         */
+        View bottomSheet = rootView.findViewById(R.id.bottom_sheet);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+
+        final CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) bottomSheet.findViewById(R.id.collapsing_toolbar);
+        final android.support.design.widget.FloatingActionButton fabRouteBSheet = (android.support.design.widget.FloatingActionButton) findViewById(R.id.fab_route_bsheet);
+
+        final Toolbar bSheetToolbar = (Toolbar) bottomSheet.findViewById(R.id.toolbar_bsheet);
+        final TextView bSheetToolbarTitle = (TextView) findViewById(R.id.toolbar_title_bsheet);
+
+        final TextView titleCollapsingSheet = (TextView) bottomSheet.findViewById(R.id.title_collapse_sheet);
+        final TextView titleSheet = (TextView) bottomSheet.findViewById(R.id.title_sheet);
+        final TextView subTitleSheet = (TextView) bottomSheet.findViewById(R.id.subtitle_sheet);
+
+        final ImageView backDrop = (ImageView) bottomSheet.findViewById(R.id.backdrop);
+
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                Log.d(TAG, "setUpMap() -> onStateChanged() -> newState: " + newState);
+                switch (newState) {
+
+                    case BottomSheetBehavior.STATE_DRAGGING: {
+
+                        titleSheet.setTextColor(ContextCompat.getColor(activityContext, R.color.transparent));
+                        subTitleSheet.setTextColor(ContextCompat.getColor(activityContext, R.color.transparent));
+
+                        bSheetToolbar.setVisibility(View.INVISIBLE);
+
+                        break;
+                    }
+
+                    case BottomSheetBehavior.STATE_SETTLING: {
+                        break;
+                    }
+
+                    case BottomSheetBehavior.STATE_EXPANDED: {
+                        bSheetToolbar.setVisibility(View.VISIBLE);
+
+                        break;
+                    }
+
+                    case BottomSheetBehavior.STATE_COLLAPSED: {
+
+                        Log.d(TAG, "Setting title: " + currentMarkerLabel + " Subtitle: " + university.getCorpsInfoNameFull().get(currentMarkerID));
+                        titleSheet.setText(currentMarkerLabel);
+                        subTitleSheet.setText(university.getCorpsInfoNameFull().get(currentMarkerID));
+                        titleSheet.setTextColor(ContextCompat.getColor(activityContext, R.color.white));
+                        subTitleSheet.setTextColor(ContextCompat.getColor(activityContext, R.color.white));
+
+                        titleCollapsingSheet.setText(currentMarkerLabel);
+
+                        bSheetToolbarTitle.setText(university.getCorpsInfoNameFull().get(currentMarkerID));
+                        bSheetToolbar.setVisibility(View.INVISIBLE);
+
+                        fabRouteBSheet.setVisibility(View.VISIBLE);
+
+                        break;
+                    }
+
+                    case BottomSheetBehavior.STATE_HIDDEN: {
+                        fabRouteBSheet.setVisibility(View.GONE);
+                        break;
+                    }
+
+                    default: {
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                Log.d(TAG, "setUpMap() -> onSlide() -> slideOffset: " + slideOffset);
+
+                if (slideOffset > 0.8) {
+                    fabRouteBSheet.setVisibility(View.GONE);
+                } else {
+                    fabRouteBSheet.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        bottomSheetBehavior.setPeekHeight((int) Utils.convertDpToPixel(100f, this));
+        //bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        //Открываем FabMenu
-        fab_menu.open(true);
-
-        //Manually open the window
-        marker.showInfoWindow();
-
-        //Animate to center
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
-
-        //Consume the method
-        return true;
+    public void openBottomSheet() {
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     private void initFloatingActionMenu() {
@@ -647,8 +749,10 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
         fab_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                APIDialogs.AlertDialogs.customDialog(activityContext, "Внимание", "Сервис находится в разработке");
+                //APIDialogs.AlertDialogs.customDialog(activityContext, "Внимание", "Сервис находится в разработке");
                 //startActivity(new Intent(activityContext, FloorActivity.class));
+                openBottomSheet();
+                fab_menu.close(true);
             }
         });
     }
@@ -678,7 +782,10 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
     private void zoomToMarker(Marker marker) {
         currentMarkerID = getMarkerId(marker);
         currentMarkerLabel = university.getCorpsLabel().get(currentMarkerID);
-        fab_menu.open(true);
+
+        //fab_menu.open(true);
+        openBottomSheet();
+
         marker.showInfoWindow();
         mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
     }
@@ -796,8 +903,13 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
     }
 
     private void showKeyboard() {
-        if (getCurrentFocus() != null)
+        if (getCurrentFocus() != null) {
             methodManager.showSoftInput(getCurrentFocus(), 0);
+
+            if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            }
+        }
     }
 
 }

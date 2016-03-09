@@ -50,7 +50,7 @@ public class AppUpdateActivity extends BaseNavigationDrawerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.update_activity);
+        setContentView(R.layout.activity_update_app);
 
         getDrawer(
                 "AppUpdateActivity",
@@ -61,9 +61,6 @@ public class AppUpdateActivity extends BaseNavigationDrawerActivity {
         button = (AppCompatButton) findViewById(R.id.update_check);
         progressBarDet = (MaterialProgressBar) findViewById(R.id.progressBar_det);
         progressBarIntdet = (MaterialProgressBar) findViewById(R.id.progressBar_indet);
-
-        progressBarIntdet.setIndeterminate(true);
-        progressBarDet.setIndeterminate(false);
 
         String currentVersion = versionCurrentTV.getText() + getString(R.string.app_version);
         versionCurrentTV.setText(currentVersion);
@@ -233,6 +230,7 @@ public class AppUpdateActivity extends BaseNavigationDrawerActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             progressBarDet.setVisibility(View.INVISIBLE);
+            button.setText(BUTTON_CHECK);
         }
     }
 }

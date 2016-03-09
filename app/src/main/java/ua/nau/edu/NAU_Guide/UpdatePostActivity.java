@@ -82,8 +82,7 @@ public class UpdatePostActivity extends BaseToolbarActivity {
             @Override
             public void onError() {
                 loadingDialog.dismiss();
-                setResult(APIValues.RESULT_ERROR);
-                finish();
+                APIDialogs.AlertDialogs.errorWhileUpdatingMessage(UpdatePostActivity.this);
             }
         });
     }

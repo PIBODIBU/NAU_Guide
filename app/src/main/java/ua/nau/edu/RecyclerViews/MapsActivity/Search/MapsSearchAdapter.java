@@ -1,15 +1,11 @@
-package ua.nau.edu.RecyclerViews.MapsActivity;
+package ua.nau.edu.RecyclerViews.MapsActivity.Search;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -17,11 +13,11 @@ import java.util.ArrayList;
 import ua.nau.edu.NAU_Guide.R;
 
 
-public class MapsAdapter extends RecyclerView.Adapter<MapsAdapter.BaseViewHolder> {
+public class MapsSearchAdapter extends RecyclerView.Adapter<MapsSearchAdapter.BaseViewHolder> {
 
     private final String TAG = this.getClass().getSimpleName();
 
-    private ArrayList<MapsDataModel> dataSet;
+    private ArrayList<MapsSearchDataModel> dataSet;
     private Context context;
     private OnItemClickListener onItemClickListener;
 
@@ -35,7 +31,7 @@ public class MapsAdapter extends RecyclerView.Adapter<MapsAdapter.BaseViewHolder
         }
     }
 
-    public MapsAdapter(ArrayList<MapsDataModel> data, Context context) {
+    public MapsSearchAdapter(ArrayList<MapsSearchDataModel> data, Context context) {
         this.dataSet = data;
         this.context = context;
     }
@@ -69,7 +65,7 @@ public class MapsAdapter extends RecyclerView.Adapter<MapsAdapter.BaseViewHolder
         return dataSet.size();
     }
 
-    public void setDataSet(ArrayList<MapsDataModel> newDataSet) {
+    public void setDataSet(ArrayList<MapsSearchDataModel> newDataSet) {
         this.dataSet = newDataSet;
     }
 

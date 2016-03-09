@@ -326,7 +326,7 @@ public class APIDialogs {
                     .content(context.getResources().getString(R.string.dialog_loading))
                     .progress(true, 0)
                     .widgetColor(ContextCompat.getColor(context, R.color.colorAppPrimary))
-                    .contentColor(ContextCompat.getColor(context, R.color.black))
+                    .contentColor(ContextCompat.getColor(context, R.color.colorTextPrimary))
                     .backgroundColor(ContextCompat.getColor(context, R.color.white))
                     .cancelable(true)
                     .cancelListener(new DialogInterface.OnCancelListener() {
@@ -349,12 +349,9 @@ public class APIDialogs {
                     .progress(true, 0)
                     .cancelable(false)
                     .widgetColor(ContextCompat.getColor(context, R.color.colorAppPrimary))
-                    .contentColor(ContextCompat.getColor(context, R.color.black))
+                    .contentColor(ContextCompat.getColor(context, R.color.colorTextPrimary))
                     .backgroundColor(ContextCompat.getColor(context, R.color.white))
                     .build();
         }
-
     }
-
-
 }

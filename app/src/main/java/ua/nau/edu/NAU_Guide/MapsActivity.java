@@ -22,7 +22,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -48,11 +47,12 @@ import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.Enum.EnumExtras;
 import ua.nau.edu.Enum.EnumMaps;
 import ua.nau.edu.NAU_Guide.Debug.MapsDistanceDataModel;
-import ua.nau.edu.RecyclerViews.MapsActivity.MapsAdapter;
-import ua.nau.edu.RecyclerViews.MapsActivity.MapsDataModel;
+import ua.nau.edu.RecyclerViews.MapsActivity.Search.MapsSearchAdapter;
+import ua.nau.edu.RecyclerViews.MapsActivity.Search.MapsSearchDataModel;
 import ua.nau.edu.Support.GoogleMap.GoogleMapUtils;
 import ua.nau.edu.Support.GoogleMap.RouteDrawer.Route;
 import ua.nau.edu.Support.System.HardwareChecks;
+import ua.nau.edu.Support.View.Animation;
 import ua.nau.edu.Support.View.SearchViewUtils;
 import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 import ua.nau.edu.University.NAU;
@@ -92,9 +92,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     private static final String CURRENT_LONGTITUDE = EnumMaps.CURRENT_LONGTITUDE.toString();
 
     private RecyclerView recyclerView;
-    private static MapsAdapter adapter;
+    private static MapsSearchAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
-    private ArrayList<MapsDataModel> data = new ArrayList<>();
+    private ArrayList<MapsSearchDataModel> data = new ArrayList<>();
 
     private boolean isSnackBarDistanceShowing = false;
 
@@ -133,7 +133,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        adapter = new MapsAdapter(data, this);
+        adapter = new MapsSearchAdapter(data, this);
         recyclerView.setAdapter(adapter);
     }
 
@@ -245,7 +245,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
             // Searching for results
             for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
                 if (entry.getValue().toLowerCase().contains(newText.toLowerCase().trim()))
-                    data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
+                    data.add(new MapsSearchDataModel(entry.getValue(), entry.getKey()));
             }
 
             // Nothing was found. Show warning
@@ -255,14 +255,14 @@ public class MapsActivity extends BaseNavigationDrawerActivity
             }
         } else {
             for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
-                data.add(new MapsDataModel(entry.getValue(), entry.getKey()));
+                data.add(new MapsSearchDataModel(entry.getValue(), entry.getKey()));
             }
         }
 
         adapter.setDataSet(data);
         adapter.notifyDataSetChanged();
 
-        adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
+        adapter.setOnItemClickListener(new MapsSearchAdapter.OnItemClickListener() {
             @Override
             public void onClick(int itemId) {
                 // Hide RecyclerView & SearchView & keyboard
@@ -353,7 +353,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                 addDefaultSearchViewItems();
 
                 // Animating to clicked position
-                adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
+                adapter.setOnItemClickListener(new MapsSearchAdapter.OnItemClickListener() {
                     @Override
                     public void onClick(int itemId) {
                         // Hide RecyclerView & SearchView & keyboard
@@ -379,14 +379,14 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
         HashMap<Integer, String> corpsNames = university.getCorpsInfoNameFull();
         for (int entryId = 1; entryId <= corpsNames.size(); entryId++) {
-            data.add(new MapsDataModel(corpsNames.get(entryId), entryId));
+            data.add(new MapsSearchDataModel(corpsNames.get(entryId), entryId));
             Log.d(TAG, "adding search item with/" + "i: " + entryId);
         }
 
         adapter.setDataSet(data);
         adapter.notifyDataSetChanged();
 
-        adapter.setOnItemClickListener(new MapsAdapter.OnItemClickListener() {
+        adapter.setOnItemClickListener(new MapsSearchAdapter.OnItemClickListener() {
             @Override
             public void onClick(int itemId) {
                 // Hide RecyclerView & SearchView & keyboard

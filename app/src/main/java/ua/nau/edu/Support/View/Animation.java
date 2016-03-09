@@ -1,4 +1,4 @@
-package ua.nau.edu.NAU_Guide;
+package ua.nau.edu.Support.View;
 
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
