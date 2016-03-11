@@ -51,8 +51,8 @@ public class AccountHeaderBgPicker extends DialogFragment {
         file_maps.put(4, R.drawable.material_bg_5);
         file_maps.put(5, R.drawable.material_bg_6);
         file_maps.put(6, R.drawable.material_bg_7);
-        file_maps.put(0, R.drawable.material_bg_8);
-        file_maps.put(1, R.drawable.material_bg_9);
+        file_maps.put(7, R.drawable.material_bg_8);
+        file_maps.put(8, R.drawable.material_bg_9);
 
         /*file_maps.put(2, R.drawable.material_bg_10);
         file_maps.put(3, R.drawable.material_bg_11);

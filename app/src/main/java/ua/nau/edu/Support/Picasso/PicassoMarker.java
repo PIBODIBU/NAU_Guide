@@ -42,6 +42,7 @@ public class PicassoMarker implements Target {
     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
 
         //Draw bitmap under user avatar
+
         /*
         Bitmap.Config conf = Bitmap.Config.ARGB_8888;
         Bitmap resultBitmap = Bitmap.createBitmap((int) Utils.convertDpToPixel(100f, context), (int) Utils.convertDpToPixel(100f, context), conf);

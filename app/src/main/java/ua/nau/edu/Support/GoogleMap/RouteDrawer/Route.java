@@ -44,6 +44,7 @@ public class Route {
     private Context context;
     private String lang;
     private int iconId = -99;
+    private RouteCallbacks routeCallbacks;
 
     public static String LANGUAGE_SPANISH = "es";
     public static String LANGUAGE_ENGLISH = "en";
@@ -270,6 +271,7 @@ public class Route {
             progressDialog = new ProgressDialog(context);
             progressDialog.setMessage(context.getResources().getString(R.string.maps_dialog_fetching));
             progressDialog.setIndeterminate(true);
+            progressDialog.setCancelable(false);
             progressDialog.show();
         }
 
@@ -285,6 +287,8 @@ public class Route {
             progressDialog.dismiss();
             if (result != null) {
                 drawPath(result, steps, iconId);
+                if (routeCallbacks != null)
+                    routeCallbacks.onDrawSuccess();
             }
         }
     }
@@ -398,5 +402,12 @@ public class Route {
         }
     }
 
+    public void setRouteCallbacks(RouteCallbacks routeCallbacks) {
+        this.routeCallbacks = routeCallbacks;
+    }
+
+    public interface RouteCallbacks {
+        void onDrawSuccess();
+    }
 
 }

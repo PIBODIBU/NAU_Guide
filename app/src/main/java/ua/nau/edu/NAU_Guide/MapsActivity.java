@@ -52,7 +52,7 @@ import ua.nau.edu.RecyclerViews.MapsActivity.Search.MapsSearchDataModel;
 import ua.nau.edu.Support.GoogleMap.GoogleMapUtils;
 import ua.nau.edu.Support.GoogleMap.RouteDrawer.Route;
 import ua.nau.edu.Support.System.HardwareChecks;
-import ua.nau.edu.Support.View.Animation;
+import ua.nau.edu.Support.View.AnimationSupport;
 import ua.nau.edu.Support.View.SearchViewUtils;
 import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 import ua.nau.edu.University.NAU;
@@ -190,7 +190,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                         drawer.closeDrawer();
                     } else if (searchView != null) {
                         if (!searchView.isIconified()) {
-                            Animation.Reveal.revealCloseTopRight(recyclerView);
+                            AnimationSupport.Reveal.revealCloseTopRight(recyclerView);
                             searchView.onActionViewCollapsed();
                         } else {
                             super.onBackPressed();
@@ -267,7 +267,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
             public void onClick(int itemId) {
                 // Hide RecyclerView & SearchView & keyboard
                 hideKeyboard();
-                Animation.Reveal.revealCloseTopRight(recyclerView);
+                AnimationSupport.Reveal.revealCloseTopRight(recyclerView);
                 searchView.onActionViewCollapsed();
 
                 // Zooming to marker
@@ -308,7 +308,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                 searchView.onActionViewExpanded();
                 searchView.setQuery(savedInstanceState.getString("SearchViewQuery", ""), false);
 
-                Animation.Reveal.revealOpenTopRight(recyclerView);
+                AnimationSupport.Reveal.revealOpenTopRight(recyclerView);
             }
         }
 
@@ -325,7 +325,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
                 // Close RecyclerView & SearchView
                 searchView.onActionViewCollapsed();
-                Animation.Reveal.revealCloseTopRight(recyclerView);
+                AnimationSupport.Reveal.revealCloseTopRight(recyclerView);
 
                 return true;
             }
@@ -340,7 +340,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                 searchView.clearFocus();
 
                 //Show RecyclerView
-                Animation.Reveal.revealOpenTopRight(recyclerView);
+                AnimationSupport.Reveal.revealOpenTopRight(recyclerView);
 
                 searchView.postDelayed(new Runnable() {
                     @Override
@@ -348,7 +348,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                         searchView.requestFocus();
                         showKeyboard();
                     }
-                }, Animation.Reveal.animDuration);
+                }, AnimationSupport.Reveal.animDuration);
 
                 addDefaultSearchViewItems();
 
@@ -358,7 +358,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                     public void onClick(int itemId) {
                         // Hide RecyclerView & SearchView & keyboard
                         hideKeyboard();
-                        Animation.Reveal.revealCloseTopRight(recyclerView);
+                        AnimationSupport.Reveal.revealCloseTopRight(recyclerView);
                         searchView.onActionViewCollapsed();
 
                         // Zooming to marker
@@ -391,7 +391,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
             public void onClick(int itemId) {
                 // Hide RecyclerView & SearchView & keyboard
                 hideKeyboard();
-                Animation.Reveal.revealCloseTopRight(recyclerView);
+                AnimationSupport.Reveal.revealCloseTopRight(recyclerView);
                 searchView.onActionViewCollapsed();
 
                 // Zooming to marker

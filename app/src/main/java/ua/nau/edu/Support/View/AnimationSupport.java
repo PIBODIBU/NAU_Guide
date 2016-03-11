@@ -1,13 +1,22 @@
 package ua.nau.edu.Support.View;
 
+import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
+import ua.nau.edu.NAU_Guide.R;
 
-public class Animation {
+public class AnimationSupport {
+    public static final String TAG = "AnimationSupport";
+
+
     public static class Reveal {
+        private static final String TAG = "Reveal";
 
         public static int animDuration = 400;
 
@@ -63,6 +72,57 @@ public class Animation {
                     view.setVisibility(View.INVISIBLE);
                 }
             }, animDuration);
+        }
+    }
+
+    public static class Fade {
+        private static final String TAG = "Fade";
+
+        public static void fadeIn(Context context, final View view) {
+            final Animation fadeIn = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+            fadeIn.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                    Log.d(AnimationSupport.TAG, TAG + " -> fadeIn() ->onAnimationStart()");
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    Log.d(AnimationSupport.TAG, TAG + " -> fadeIn() -> onAnimationEnd()");
+                    view.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            view.startAnimation(fadeIn);
+        }
+
+        public static void fadeOut(Context context, final View view) {
+            final Animation fadeOut = AnimationUtils.loadAnimation(context, R.anim.fade_out);
+
+            fadeOut.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                    Log.d(AnimationSupport.TAG, TAG + " -> fadeOut() -> onAnimationStart()");
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    Log.d(AnimationSupport.TAG, TAG + " -> fadeOut() -> onAnimationEnd()");
+                    view.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            view.startAnimation(fadeOut);
         }
     }
 

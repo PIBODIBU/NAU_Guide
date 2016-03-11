@@ -118,6 +118,8 @@ public class AppUpdateActivity extends BaseNavigationDrawerActivity {
         @Override
         protected void onPostExecute(String response) {
             try {
+                Log.d(TAG, "CheckUtils -> Server response:\n" + response);
+
                 JSONObject jsonObject = new JSONObject(response);
 
                 if (jsonObject.getString("error").equalsIgnoreCase("false")) {
@@ -160,7 +162,7 @@ public class AppUpdateActivity extends BaseNavigationDrawerActivity {
                 HashMap<String, String> requestGetUrlParams = new HashMap<>();
                 requestGetUrlParams.put("action", "getUpdateUrl");
                 String response = httpUtils.sendPostRequestWithParams(URL_UPDATE_GET_APP_URL, requestGetUrlParams);
-                Log.d(TAG, "response: " + response);
+                Log.d(TAG, "UpdateUtils -> Server response: " + response);
                 JSONObject jsonObject = new JSONObject(response);
                 String REQUEST_URL = jsonObject.getString("url");
 
