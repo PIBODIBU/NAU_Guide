@@ -33,6 +33,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
@@ -614,17 +619,17 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
                         ));
 
                         Log.d(TAG, "Added new MarkerDataModel with: \n" +
-                                jsonObject.getInt("id") + "\n" +
-                                jsonObject.getDouble("lat") + "\n" +
-                                jsonObject.getDouble("lng") + "\n" +
-                                jsonObject.getString("icon") + "\n" +
-                                jsonObject.getString("label") + "\n" +
-                                jsonObject.getString("name_short") + "\n" +
-                                jsonObject.getString("name_full") + "\n" +
-                                jsonObject.getString("phone") + "\n" +
-                                jsonObject.getString("information") + "\n" +
-                                jsonObject.getString("website") + "\n" +
-                                jsonObject.getString("slider_images"));
+                                "id: " + jsonObject.getInt("id") + "\n" +
+                                "lat: " + jsonObject.getDouble("lat") + "\n" +
+                                "lng: " + jsonObject.getDouble("lng") + "\n" +
+                                "icon: " + jsonObject.getString("icon") + "\n" +
+                                "label: " + jsonObject.getString("label") + "\n" +
+                                "name_short: " + jsonObject.getString("name_short") + "\n" +
+                                "name_full: " + jsonObject.getString("name_full") + "\n" +
+                                "phone: " + jsonObject.getString("phone") + "\n" +
+                                "information: " + jsonObject.getString("information") + "\n" +
+                                "website: " + jsonObject.getString("website") + "\n" +
+                                "slider_images: " + jsonObject.getString("slider_images"));
 
                     }
                 } catch (Exception ex) {
@@ -639,16 +644,35 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
             protected void onPostExecute(ArrayList<MarkerDataModel> markerDataModels) {
                 if (markerDataModels != null && markerDataModels.size() != 0) {
                     loadingDialog.setTitle("Adding markers");
-                    MarkerDataModel markerDataModel;
+
+                    PicassoMarker picassoMarker;
 
                     for (int i = 0; i < markerDataModels.size(); i++) {
-                        markerDataModel = markerDataModels.get(i);
+                        MarkerDataModel markerDataModel = markerDataModels.get(i);
 
                         final Marker marker = googleMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(markerDataModel.getLat(), markerDataModel.getLng()))
                                 .title(markerDataModel.getLabel()));
-                        PicassoMarker picassoMarker = new PicassoMarker(marker);
-                        Picasso.with(activityContext).load(markerDataModel.getIcon()).memoryPolicy(MemoryPolicy.NO_CACHE).networkPolicy(NetworkPolicy.NO_CACHE).into(picassoMarker);
+
+                        /*picassoMarker = new PicassoMarker(marker);
+                        Picasso.
+                                with(activityContext)
+                                .load(markerDataModel.getIcon())
+                                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                                .networkPolicy(NetworkPolicy.NO_CACHE)
+                                .into(picassoMarker);*/
+                        Glide
+                                .with(activityContext)
+                                .load(markerDataModel.getIcon()).asBitmap()
+                                .into(new SimpleTarget<Bitmap>() {
+                                    @Override
+                                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                        Log.d(TAG, "Glide -> Bitmap loaded");
+                                        marker.setIcon(BitmapDescriptorFactory.fromBitmap(resource));
+                                    }
+                                });
+
+                        markerHashMap.put(i, marker);
                     }
                 }
                 loadingDialog.dismiss();

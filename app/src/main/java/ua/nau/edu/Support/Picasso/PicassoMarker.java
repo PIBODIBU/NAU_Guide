@@ -40,32 +40,11 @@ public class PicassoMarker implements Target {
 
     @Override
     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-
-        //Draw bitmap under user avatar
-
-        /*
-        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-        Bitmap resultBitmap = Bitmap.createBitmap((int) Utils.convertDpToPixel(100f, context), (int) Utils.convertDpToPixel(100f, context), conf);
-        Canvas canvas = new Canvas(resultBitmap);
-
-        // paint defines the text color,
-        // stroke width, size
-        Paint paint = new Paint();
-        paint.setTextSize(35);
-        paint.setColor(Color.BLACK);
-
-        canvas.drawBitmap(bitmap, 0, 0, paint);
-        canvas.drawText("It's me!", 30, 40, paint);
-        */
-
         marker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
         Log.d(TAG, "onBitmapLoaded() -> " +
                 "\nBitmap:" +
                 "\n\twidth: " + bitmap.getWidth() +
-                "\n\theight: " + bitmap.getHeight() /*+
-                "\nCanvas:" +
-                "\n\twidth: " + resultBitmap.getWidth() +
-                "\n\theight: " + resultBitmap.getHeight()*/
+                "\n\theight: " + bitmap.getHeight()
         );
 
         if (loadingCallBacks != null) {
