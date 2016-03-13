@@ -2,14 +2,11 @@ package ua.nau.edu.Adapters.UserProfileAdapter.Fragments;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -27,7 +24,6 @@ import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import org.json.JSONObject;
 
@@ -35,9 +31,8 @@ import java.util.HashMap;
 
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.API.APIHTTPUtils;
-import ua.nau.edu.API.APIStrings;
+import ua.nau.edu.API.APIUrl;
 import ua.nau.edu.API.APIValues;
-import ua.nau.edu.NAU_Guide.MainActivity;
 import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.NAU_Guide.UserProfileActivity;
 import ua.nau.edu.Support.Picasso.CircleTransform;
@@ -107,7 +102,7 @@ public class FragmentInfo extends Fragment {
                 HashMap<String, String> data = new HashMap<>();
                 data.put("token", params[0]);
 
-                String response = apiUtils.sendPostRequestWithParams(APIStrings.RequestUrl.GET_MYPAGE, data);
+                String response = apiUtils.sendPostRequestWithParams(APIUrl.RequestUrl.GET_MYPAGE, data);
                 if (response.equalsIgnoreCase("error_connection")) {
                     Log.e(TAG, "No Internet avalible");
                     supportActivity.runOnUiThread(new Runnable() {
@@ -145,7 +140,7 @@ public class FragmentInfo extends Fragment {
                 super.onPostExecute(result);
                 if (result != null) {
                     try {
-                        final String PHOTO_URL = result.getString(APIStrings.ResponseKeys.PageLoading.PHOTO_URL);
+                        final String PHOTO_URL = result.getString(APIUrl.ResponseKeys.PageLoading.PHOTO_URL);
 
                         ExpandableTextView expTv1 = (ExpandableTextView) supportActivity.findViewById(R.id.bio_text_expand);
                         TextView textViewName = (TextView) supportActivity.findViewById(R.id.expandable_text);
@@ -154,16 +149,16 @@ public class FragmentInfo extends Fragment {
                             Setting Up NAME
                         */
                         //textViewName.setText(result.getString(APIStrings.ResponseKeys.PageLoading.NAME));
-                        String name = result.getString(APIStrings.ResponseKeys.PageLoading.NAME);
+                        String name = result.getString(APIUrl.ResponseKeys.PageLoading.NAME);
                         supportActivity.collapsingToolbarLayout.setTitle(name);
 
                         /*
                             Setting Up BIOGRAPHY
                         */
                         CardView cardBio = (CardView) supportActivity.findViewById(R.id.card_bio);
-                        if (!result.getString(APIStrings.ResponseKeys.PageLoading.BIOGRAPHY).equals("")) {
+                        if (!result.getString(APIUrl.ResponseKeys.PageLoading.BIOGRAPHY).equals("")) {
                             cardBio.setVisibility(View.VISIBLE);
-                            expTv1.setText(result.getString(APIStrings.ResponseKeys.PageLoading.BIOGRAPHY));
+                            expTv1.setText(result.getString(APIUrl.ResponseKeys.PageLoading.BIOGRAPHY));
                             if (textViewName.getLineCount() < APIValues.maxLinesBeforeExpand) {
                                 textViewName.setPadding(0, 0, 0, (int) Utils.convertDpToPixel(8, supportActivity));
                             }
@@ -234,7 +229,7 @@ public class FragmentInfo extends Fragment {
                 HashMap<String, String> data = new HashMap<>();
                 data.put("unique_id", params[0]);
 
-                String response = apiUtils.sendPostRequestWithParams(APIStrings.RequestUrl.GET_PAGE, data);
+                String response = apiUtils.sendPostRequestWithParams(APIUrl.RequestUrl.GET_PAGE, data);
 
                 if (response.equalsIgnoreCase("error_connection")) {
                     supportActivity.runOnUiThread(new Runnable() {
@@ -274,7 +269,7 @@ public class FragmentInfo extends Fragment {
                 super.onPostExecute(result);
                 if (result != null) {
                     try {
-                        final String PHOTO_URL = result.getString(APIStrings.ResponseKeys.PageLoading.PHOTO_URL);
+                        final String PHOTO_URL = result.getString(APIUrl.ResponseKeys.PageLoading.PHOTO_URL);
 
                         TextView textViewName = (TextView) supportActivity.findViewById(R.id.textViewName);
                         ExpandableTextView expTv1 = (ExpandableTextView) supportActivity.findViewById(R.id.bio_text_expand);
@@ -283,16 +278,16 @@ public class FragmentInfo extends Fragment {
                             Setting Up NAME
                         */
                         //textViewName.setText(result.getString(APIStrings.ResponseKeys.PageLoading.NAME));
-                        String name = result.getString(APIStrings.ResponseKeys.PageLoading.NAME);
+                        String name = result.getString(APIUrl.ResponseKeys.PageLoading.NAME);
                         supportActivity.collapsingToolbarLayout.setTitle(name);
 
                         /*
                             Setting Up BIOGRAPHY
                         */
                         CardView cardBio = (CardView) supportActivity.findViewById(R.id.card_bio);
-                        if (!result.getString(APIStrings.ResponseKeys.PageLoading.BIOGRAPHY).equals("")) {
+                        if (!result.getString(APIUrl.ResponseKeys.PageLoading.BIOGRAPHY).equals("")) {
                             cardBio.setVisibility(View.VISIBLE);
-                            expTv1.setText(result.getString(APIStrings.ResponseKeys.PageLoading.BIOGRAPHY));
+                            expTv1.setText(result.getString(APIUrl.ResponseKeys.PageLoading.BIOGRAPHY));
                         }
 
                         /*

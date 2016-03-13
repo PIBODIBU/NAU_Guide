@@ -3,17 +3,23 @@ package ua.nau.edu.NAU_Guide;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -21,10 +27,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.RelativeLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
-import com.github.clans.fab.FloatingActionButton;
-import com.github.clans.fab.FloatingActionMenu;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.daimajia.slider.library.SliderLayout;
+import com.daimajia.slider.library.SliderTypes.BaseSliderView;
+import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
+import com.gc.materialdesign.widgets.ProgressDialog;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -38,27 +52,38 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.ms.square.android.expandabletextview.ExpandableTextView;
+import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import ua.nau.edu.API.APIDialogs;
-import ua.nau.edu.Enum.EnumExtras;
-import ua.nau.edu.Enum.EnumMaps;
+import ua.nau.edu.API.APIHTTPUtils;
+import ua.nau.edu.API.APIUrl;
+import ua.nau.edu.NAU_Guide.BaseNavigationDrawerActivity;
 import ua.nau.edu.NAU_Guide.Debug.MapsDistanceDataModel;
+import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.RecyclerViews.MapsActivity.Search.MapsSearchAdapter;
 import ua.nau.edu.RecyclerViews.MapsActivity.Search.MapsSearchDataModel;
 import ua.nau.edu.Support.GoogleMap.GoogleMapUtils;
+import ua.nau.edu.Support.GoogleMap.MarkerDataModel;
 import ua.nau.edu.Support.GoogleMap.RouteDrawer.Route;
+import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 import ua.nau.edu.Support.System.HardwareChecks;
+import ua.nau.edu.Support.System.Utils;
 import ua.nau.edu.Support.View.AnimationSupport;
 import ua.nau.edu.Support.View.SearchViewUtils;
-import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 import ua.nau.edu.University.NAU;
 
 public class MapsActivity extends BaseNavigationDrawerActivity
-        implements GoogleMap.OnMarkerClickListener, SearchView.OnQueryTextListener {
+        implements SearchView.OnQueryTextListener {
     public MapsActivity() {
     }
 
@@ -69,71 +94,80 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
     private Bundle savedInstanceState;
 
-    private int currentMarkerID = -1;
-    private String currentMarkerLabel = "";
-    private Marker mainActivityMarker = null;
+    private int currentMarkerID = 1;
 
     private InputMethodManager methodManager;
-    private SharedPreferences settings = null;
     private SearchView searchView;
-    private HashMap<Integer, Marker> markerHashMap = new HashMap<>();
 
-    private RelativeLayout rootView;
+    private CoordinatorLayout rootView;
 
     private GoogleApiClient googleApiClient;
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    private NAU university;
+    private GoogleMap googleMap; // Might be null if Google Play services APK is not available
     private Route supportRoute = new Route();
-    private FloatingActionMenu fab_menu;
-
-    private static final String CORP_ID_KEY = EnumExtras.CORP_ID_KEY.toString();
-    private static final String CORP_LABEL_KEY = EnumExtras.CORP_LABEL_KEY.toString();
-    private static final String CURRENT_LATITUDE = EnumMaps.CURRENT_LATITUDE.toString();
-    private static final String CURRENT_LONGTITUDE = EnumMaps.CURRENT_LONGTITUDE.toString();
+    private FloatingActionButton FABMyLocation;
 
     private RecyclerView recyclerView;
     private static MapsSearchAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
-    private ArrayList<MapsSearchDataModel> data = new ArrayList<>();
+    private ArrayList<MapsSearchDataModel> dataSearch = new ArrayList<>();
 
-    private boolean isSnackBarDistanceShowing = false;
+    private BottomSheetBehavior bottomSheetBehavior;
+
+    private ArrayList<MarkerDataModel> markerDataModels = new ArrayList<>();
+    private HashMap<Marker, MarkerDataModel> markerHashMap = new HashMap<>();
+
+    private int idFromIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
         sharedPrefUtils = new SharedPrefUtils(this);
-        settings = getSharedPreferences(SharedPrefUtils.APP_PREFERENCES, MODE_PRIVATE);
 
         if (savedInstanceState != null) {
             this.savedInstanceState = savedInstanceState;
         }
 
-        university = new NAU(this);
-        university.init();
+        idFromIntent = getIntent().getIntExtra("MAINACTIVITY_CORP_ID", -1);
+        Log.d(TAG, "idFromIntent: " + idFromIntent);
 
-// Get and set system services & Buttons & SharedPreferences & Requests
         methodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-
-        rootView = (RelativeLayout) findViewById(R.id.root_view);
+        rootView = (CoordinatorLayout) findViewById(R.id.root_view);
 
         setUpMapIfNeeded();
-        initFloatingActionMenu();
+        initBottomSheet();
         setUpRecyclerView();
 
         getDrawer(
                 sharedPrefUtils.getName(),
                 sharedPrefUtils.getEmail()
         );
+
+        FABMyLocation = (FloatingActionButton) findViewById(R.id.fab_location);
+
+        FABMyLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                zoomToMyLocation();
+            }
+        });
+
     }
 
     private void setUpRecyclerView() {
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview_search);
-        recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
+
+        try {
+            recyclerView.setHasFixedSize(true);
+        } catch (Exception ex) {
+            Log.e(TAG, "setUpRecyclerView() -> ", ex);
+        }
+
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        adapter = new MapsSearchAdapter(data, this);
+        adapter = new MapsSearchAdapter(dataSearch, this);
         recyclerView.setAdapter(adapter);
     }
 
@@ -168,9 +202,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
         //setUpMapIfNeeded();
 
-        if (mMap != null) {
+        if (googleMap != null) {
             if (sharedPrefUtils.getMapLayer() != -1)
-                mMap.setMapType(sharedPrefUtils.getMapLayer());
+                googleMap.setMapType(sharedPrefUtils.getMapLayer());
         }
     }
 
@@ -239,27 +273,26 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         Log.d(TAG, "Query changed: " + newText);
 
         // Clearing ArrayList before adding new items
-        data.clear();
+        dataSearch.clear();
 
         if (!newText.equals("")) {
             // Searching for results
-            for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
-                if (entry.getValue().toLowerCase().contains(newText.toLowerCase().trim()))
-                    data.add(new MapsSearchDataModel(entry.getValue(), entry.getKey()));
+            for (MarkerDataModel entry : markerDataModels) {
+                if (entry.getNameFull().toLowerCase().contains(newText.toLowerCase().trim()))
+                    dataSearch.add(new MapsSearchDataModel(entry.getNameFull(), entry.getId()));
             }
 
             // Nothing was found. Show warning
-            if (data.size() == 0) {
-                // TODO add warning message
+            if (dataSearch.size() == 0) {
                 Snackbar.make(rootView, "Ничего не найдено", Snackbar.LENGTH_LONG).show();
             }
         } else {
-            for (Map.Entry<Integer, String> entry : university.getCorpsInfoNameFull().entrySet()) {
-                data.add(new MapsSearchDataModel(entry.getValue(), entry.getKey()));
+            for (MarkerDataModel entry : markerDataModels) {
+                dataSearch.add(new MapsSearchDataModel(entry.getNameFull(), entry.getId()));
             }
         }
 
-        adapter.setDataSet(data);
+        adapter.setDataSet(dataSearch);
         adapter.notifyDataSetChanged();
 
         adapter.setOnItemClickListener(new MapsSearchAdapter.OnItemClickListener() {
@@ -271,7 +304,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                 searchView.onActionViewCollapsed();
 
                 // Zooming to marker
-                zoomToMarker(markerHashMap.get(itemId));
+                zoomToMarker(markerDataModels.get(itemId - 1).getMarker());
             }
         });
 
@@ -351,21 +384,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                 }, AnimationSupport.Reveal.animDuration);
 
                 addDefaultSearchViewItems();
-
-                // Animating to clicked position
-                adapter.setOnItemClickListener(new MapsSearchAdapter.OnItemClickListener() {
-                    @Override
-                    public void onClick(int itemId) {
-                        // Hide RecyclerView & SearchView & keyboard
-                        hideKeyboard();
-                        AnimationSupport.Reveal.revealCloseTopRight(recyclerView);
-                        searchView.onActionViewCollapsed();
-
-                        // Zooming to marker
-                        zoomToMarker(markerHashMap.get(itemId));
-                    }
-                });
-
             }
         });
 
@@ -375,15 +393,15 @@ public class MapsActivity extends BaseNavigationDrawerActivity
      * Adding default items to RecyclerView.Adapter
      */
     private void addDefaultSearchViewItems() {
-        data.clear();
+        dataSearch.clear();
 
-        HashMap<Integer, String> corpsNames = university.getCorpsInfoNameFull();
-        for (int entryId = 1; entryId <= corpsNames.size(); entryId++) {
-            data.add(new MapsSearchDataModel(corpsNames.get(entryId), entryId));
-            Log.d(TAG, "adding search item with/" + "i: " + entryId);
+        for (MarkerDataModel entry : markerDataModels) {
+            dataSearch.add(new MapsSearchDataModel(entry.getNameFull(), entry.getId()));
+            Log.d(TAG, "adding search item with/" + "i: " + entry.getId());
+
         }
 
-        adapter.setDataSet(data);
+        adapter.setDataSet(dataSearch);
         adapter.notifyDataSetChanged();
 
         adapter.setOnItemClickListener(new MapsSearchAdapter.OnItemClickListener() {
@@ -395,7 +413,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                 searchView.onActionViewCollapsed();
 
                 // Zooming to marker
-                zoomToMarker(markerHashMap.get(itemId));
+                zoomToMarker(markerDataModels.get(itemId - 1).getMarker());
             }
         });
     }
@@ -403,15 +421,15 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     private void setUpMapIfNeeded() {
         Log.i(TAG, "setUpMapIfNeeded called");
 
-        if (mMap == null) {
+        if (googleMap == null) {
             MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
 
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
-                    mMap = googleMap;
+                    MapsActivity.this.googleMap = googleMap;
 
-                    if (mMap != null) {
+                    if (MapsActivity.this.googleMap != null) {
                         setUpMap();
                         initGoogleApiClient();
                     }
@@ -421,68 +439,26 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     }
 
     /**
-     * Adding custom marker on GoogleMap
-     *
-     * @param i     loop iterator
-     * @param icon  marker's icon resource id
-     * @param title title of icon
-     */
-    private void addMarkerCustom(Integer i, int icon, String title) {
-        Marker mMapMarker = mMap.addMarker(new MarkerOptions()
-                .position(university.getCorps().get(i))
-                .title(title)
-                .icon(BitmapDescriptorFactory.fromResource(icon)));
-
-        if (getIntent().getIntExtra("MAINACTIVITY_CORP_ID", -1) == i)
-            mainActivityMarker = mMapMarker;
-
-        markerHashMap.put(i, mMapMarker);
-    }
-
-    /**
-     * Adding custom marker on GoogleMap
-     *
-     * @param i                  loop iterator == merker Id
-     * @param markerOptions      new MarkerOptions for custom Marker
-     * @param markerIdFromIntent Activity was started from button (e.g. on MainActivity), so
-     *                           need to get Id of Marker to open
-     */
-    private void addMarkerCustom(int i, MarkerOptions markerOptions, int markerIdFromIntent) {
-        Marker mMapMarker = mMap.addMarker(markerOptions);
-
-        if (markerIdFromIntent == i) {
-            Log.d(TAG, "addMarkerCustom()/ Intent: " + markerIdFromIntent + " == Iterator: " + i);
-            openMarkerFromIntent(mMapMarker);
-        }
-
-        markerHashMap.put(i, mMapMarker);
-    }
-
-    /**
      * Activity wasn't started from Drawer
      * Need to open marker
      */
     private void openMarkerFromIntent(Marker marker) {
         if (marker != null) {
-            Log.d(TAG, "openMarkerFromIntent() opening marker...");
+            Log.d(TAG, "openMarkerFromIntent() -> opening marker...");
 
             //Записываем id текущего маркера в глобальную переменную
             currentMarkerID = getMarkerId(marker);
-            Log.i("MainActivity", "currentMarkerID =  " + Integer.toString(currentMarkerID));
+            Log.d(TAG, "openMarkerFromIntent() -> currentMarkerID:  " + Integer.toString(currentMarkerID));
 
             //Записываем label текущего маркера в глобальную переменную
-            currentMarkerLabel = university.getCorpsLabel().get(getMarkerId(marker));
+            //currentMarkerLabel = university.getCorpsLabel().get(getMarkerId(marker));
 
-            //Открываем FabMenu
-            fab_menu.open(true);
+            googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
 
-            //Manually open the window
+            //openBottomSheet(currentMarkerLabel, university.getCorpsInfoNameFull().get(currentMarkerID));
             marker.showInfoWindow();
-
-            //Animate to center
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
         } else {
-            Log.e(TAG, "openMarkerFromIntent() mainActivityMarker == null");
+            Log.e(TAG, "openMarkerFromIntent() marker == null");
         }
     }
 
@@ -491,152 +467,401 @@ public class MapsActivity extends BaseNavigationDrawerActivity
      */
     private void setUpMap() {
         // Camera start position
-        LatLng nau = new LatLng(50.437476, 30.428322);
+        LatLng nau = new LatLng(50.440259, 30.429853);
         CameraPosition cameraPosition_start = new CameraPosition.Builder()
                 .target(nau)      // Sets the center of the map to NAU
                 .zoom(15)                   // Sets the zoom
                 .bearing(160)               // Sets the orientation of the camera to east
+                .tilt(90)
                 .build();                   // Creates a CameraPosition from the builder
 
-        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition_start));
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition_start));
 
         try {
-            mMap.setMyLocationEnabled(true);
+            googleMap.setMyLocationEnabled(true);
         } catch (SecurityException ex) {
             ex.printStackTrace();
         }
-        mMap.getUiSettings().setMapToolbarEnabled(false);
-        mMap.setIndoorEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(false);
-        mMap.getUiSettings().setCompassEnabled(false);
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
+        googleMap.setIndoorEnabled(true);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        googleMap.getUiSettings().setCompassEnabled(false);
 
         if (sharedPrefUtils.getMapLayer() != -1)
-            mMap.setMapType(sharedPrefUtils.getMapLayer());
+            googleMap.setMapType(sharedPrefUtils.getMapLayer());
 
         /**
          * Adding markers from {@link ua.nau.edu.University.NAU} using {@link android.os.AsyncTask}
          * Important! Loop needs to be started from 1
          */
-        new AsyncTask<Void, Void, HashMap<Integer, MarkerOptions>>() {
+        new AsyncTask<String, Void, ArrayList<MarkerDataModel>>() {
+            private MaterialDialog loadingDialog;
+
             @Override
-            protected void onPostExecute(HashMap<Integer, MarkerOptions> markerOptions) {
-                int markerIdFromIntent = getIntent().getIntExtra("MAINACTIVITY_CORP_ID", -1);
-                for (int i = 1; i <= markerOptions.size(); i++) {
-                    addMarkerCustom(i, markerOptions.get(i), markerIdFromIntent);
-                }
+            protected void onPreExecute() {
+                loadingDialog = APIDialogs.ProgressDialogs.loading(activityContext);
+                loadingDialog.show();
             }
 
             @Override
-            protected HashMap<Integer, MarkerOptions> doInBackground(Void... params) {
-                HashMap<Integer, MarkerOptions> markerOptions = new HashMap<>();
+            protected ArrayList<MarkerDataModel> doInBackground(String... params) {
+                ArrayList<MarkerDataModel> markerDataModels = new ArrayList<>();
 
-                for (int i = 1; i <= university.getHashMapSize(); i++) {
-                    markerOptions.put(i, new MarkerOptions()
-                            .position(university.getCorps().get(i))
-                            .title(university.getCorpsMarkerLabel().get(i))
-                            .icon(BitmapDescriptorFactory.fromResource(university.getCorpsIcon().get(i))));
+                try {
+                    APIHTTPUtils httpUtils = new APIHTTPUtils();
+                    HashMap<String, String> requestParams = new HashMap<>();
+
+                    requestParams.put("action", "getMarkers");
+                    String markersData = httpUtils.sendPostRequestWithParams(params[0], requestParams);
+                    Log.d(TAG, "Server response: " + markersData);
+
+                    JSONArray jsonArray = new JSONArray(markersData);
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                        markerDataModels.add(new MarkerDataModel(
+                                jsonObject.getInt("id"),
+                                jsonObject.getDouble("lat"),
+                                jsonObject.getDouble("lng"),
+                                jsonObject.getString("icon"),
+                                jsonObject.getString("label"),
+                                jsonObject.getString("name_short"),
+                                jsonObject.getString("name_full"),
+                                jsonObject.getString("phone"),
+                                jsonObject.getString("information"),
+                                jsonObject.getString("website"),
+                                jsonObject.getString("slider_images")
+                        ));
+
+                        Log.d(TAG, "Added new MarkerDataModel with: \n" +
+                                "id: " + jsonObject.getInt("id") + "\n" +
+                                "lat: " + jsonObject.getDouble("lat") + "\n" +
+                                "lng: " + jsonObject.getDouble("lng") + "\n" +
+                                "icon: " + jsonObject.getString("icon") + "\n" +
+                                "label: " + jsonObject.getString("label") + "\n" +
+                                "name_short: " + jsonObject.getString("name_short") + "\n" +
+                                "name_full: " + jsonObject.getString("name_full") + "\n" +
+                                "phone: " + jsonObject.getString("phone") + "\n" +
+                                "information: " + jsonObject.getString("information") + "\n" +
+                                "website: " + jsonObject.getString("website") + "\n" +
+                                "slider_images: " + jsonObject.getString("slider_images"));
+
+                    }
+                } catch (Exception ex) {
+                    Log.e(TAG, "", ex);
+                    return null;
                 }
 
-                return markerOptions;
+                return markerDataModels;
             }
-        }.execute();
+
+            @Override
+            protected void onPostExecute(ArrayList<MarkerDataModel> markerDataModels) {
+                setMarkerModels(markerDataModels);
+
+                if (markerDataModels != null && markerDataModels.size() != 0) {
+
+                    for (int i = 0; i < markerDataModels.size(); i++) {
+                        MarkerDataModel markerDataModel = markerDataModels.get(i);
+
+                        final Marker marker = googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(markerDataModel.getLat(), markerDataModel.getLng()))
+                                .title(markerDataModel.getLabel()));
+
+                        if (idFromIntent - 1 == i) {
+                            Glide
+                                    .with(activityContext)
+                                    .load(markerDataModel.getIcon())
+                                    .asBitmap()
+                                    .into(new SimpleTarget<Bitmap>() {
+                                        @Override
+                                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                            Log.d(TAG, "Glide -> Bitmap loaded: " +
+                                                    "\nWidth: " + resource.getWidth() +
+                                                    "\nHeight: " + resource.getHeight()
+                                            );
+                                            marker.setIcon(BitmapDescriptorFactory.fromBitmap(resource));
+                                            zoomToMarker(marker);
+                                        }
+                                    });
+                        } else {
+                            Glide
+                                    .with(activityContext)
+                                    .load(markerDataModel.getIcon())
+                                    .asBitmap()
+                                    .into(new SimpleTarget<Bitmap>() {
+                                        @Override
+                                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                            Log.d(TAG, "Glide -> Bitmap loaded: " +
+                                                    "\nWidth: " + resource.getWidth() +
+                                                    "\nHeight: " + resource.getHeight()
+                                            );
+                                            marker.setIcon(BitmapDescriptorFactory.fromBitmap(resource));
+                                        }
+                                    });
+                        }
+
+                        markerDataModel.setMarker(marker);
+                        markerHashMap.put(marker, markerDataModel);
+                    }
+                }
+                loadingDialog.dismiss();
+            }
+        }.execute(APIUrl.RequestUrl.API);
+
+        supportRoute.setRouteCallbacks(new Route.RouteCallbacks() {
+            @Override
+            public void onDrawSuccess() {
+                // Animate & move camera to current position
+                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+                        .target(getMyCoordinate())
+                        .bearing(180)
+                        .zoom(15f)
+                        .build()));
+            }
+        });
 
         //Обработчик нажатия на маркер
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                closeBottomSheet();
+
+                if (marker.isInfoWindowShown())
+                    marker.hideInfoWindow();
+
+                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+                        .target(marker.getPosition())
+                        .zoom(18)
+                        .tilt(90)
+                        .bearing(160)
+                        .build()));
+            }
+        });
+
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                // Open FabMenu
-                fab_menu.open(true);
+                currentMarkerID = markerHashMap.get(marker).getId() - 1;
 
-                //Записываем id текущего маркера в глобальную переменную
-                currentMarkerID = getMarkerId(marker);
+                openBottomSheet(
+                        markerHashMap.get(marker).getLabel(),
+                        markerHashMap.get(marker).getNameFull(),
+                        markerHashMap.get(marker).getInformation()
+                );
+                Log.d(TAG, "onMarkerClick() -> \nLabel: " + markerHashMap.get(marker).getLabel() + "\nId: " + markerHashMap.get(marker).getId());
 
-                //Записываем label текущего маркера в глобальную переменную
-                currentMarkerLabel = university.getCorpsLabel().get(getMarkerId(marker));
+                // Manually open the window
+                marker.showInfoWindow();
 
-                return false;
+                // Animate to center
+                googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+
+                return true;
             }
         });
 
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                if (fab_menu.isOpened()) {
-                    fab_menu.close(true);
-                    currentMarkerID = -1;
-                    currentMarkerLabel = "";
+                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                } else if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 }
             }
         });
     }
 
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        //Открываем FabMenu
-        fab_menu.open(true);
-
-        //Manually open the window
-        marker.showInfoWindow();
-
-        //Animate to center
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
-
-        //Consume the method
-        return true;
+    public void setMarkerModels(ArrayList<MarkerDataModel> markerModels) {
+        this.markerDataModels = markerModels;
     }
 
-    private void initFloatingActionMenu() {
-        fab_menu = (FloatingActionMenu) findViewById(R.id.fab_menu);
+    /**
+     * Bottom Sheet block
+     */
+    private void initBottomSheet() {
+        new AsyncTask<Void, Void, Void>() {
 
-        FloatingActionButton fab_info = (FloatingActionButton) findViewById(R.id.fab_info);
-        FloatingActionButton fab_location = (FloatingActionButton) findViewById(R.id.fab_location);
-        FloatingActionButton fab_route = (FloatingActionButton) findViewById(R.id.fab_route);
+            // Root View
+            View bottomSheetFrame = rootView.findViewById(R.id.bottom_sheet);
 
-        fab_route.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (HardwareChecks.isInternetAvailable()) {
-                    supportRoute.clearPath();
+            // Overlaping head
+            final LinearLayout sheetOverlapHead = (LinearLayout) findViewById(R.id.head_bsheet);
+            final TextView sheetOverlapHeadTitle = (TextView) bottomSheetFrame.findViewById(R.id.title_sheet);
+            final TextView sheetOverlapHeadSubtitle = (TextView) bottomSheetFrame.findViewById(R.id.subtitle_sheet);
 
-                    supportRoute.drawRoute(mMap, activityContext, getMyCoordinate(), university.getCorps().get(currentMarkerID),
-                            Route.TRANSPORT_WALKING, false, Route.LANGUAGE_RUSSIAN, R.drawable.ic_place_black_24dp);
+            // CollapsingToolbarLayout, Toolbar, FAB
+            final CollapsingToolbarLayout sheetCollapsingToolbar = (CollapsingToolbarLayout) bottomSheetFrame.findViewById(R.id.collapsing_toolbar);
+            final TextView sheetCollapsingToolbarTitle = (TextView) bottomSheetFrame.findViewById(R.id.title_collapse_sheet);
+            final ImageView sheetCollapsingToolbarBackground = (ImageView) bottomSheetFrame.findViewById(R.id.backdrop);
+            final Toolbar sheetToolbar = (Toolbar) bottomSheetFrame.findViewById(R.id.toolbar_bsheet);
+            final TextView sheetToolbarTitle = (TextView) findViewById(R.id.toolbar_title_bsheet);
+            final android.support.design.widget.FloatingActionButton sheetFABRoute = (android.support.design.widget.FloatingActionButton) findViewById(R.id.fab_route_bsheet);
 
-                    CameraPosition currentPosition = new CameraPosition.Builder()
-                            .target(getMyCoordinate())
-                            .bearing(180)
-                            .zoom(13f)
-                            .build();
-                    mMap.moveCamera(CameraUpdateFactory.newCameraPosition(currentPosition));
+            // Main content
+            final SliderLayout sheetContentSlider = (SliderLayout) findViewById(R.id.slider);
+            final ExpandableTextView sheetContentExpandText = (ExpandableTextView) findViewById(R.id.text_expandable);
 
-                } else {
-                    APIDialogs.AlertDialogs.internetConnectionError(activityContext);
-                }
-            }
-        });
+            final ImageView sheetContentImageGoogleMap = (ImageView) findViewById(R.id.google_map);
+            final ImageView sheetContentImageGoogleStreet = (ImageView) findViewById(R.id.google_street);
 
-        fab_info.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                if (!currentMarkerLabel.equals("") &&
-                        currentMarkerID != 0 && currentMarkerID > 0 &&
-                        currentMarkerID <= university.getHashMapSize()) {
-
-                    startActivity(new Intent(activityContext, InfoActivity.class)
-                            .putExtra(CORP_ID_KEY, currentMarkerID)
-                            .putExtra(CORP_LABEL_KEY, currentMarkerLabel)
-                            .putExtra(CURRENT_LATITUDE, getMyCoordinate().latitude)
-                            .putExtra(CURRENT_LONGTITUDE, getMyCoordinate().longitude));
-
+            protected void onPreExecute() {
+                HashMap<Integer, Integer> sliderImages = new HashMap<>();
+                sliderImages.put(0, R.drawable.material_bg_1);
+                sliderImages.put(1, R.drawable.material_bg_2);
+                sliderImages.put(2, R.drawable.material_bg_3);
+                sliderImages.put(3, R.drawable.material_bg_4);
+                sliderImages.put(4, R.drawable.material_bg_5);
+                for (int i = 0; i < sliderImages.size(); i++) {
+                    sheetContentSlider.addSlider(new DefaultSliderView(activityContext)
+                            .image(sliderImages.get(i))
+                            .setScaleType(BaseSliderView.ScaleType.Fit));
                 }
-            }
-        });
 
-        fab_location.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                APIDialogs.AlertDialogs.customDialog(activityContext, "Внимание", "Сервис находится в разработке");
-                //startActivity(new Intent(activityContext, FloorActivity.class));
+                sheetFABRoute.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        try {
+                            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                            drawPathToMarker(markerDataModels.get(currentMarkerID).getLatLng());
+                        } catch (Exception ex) {
+                            Log.e(TAG, "sheetFABRoute -> onclick(): ", ex);
+                        }
+                    }
+                });
+
+                Picasso.with(activityContext).load(R.drawable.google_map).into(sheetContentImageGoogleMap);
+                Picasso.with(activityContext).load(R.drawable.google_street).into(sheetContentImageGoogleStreet);
             }
-        });
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetFrame);
+
+                bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+                    private boolean isOnTop = false;
+
+                    @Override
+                    public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                        Log.d(TAG, "setUpMap() -> onStateChanged() -> newState: " + newState);
+                        switch (newState) {
+
+                            case BottomSheetBehavior.STATE_DRAGGING: {
+                                if (isOnTop) {
+                                    sheetOverlapHead.setVisibility(View.INVISIBLE);
+                                } else {
+                                    AnimationSupport.Fade.fadeOut(activityContext, sheetOverlapHead);
+                                }
+
+                                sheetToolbar.setVisibility(View.INVISIBLE);
+
+                                break;
+                            }
+
+                            case BottomSheetBehavior.STATE_SETTLING: {
+                                break;
+                            }
+
+                            case BottomSheetBehavior.STATE_EXPANDED: {
+                                sheetToolbar.setVisibility(View.VISIBLE);
+
+                                break;
+                            }
+
+                            case BottomSheetBehavior.STATE_COLLAPSED: {
+                                AnimationSupport.Fade.fadeIn(activityContext, sheetOverlapHead);
+                                sheetOverlapHeadTitle.setText(markerDataModels.get(currentMarkerID).getNameShort());
+                                sheetOverlapHeadSubtitle.setText(markerDataModels.get(currentMarkerID).getNameFull());
+
+                                sheetCollapsingToolbarTitle.setText(markerDataModels.get(currentMarkerID).getNameShort());
+
+                                sheetToolbarTitle.setText(markerDataModels.get(currentMarkerID).getNameFull());
+                                sheetToolbar.setVisibility(View.INVISIBLE);
+
+                                sheetFABRoute.setVisibility(View.VISIBLE);
+
+                                /************************** Main container ********************/
+                                sheetContentExpandText.setText(markerDataModels.get(currentMarkerID).getInformation());
+
+                                FABMyLocation.hide();
+
+                                break;
+                            }
+
+                            case BottomSheetBehavior.STATE_HIDDEN: {
+                                sheetFABRoute.setVisibility(View.GONE);
+
+                                FABMyLocation.show();
+
+                                break;
+                            }
+
+                            default: {
+                                break;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                        Log.d(TAG, "setUpMap() -> onSlide() -> slideOffset: " + slideOffset);
+
+                        if (slideOffset > 0.8) {
+                            isOnTop = true;
+
+                            sheetFABRoute.hide();
+                        } else {
+                            isOnTop = false;
+
+                            sheetFABRoute.show();
+                        }
+                    }
+                });
+
+                bottomSheetBehavior.setPeekHeight((int) Utils.convertDpToPixel(100f, activityContext));
+                try {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                } catch (Exception ex) {
+                    Log.e(TAG, "", ex);
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+            }
+        }.execute();
+    }
+
+    public void closeBottomSheet() {
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+    public void openBottomSheet(String title, String subTitle, String info) {
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+        try {
+            final TextView sheetOverlapHeadTitle = (TextView) findViewById(R.id.title_sheet);
+            final TextView sheetOverlapHeadSubtitle = (TextView) findViewById(R.id.subtitle_sheet);
+            final TextView sheetCollapsingToolbarTitle = (TextView) findViewById(R.id.title_collapse_sheet);
+            final TextView sheetToolbarTitle = (TextView) findViewById(R.id.toolbar_title_bsheet);
+
+            final ExpandableTextView sheetContentExpandText = (ExpandableTextView) findViewById(R.id.text_expandable);
+
+            sheetOverlapHeadTitle.setText(title);
+            sheetOverlapHeadSubtitle.setText(subTitle);
+            sheetToolbarTitle.setText(subTitle);
+            sheetCollapsingToolbarTitle.setText(title);
+
+            sheetContentExpandText.setText(info);
+        } catch (Exception ex) {
+            Log.e(TAG, "openBottomSheet() -> ", ex);
+        }
     }
 
     private int getMarkerId(Marker marker) {
@@ -647,10 +872,13 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         return i;
     }
 
+    /**
+     * Move and zoom camera to current position
+     */
     private void zoomToMyLocation() {
         if (HardwareChecks.isWifiEnabled(this)) {
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(getMyCoordinate(), 16);
-            mMap.animateCamera(cameraUpdate);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(getMyCoordinate(), 18);
+            googleMap.animateCamera(cameraUpdate);
         } else {
             APIDialogs.AlertDialogs.wifiDisabled(this);
         }
@@ -662,27 +890,53 @@ public class MapsActivity extends BaseNavigationDrawerActivity
      * @param marker marker for zooming
      */
     private void zoomToMarker(Marker marker) {
-        currentMarkerID = getMarkerId(marker);
-        currentMarkerLabel = university.getCorpsLabel().get(currentMarkerID);
-        fab_menu.open(true);
+        currentMarkerID = markerHashMap.get(marker).getId() - 1;
+
         marker.showInfoWindow();
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+
+        openBottomSheet(
+                markerHashMap.get(marker).getLabel(),
+                markerHashMap.get(marker).getNameFull(),
+                markerHashMap.get(marker).getInformation()
+        );
     }
 
+    /**
+     * Draw path from current position to {@code latLng}
+     *
+     * @param latLng destination position
+     */
+    private void drawPathToMarker(LatLng latLng) {
+        if (HardwareChecks.isInternetAvailable()) {
+            supportRoute.clearPath();
+
+            supportRoute.drawRoute(googleMap, activityContext, getMyCoordinate(), latLng,
+                    Route.TRANSPORT_WALKING, false, Route.LANGUAGE_RUSSIAN, R.drawable.ic_place_black_24dp);
+
+        } else {
+            APIDialogs.AlertDialogs.internetConnectionError(activityContext);
+        }
+    }
+
+    /**
+     * Find current location
+     *
+     * @return new {@link LatLng} instance - current coordinates
+     */
+    @Nullable
     public LatLng getMyCoordinate() {
-        Location currentLocation = null;
+        Location currentLocation;
 
         try {
             currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         } catch (SecurityException ex) {
             ex.printStackTrace();
             Log.e(TAG, "getMyCoordinate() -> ", ex);
+            return null;
         }
 
-        if (currentLocation != null)
-            return new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        else
-            return null;
+        return new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
     }
 
     /**
@@ -690,7 +944,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
      *
      * @param myLocation LatLng Object which points to user's current location
      * @param points     HashMap<Integer, LatLng> Object, which contains points for comparing
-     * @return Key of points - object, which has minimal distance to user
+     * @return new {@link MapsDistanceDataModel} instance
      */
     private MapsDistanceDataModel findMinDistance(LatLng myLocation, HashMap<Integer, LatLng> points) {
         int minId = -1;
@@ -782,8 +1036,13 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     }
 
     private void showKeyboard() {
-        if (getCurrentFocus() != null)
+        if (getCurrentFocus() != null) {
             methodManager.showSoftInput(getCurrentFocus(), 0);
+
+            if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            }
+        }
     }
 
 }

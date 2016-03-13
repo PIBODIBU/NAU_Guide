@@ -97,42 +97,6 @@
                     android:textColor="@color/white"
                     android:textSize="24sp"
                     app:layout_collapseMode="parallax" />
-
-                <LinearLayout
-                    android:id="@+id/head_bsheet"
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:background="@color/white"
-                    android:orientation="vertical"
-                    app:layout_collapseMode="parallax">
-
-                    <TextView
-                        android:id="@+id/title_sheet"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="top"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingTop="16dp"
-                        android:text="ИКИТ"
-                        android:textColor="@color/colorTextPrimary"
-                        android:textSize="20sp"
-                        app:layout_collapseMode="parallax" />
-
-                    <TextView
-                        android:id="@+id/subtitle_sheet"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom"
-                        android:paddingBottom="16dp"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:text="Институт Компьютерных Информационных технологий"
-                        android:textColor="@color/colorTextPrimary"
-                        android:textSize="16sp"
-                        app:layout_collapseMode="parallax" />
-
-                </LinearLayout>
             </android.support.design.widget.CollapsingToolbarLayout>
         </android.support.design.widget.AppBarLayout>
 
@@ -145,6 +109,41 @@
             <include layout="@layout/activity_maps_bsheet_content" />
 
         </android.support.v4.widget.NestedScrollView>
+
+        <LinearLayout
+            android:id="@+id/head_bsheet"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@color/white"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/title_sheet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="16dp"
+                android:text="ИКИТ"
+                android:textColor="@color/colorTextPrimary"
+                android:textSize="20sp"
+                app:layout_collapseMode="parallax" />
+
+            <TextView
+                android:id="@+id/subtitle_sheet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:paddingBottom="16dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:text="Институт Компьютерных Информационных технологий"
+                android:textColor="@color/colorTextPrimary"
+                android:textSize="16sp"
+                app:layout_collapseMode="parallax" />
+
+        </LinearLayout>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_route_collasping_bsheet"

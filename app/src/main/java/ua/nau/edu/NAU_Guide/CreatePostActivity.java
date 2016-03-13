@@ -15,7 +15,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.API.APICreateBuilder;
-import ua.nau.edu.API.APIStrings;
+import ua.nau.edu.API.APIUrl;
 import ua.nau.edu.API.APIValues;
 import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 
@@ -93,7 +93,7 @@ public class CreatePostActivity extends BaseToolbarActivity {
                     if (!isValidLength()) {
                         APIDialogs.AlertDialogs.tooLongMeassage(this);
                     } else {
-                        apiCreateBuilder.postMessage(APIStrings.RequestUrl.MAKE_POST, sharedPrefUtils.getToken(), message);
+                        apiCreateBuilder.postMessage(APIUrl.RequestUrl.MAKE_POST, sharedPrefUtils.getToken(), message);
                     }
                 }
                 break;

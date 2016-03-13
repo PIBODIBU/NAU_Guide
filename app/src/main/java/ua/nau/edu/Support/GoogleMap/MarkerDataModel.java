@@ -1,6 +1,16 @@
 package ua.nau.edu.Support.GoogleMap;
 
+import android.support.annotation.Nullable;
+import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+
 public class MarkerDataModel {
+
+    private final String TAG = "MarkerDataModel";
+
+    private Marker marker;
 
     private int id;
     private double lat;
@@ -42,6 +52,12 @@ public class MarkerDataModel {
     /**
      * Getters
      */
+
+    @Nullable
+    public Marker getMarker() {
+        return marker;
+    }
+
     public int getId() {
         return id;
     }
@@ -84,5 +100,24 @@ public class MarkerDataModel {
 
     public String getWebsite() {
         return website;
+    }
+
+
+    @Nullable
+    public LatLng getLatLng() {
+        try {
+            return new LatLng(lat, lng);
+        } catch (Exception ex) {
+            Log.e(TAG, "getLatLng() -> ", ex);
+            return null;
+        }
+    }
+
+    /**
+     * Setters
+     */
+
+    public void setMarker(Marker marker) {
+        this.marker = marker;
     }
 }

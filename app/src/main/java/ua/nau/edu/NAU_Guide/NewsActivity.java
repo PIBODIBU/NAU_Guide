@@ -26,7 +26,7 @@ import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.API.APILoaderBuilder;
 import ua.nau.edu.API.APIRefreshBuilder;
-import ua.nau.edu.API.APIStrings;
+import ua.nau.edu.API.APIUrl;
 import ua.nau.edu.API.APIUpdateBuilder;
 import ua.nau.edu.API.APIValues;
 import ua.nau.edu.RecyclerViews.NewsActivity.NewsAdapter;
@@ -74,7 +74,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
         setUpSwipeRefreshLayout();
 
         Log.i(TAG, "onCreate: Loading first " + loadNumber + " posts...");
-        postsLoaderWithDialog.loadPostsAll(startLoadPosition, loadNumber, APIStrings.RequestUrl.GET_POST_ALL);
+        postsLoaderWithDialog.loadPostsAll(startLoadPosition, loadNumber, APIUrl.RequestUrl.GET_POST_ALL);
         startLoadPosition += loadNumber;
     }
 
@@ -145,7 +145,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
     }
 
     private void refreshAllPosts() {
-        apiRefreshBuilder.refreshItemsAll(APIStrings.RequestUrl.GET_POST_ALL, loadNumber);
+        apiRefreshBuilder.refreshItemsAll(APIUrl.RequestUrl.GET_POST_ALL, loadNumber);
     }
 
     private void setUpAPI() {
@@ -279,7 +279,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
 
                         Log.i(TAG, "From onRefreshedAction / Loading new data... (" + Integer.toString(loadNumber) + ") posts");
                         postsLoaderWithoutDialog.setProgressItemIndex(data.size() - 1);
-                        postsLoaderWithoutDialog.loadPostsAll(startLoadPosition, loadNumber, APIStrings.RequestUrl.GET_POST_ALL);
+                        postsLoaderWithoutDialog.loadPostsAll(startLoadPosition, loadNumber, APIUrl.RequestUrl.GET_POST_ALL);
                         startLoadPosition += loadNumber;
                     }
                 });
@@ -313,7 +313,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
             @Override
             public void onRefresh() {
                 // Refreshing items
-                apiRefreshBuilder.refreshItemsAll(APIStrings.RequestUrl.GET_POST_ALL, loadNumber);
+                apiRefreshBuilder.refreshItemsAll(APIUrl.RequestUrl.GET_POST_ALL, loadNumber);
 
             }
         });
@@ -323,7 +323,12 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview_news);
         layoutManager = new LinearLayoutManager(this);
 
-        recyclerView.setHasFixedSize(true);
+        try {
+            recyclerView.setHasFixedSize(true);
+        } catch (Exception ex) {
+            Log.e(TAG, "setUpRecyclerView() -> ", ex);
+        }
+
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -350,7 +355,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
 
                 Log.i(NewsActivity.TAG, "onLoadMore/ Loading new data... (" + Integer.toString(loadNumber) + ") posts");
                 postsLoaderWithoutDialog.setProgressItemIndex(data.size() - 1);
-                postsLoaderWithoutDialog.loadPostsAll(startLoadPosition, loadNumber, APIStrings.RequestUrl.GET_POST_ALL);
+                postsLoaderWithoutDialog.loadPostsAll(startLoadPosition, loadNumber, APIUrl.RequestUrl.GET_POST_ALL);
                 startLoadPosition += loadNumber;
             }
         });
@@ -365,7 +370,7 @@ public class NewsActivity extends BaseNavigationDrawerActivity {
                         .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                apiDeleteBuilder.deletePost(APIStrings.RequestUrl.DELETE_POST, sharedPrefUtils.getToken(), postId, deletePosition);
+                                apiDeleteBuilder.deletePost(APIUrl.RequestUrl.DELETE_POST, sharedPrefUtils.getToken(), postId, deletePosition);
                             }
                         })
                         .setNegativeButton("Нет", new DialogInterface.OnClickListener() {

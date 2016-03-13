@@ -62,7 +62,7 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity implements
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        adapter = new LectorsAdapter(data, LectorsListActivity.this);
+        adapter = new LectorsAdapter(data, LectorsListActivity.this, this);
 
         new AsyncTask<Void, Void, Void>() {
             MaterialDialog loadingDialog;

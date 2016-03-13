@@ -28,7 +28,7 @@ import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.API.APILoaderBuilder;
 import ua.nau.edu.API.APIRefreshBuilder;
-import ua.nau.edu.API.APIStrings;
+import ua.nau.edu.API.APIUrl;
 import ua.nau.edu.API.APIValues;
 import ua.nau.edu.NAU_Guide.CreatePostActivity;
 import ua.nau.edu.NAU_Guide.R;
@@ -77,7 +77,7 @@ public class FragmentPosts extends Fragment {
 
         Log.i(TAG, "onCreateView: Loading first " + loadNumber + " posts...");
         Log.i(TAG, "onCreateView: Loading first unique id: " + getActivity().getIntent().getExtras().getString("uniqueId"));
-        apiLoaderBuilder.loadPostsTargeted(APIStrings.RequestUrl.GET_POST_TARGETED,
+        apiLoaderBuilder.loadPostsTargeted(APIUrl.RequestUrl.GET_POST_TARGETED,
                 authorUniqueId,
                 startLoadPosition,
                 loadNumber);
@@ -220,7 +220,7 @@ public class FragmentPosts extends Fragment {
 
                         Log.i(TAG, "From onRefreshedAction / Loading new data... (" + Integer.toString(loadNumber) + ") posts");
                         postsLoaderWithoutDialog.setProgressItemIndex(data.size() - 1);
-                        postsLoaderWithoutDialog.loadPostsTargeted(APIStrings.RequestUrl.GET_POST_TARGETED,
+                        postsLoaderWithoutDialog.loadPostsTargeted(APIUrl.RequestUrl.GET_POST_TARGETED,
                                 authorUniqueId,
                                 startLoadPosition,
                                 loadNumber);
@@ -258,7 +258,7 @@ public class FragmentPosts extends Fragment {
             @Override
             public void onRefresh() {
                 // Refreshing items
-                apiRefreshBuilder.refreshItemsTargeted(APIStrings.RequestUrl.GET_POST_TARGETED, authorUniqueId, loadNumber);
+                apiRefreshBuilder.refreshItemsTargeted(APIUrl.RequestUrl.GET_POST_TARGETED, authorUniqueId, loadNumber);
 
             }
         });
@@ -284,7 +284,7 @@ public class FragmentPosts extends Fragment {
 
                 Log.i(TAG, "onLoadMore/ Loading new data... (" + Integer.toString(loadNumber) + ") posts");
                 postsLoaderWithoutDialog.setProgressItemIndex(data.size() - 1);
-                postsLoaderWithoutDialog.loadPostsTargeted(APIStrings.RequestUrl.GET_POST_TARGETED,
+                postsLoaderWithoutDialog.loadPostsTargeted(APIUrl.RequestUrl.GET_POST_TARGETED,
                         authorUniqueId,
                         startLoadPosition,
                         loadNumber);
@@ -302,7 +302,7 @@ public class FragmentPosts extends Fragment {
                         .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                apiDeleteBuilder.deletePost(APIStrings.RequestUrl.DELETE_POST, sharedPrefUtils.getToken(), postId, deletePosition);
+                                apiDeleteBuilder.deletePost(APIUrl.RequestUrl.DELETE_POST, sharedPrefUtils.getToken(), postId, deletePosition);
                             }
                         })
                         .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
@@ -347,7 +347,7 @@ public class FragmentPosts extends Fragment {
             case CreatePostActivity.REQUEST_CODE: {
                 if (resultCode == APIValues.RESULT_OK) {
                     Snackbar.make(supportActivity.rootView, "Отправлено", Snackbar.LENGTH_LONG).show();
-                    apiRefreshBuilder.refreshItemsTargeted(APIStrings.RequestUrl.GET_POST_TARGETED, authorUniqueId, loadNumber);
+                    apiRefreshBuilder.refreshItemsTargeted(APIUrl.RequestUrl.GET_POST_TARGETED, authorUniqueId, loadNumber);
                 } else if (resultCode == APIValues.RESULT_ERROR) {
                     APIDialogs.AlertDialogs.errorWhilePostingMessage(supportActivity);
                 }
@@ -357,7 +357,7 @@ public class FragmentPosts extends Fragment {
             case UpdatePostActivity.REQUEST_CODE: {
                 if (resultCode == APIValues.RESULT_OK) {
                     Snackbar.make(supportActivity.rootView, "Обновлено", Snackbar.LENGTH_LONG).show();
-                    apiRefreshBuilder.refreshItemsTargeted(APIStrings.RequestUrl.GET_POST_TARGETED, authorUniqueId, loadNumber);
+                    apiRefreshBuilder.refreshItemsTargeted(APIUrl.RequestUrl.GET_POST_TARGETED, authorUniqueId, loadNumber);
                 } else if (resultCode == APIValues.RESULT_ERROR) {
                     APIDialogs.AlertDialogs.errorWhileUpdatingMessage(supportActivity);
                 }

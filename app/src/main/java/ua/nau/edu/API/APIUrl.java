@@ -1,7 +1,15 @@
 package ua.nau.edu.API;
 
-public class APIStrings {
+public class APIUrl {
     public static class RequestUrl {
+
+        /**
+         * Required params:
+         * <p/>
+         * action - action to perform
+         */
+        public static final String API = "http://nauguide.esy.es/include/api";
+
         /**
          * Required params:
          * <p/>

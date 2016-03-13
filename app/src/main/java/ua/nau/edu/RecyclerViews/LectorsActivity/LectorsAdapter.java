@@ -1,5 +1,6 @@
 package ua.nau.edu.RecyclerViews.LectorsActivity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -25,6 +26,7 @@ public class LectorsAdapter extends RecyclerView.Adapter<LectorsAdapter.BaseView
 
     private ArrayList<LectorsDataModel> dataSet;
     private Context context;
+    private Activity activity;
 
     public class BaseViewHolder extends RecyclerView.ViewHolder {
 
@@ -42,9 +44,10 @@ public class LectorsAdapter extends RecyclerView.Adapter<LectorsAdapter.BaseView
         }
     }
 
-    public LectorsAdapter(ArrayList<LectorsDataModel> data, Context context) {
+    public LectorsAdapter(ArrayList<LectorsDataModel> data, Context context, Activity activity) {
         this.dataSet = data;
         this.context = context;
+        this.activity = activity;
     }
 
     @Override
@@ -76,6 +79,7 @@ public class LectorsAdapter extends RecyclerView.Adapter<LectorsAdapter.BaseView
                 context.startActivity(new Intent(context, UserProfileActivity.class)
                         .putExtra("action", "getPage")
                         .putExtra("uniqueId", dataSet.get(listPosition).getUniqueId()));
+                activity.overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
         });
 

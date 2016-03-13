@@ -12,7 +12,7 @@
         android:id="@+id/toolbar"
         layout="@layout/toolbar" />
 
-    <ua.nau.edu.Support.View.ImprovedSwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <ua.nau.edu.Support.View.ImprovedSwipeLayout
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/swipeLayoutContainer"
         android:layout_width="match_parent"

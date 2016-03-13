@@ -15,7 +15,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import ua.nau.edu.API.APIDialogs;
-import ua.nau.edu.API.APIStrings;
+import ua.nau.edu.API.APIUrl;
 import ua.nau.edu.API.APIUpdateBuilder;
 import ua.nau.edu.API.APIValues;
 import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
@@ -103,7 +103,7 @@ public class UpdatePostActivity extends BaseToolbarActivity {
                         APIDialogs.AlertDialogs.tooLongMeassage(this);
                     } else {
                         if (postId != -1) {
-                            apiUpdateBuilder.updateMessage(APIStrings.RequestUrl.UPDATE_POST, sharedPrefUtils.getToken(), messageNew, postId);
+                            apiUpdateBuilder.updateMessage(APIUrl.RequestUrl.UPDATE_POST, sharedPrefUtils.getToken(), messageNew, postId);
                         } else {
                             Toast.makeText(this, "Bad post ID", Toast.LENGTH_LONG).show();
                         }
