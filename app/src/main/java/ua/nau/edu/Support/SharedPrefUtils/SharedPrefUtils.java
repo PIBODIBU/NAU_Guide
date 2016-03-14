@@ -32,6 +32,7 @@ public class SharedPrefUtils {
     public static final String EXIT_KEY = EnumSharedPreferences.EXIT.toString();
     public static final String ACCOUNTHEADER_BG_IMAGE = EnumSharedPreferences.ACCOUNTHEADER_BG_IMAGE.toString();
     public static final String MAP_LAYER_KEY = EnumSharedPreferences.MAP_LAYER_KEY.toString();
+    public static final String MAP_MY_LOCATION_VISIBILITY_KEY = EnumSharedPreferences.MAP_MY_LOCATION_VISIBILITY_KEY.toString();
 
     public void performLogin(String name, String email, String uniqueId, String token, String photoLocation, String photoUrl) {
         setSignedState(true);
@@ -71,6 +72,15 @@ public class SharedPrefUtils {
 
     public int getMapLayer() {
         return sharedPrefs.getInt(MAP_LAYER_KEY, -1);
+    }
+
+
+    public void setMyLocationVisibility(boolean isVisible) {
+        sharedPrefs.edit().putBoolean(MAP_MY_LOCATION_VISIBILITY_KEY, isVisible).apply();
+    }
+
+    public boolean getMyLocationVisibility() {
+        return sharedPrefs.getBoolean(MAP_MY_LOCATION_VISIBILITY_KEY, true);
     }
 
 

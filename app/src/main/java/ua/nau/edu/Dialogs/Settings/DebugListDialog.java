@@ -25,7 +25,7 @@ public class DebugListDialog extends DialogFragment implements AdapterView.OnIte
     private AlertDialog.Builder dialogBuilder;
     private LinearLayout parentRootView;
     private View rootView;
-    private AlertDialog dialog;
+    private Dialog dialog;
 
     private String[] listItems = {"MapsTestActivity", "AppUpdateActivity", "Test item 2", "Test item 3"};
     private ListView listView;
@@ -46,6 +46,7 @@ public class DebugListDialog extends DialogFragment implements AdapterView.OnIte
         listView = (ListView) rootView.findViewById(R.id.listView);
 
         dialogBuilder
+                .setTitle("Choose Activity")
                 .setCancelable(true)
                 .setView(rootView);
 

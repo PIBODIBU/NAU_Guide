@@ -1,6 +1,9 @@
 package ua.nau.edu.Support.View;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -58,20 +61,21 @@ public class AnimationSupport {
             SupportAnimator animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
             animator.setInterpolator(new AccelerateDecelerateInterpolator());
             animator.setDuration(animDuration);
+
             animator = animator.reverse();
 
             try {
+                new Handler().postDelayed(new Runnable(){
+                    @Override
+                    public void run() {
+                        view.setVisibility(View.INVISIBLE);
+                    }
+                }, animDuration);
+
                 animator.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-
-            view.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    view.setVisibility(View.INVISIBLE);
-                }
-            }, animDuration);
         }
     }
 

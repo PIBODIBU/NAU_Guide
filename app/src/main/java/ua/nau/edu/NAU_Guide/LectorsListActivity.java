@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import ua.nau.edu.API.APIHTTPUtils;
+import ua.nau.edu.API.APIUrl;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsAdapter;
 import ua.nau.edu.RecyclerViews.LectorsActivity.LectorsDataModel;
 import ua.nau.edu.API.APIDialogs;
@@ -31,8 +32,7 @@ import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 
 public class LectorsListActivity extends BaseNavigationDrawerActivity implements SearchView.OnQueryTextListener {
 
-    private static final String REQUEST_URL = "http://nauguide.esy.es/include/getLectors.php";
-    private static final String TAG = "LectorsListActivity";
+    private final String TAG = getClass().getSimpleName();
 
     private static LectorsAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -77,7 +77,7 @@ public class LectorsListActivity extends BaseNavigationDrawerActivity implements
             @Override
             protected Void doInBackground(Void... params) {
                 APIHTTPUtils httpUtils = new APIHTTPUtils();
-                String response = httpUtils.sendPostRequest(REQUEST_URL);
+                String response = httpUtils.sendPostRequest(APIUrl.RequestUrl.GET_USER_ALL);
 
                 if (response.equalsIgnoreCase("error_connection")) {
                     Log.e(TAG, "No Internet avalible");

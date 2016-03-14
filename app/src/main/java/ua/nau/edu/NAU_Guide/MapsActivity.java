@@ -14,6 +14,8 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -38,9 +40,10 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
-import com.gc.materialdesign.widgets.ProgressDialog;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -52,14 +55,16 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,9 +72,7 @@ import java.util.Map;
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.API.APIUrl;
-import ua.nau.edu.NAU_Guide.BaseNavigationDrawerActivity;
 import ua.nau.edu.NAU_Guide.Debug.MapsDistanceDataModel;
-import ua.nau.edu.NAU_Guide.R;
 import ua.nau.edu.RecyclerViews.MapsActivity.Search.MapsSearchAdapter;
 import ua.nau.edu.RecyclerViews.MapsActivity.Search.MapsSearchDataModel;
 import ua.nau.edu.Support.GoogleMap.GoogleMapUtils;
@@ -80,7 +83,6 @@ import ua.nau.edu.Support.System.HardwareChecks;
 import ua.nau.edu.Support.System.Utils;
 import ua.nau.edu.Support.View.AnimationSupport;
 import ua.nau.edu.Support.View.SearchViewUtils;
-import ua.nau.edu.University.NAU;
 
 public class MapsActivity extends BaseNavigationDrawerActivity
         implements SearchView.OnQueryTextListener {
@@ -113,7 +115,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
     private BottomSheetBehavior bottomSheetBehavior;
 
-    private ArrayList<MarkerDataModel> markerDataModels = new ArrayList<>();
+    private ArrayList<MarkerDataModel> markerPrimaryModels = new ArrayList<>();
     private HashMap<Marker, MarkerDataModel> markerHashMap = new HashMap<>();
 
     private int idFromIntent;
@@ -153,6 +155,30 @@ public class MapsActivity extends BaseNavigationDrawerActivity
             }
         });
 
+        getSupportDrawer(
+                new PrimaryDrawerItem()
+                        .withName("Show people")
+                        .withIcon(GoogleMaterial.Icon.gmd_people)
+                        .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                            @Override
+                            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                                UsersLocationsLoaderTask usersLocationsLoaderTask = new UsersLocationsLoaderTask();
+                                usersLocationsLoaderTask.execute();
+                                return false;
+                            }
+                        }),
+                new PrimaryDrawerItem()
+                        .withName("Test Item")
+                        .withIcon(GoogleMaterial.Icon.gmd_people)
+                        .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                            @Override
+                            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                                Snackbar.make(rootView, "Hi, bro!", Snackbar.LENGTH_LONG).show();
+                                drawerItem.withSetSelected(false);
+                                return false;
+                            }
+                        })
+        );
     }
 
     private void setUpRecyclerView() {
@@ -178,6 +204,16 @@ public class MapsActivity extends BaseNavigationDrawerActivity
             googleApiClient.disconnect();
         } catch (NullPointerException ex) {
             Log.d(TAG, "Can't disconnect. GoogleClientApi == null", ex);
+        }
+
+        try {
+            Log.d(TAG, "Sending location disconnect request...");
+            DisconnectLocationTask disconnectLocationTask = new DisconnectLocationTask(sharedPrefUtils.getToken());
+            disconnectLocationTask.execute();
+        } catch (Exception ex) {
+            Log.e(TAG, "onDestroy() -> Error occurred while disconnecting location. Trying again");
+            DisconnectLocationTask disconnectLocationTask = new DisconnectLocationTask(sharedPrefUtils.getToken());
+            disconnectLocationTask.execute();
         }
 
         Log.d(TAG, "onDestroy()");
@@ -277,7 +313,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
         if (!newText.equals("")) {
             // Searching for results
-            for (MarkerDataModel entry : markerDataModels) {
+            for (MarkerDataModel entry : markerPrimaryModels) {
                 if (entry.getNameFull().toLowerCase().contains(newText.toLowerCase().trim()))
                     dataSearch.add(new MapsSearchDataModel(entry.getNameFull(), entry.getId()));
             }
@@ -287,7 +323,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                 Snackbar.make(rootView, "Ничего не найдено", Snackbar.LENGTH_LONG).show();
             }
         } else {
-            for (MarkerDataModel entry : markerDataModels) {
+            for (MarkerDataModel entry : markerPrimaryModels) {
                 dataSearch.add(new MapsSearchDataModel(entry.getNameFull(), entry.getId()));
             }
         }
@@ -304,7 +340,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                 searchView.onActionViewCollapsed();
 
                 // Zooming to marker
-                zoomToMarker(markerDataModels.get(itemId - 1).getMarker());
+                zoomToMarker(markerPrimaryModels.get(itemId - 1).getMarker());
             }
         });
 
@@ -395,7 +431,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     private void addDefaultSearchViewItems() {
         dataSearch.clear();
 
-        for (MarkerDataModel entry : markerDataModels) {
+        for (MarkerDataModel entry : markerPrimaryModels) {
             dataSearch.add(new MapsSearchDataModel(entry.getNameFull(), entry.getId()));
             Log.d(TAG, "adding search item with/" + "i: " + entry.getId());
 
@@ -413,7 +449,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                 searchView.onActionViewCollapsed();
 
                 // Zooming to marker
-                zoomToMarker(markerDataModels.get(itemId - 1).getMarker());
+                zoomToMarker(markerPrimaryModels.get(itemId - 1).getMarker());
             }
         });
     }
@@ -439,30 +475,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     }
 
     /**
-     * Activity wasn't started from Drawer
-     * Need to open marker
-     */
-    private void openMarkerFromIntent(Marker marker) {
-        if (marker != null) {
-            Log.d(TAG, "openMarkerFromIntent() -> opening marker...");
-
-            //Записываем id текущего маркера в глобальную переменную
-            currentMarkerID = getMarkerId(marker);
-            Log.d(TAG, "openMarkerFromIntent() -> currentMarkerID:  " + Integer.toString(currentMarkerID));
-
-            //Записываем label текущего маркера в глобальную переменную
-            //currentMarkerLabel = university.getCorpsLabel().get(getMarkerId(marker));
-
-            googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
-
-            //openBottomSheet(currentMarkerLabel, university.getCorpsInfoNameFull().get(currentMarkerID));
-            marker.showInfoWindow();
-        } else {
-            Log.e(TAG, "openMarkerFromIntent() marker == null");
-        }
-    }
-
-    /**
      * Setting Up GoogleMap
      */
     private void setUpMap() {
@@ -470,7 +482,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         LatLng nau = new LatLng(50.440259, 30.429853);
         CameraPosition cameraPosition_start = new CameraPosition.Builder()
                 .target(nau)      // Sets the center of the map to NAU
-                .zoom(15)                   // Sets the zoom
+                .zoom(17)                   // Sets the zoom
                 .bearing(160)               // Sets the orientation of the camera to east
                 .tilt(90)
                 .build();                   // Creates a CameraPosition from the builder
@@ -521,6 +533,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
 
                         markerDataModels.add(new MarkerDataModel(
+                                MarkerDataModel.TYPE_PRIMARY,
                                 jsonObject.getInt("id"),
                                 jsonObject.getDouble("lat"),
                                 jsonObject.getDouble("lng"),
@@ -535,6 +548,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                         ));
 
                         Log.d(TAG, "Added new MarkerDataModel with: \n" +
+                                "type: " + MarkerDataModel.TYPE_PRIMARY + "\n" +
                                 "id: " + jsonObject.getInt("id") + "\n" +
                                 "lat: " + jsonObject.getDouble("lat") + "\n" +
                                 "lng: " + jsonObject.getDouble("lng") + "\n" +
@@ -549,7 +563,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
                     }
                 } catch (Exception ex) {
-                    Log.e(TAG, "", ex);
+                    Log.e(TAG, "setUpMap() -> ", ex);
                     return null;
                 }
 
@@ -558,7 +572,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
             @Override
             protected void onPostExecute(ArrayList<MarkerDataModel> markerDataModels) {
-                setMarkerModels(markerDataModels);
+                setMarkerPrimaryModels(markerDataModels);
 
                 if (markerDataModels != null && markerDataModels.size() != 0) {
 
@@ -582,6 +596,11 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                                                     "\nHeight: " + resource.getHeight()
                                             );
                                             marker.setIcon(BitmapDescriptorFactory.fromBitmap(resource));
+                                            try {
+                                                ((FloatingActionButton) findViewById(R.id.fab_route_bsheet)).hide();
+                                            } catch (NullPointerException ex) {
+                                                Log.e(TAG, "setUpMap() ->", ex);
+                                            }
                                             zoomToMarker(marker);
                                         }
                                     });
@@ -617,7 +636,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                 googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
                         .target(getMyCoordinate())
                         .bearing(180)
-                        .zoom(15f)
+                        .zoom(15)
                         .build()));
             }
         });
@@ -643,20 +662,37 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                currentMarkerID = markerHashMap.get(marker).getId() - 1;
+                MarkerDataModel markerDataModel = markerHashMap.get(marker);
+                Log.d(TAG, "onMarkerClick() -> " + markerDataModel.getType());
 
-                openBottomSheet(
-                        markerHashMap.get(marker).getLabel(),
-                        markerHashMap.get(marker).getNameFull(),
-                        markerHashMap.get(marker).getInformation()
-                );
-                Log.d(TAG, "onMarkerClick() -> \nLabel: " + markerHashMap.get(marker).getLabel() + "\nId: " + markerHashMap.get(marker).getId());
+                switch (markerDataModel.getType()) {
+                    case MarkerDataModel.TYPE_PRIMARY: {
+                        currentMarkerID = markerHashMap.get(marker).getId() - 1;
 
-                // Manually open the window
-                marker.showInfoWindow();
+                        openBottomSheet(
+                                markerDataModel.getNameShort(),
+                                markerDataModel.getNameFull(),
+                                markerDataModel.getInformation()
+                        );
+                        Log.d(TAG, "onMarkerClick() -> \nLabel: " + markerHashMap.get(marker).getNameShort() + "\nId: " + markerDataModel.getId());
+
+                        // Manually open the window
+                        marker.showInfoWindow();
+
+                        break;
+                    }
+                    case MarkerDataModel.TYPE_PEOPLE: {
+                        Log.d(TAG, "onMarkerClick() -> Marker type: TYPE_PEOPLE");
+                        Snackbar.make(rootView, markerDataModel.getUniqueId() + "\n" + markerDataModel.getRegisterTime(), Snackbar.LENGTH_LONG).show();
+                        break;
+                    }
+                }
 
                 // Animate to center
-                googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+                        .target(marker.getPosition())
+                        .zoom(18)
+                        .build()));
 
                 return true;
             }
@@ -674,8 +710,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         });
     }
 
-    public void setMarkerModels(ArrayList<MarkerDataModel> markerModels) {
-        this.markerDataModels = markerModels;
+    public void setMarkerPrimaryModels(ArrayList<MarkerDataModel> markerModels) {
+        this.markerPrimaryModels = markerModels;
     }
 
     /**
@@ -698,7 +734,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
             final ImageView sheetCollapsingToolbarBackground = (ImageView) bottomSheetFrame.findViewById(R.id.backdrop);
             final Toolbar sheetToolbar = (Toolbar) bottomSheetFrame.findViewById(R.id.toolbar_bsheet);
             final TextView sheetToolbarTitle = (TextView) findViewById(R.id.toolbar_title_bsheet);
-            final android.support.design.widget.FloatingActionButton sheetFABRoute = (android.support.design.widget.FloatingActionButton) findViewById(R.id.fab_route_bsheet);
+            final FloatingActionButton sheetFABRoute = (FloatingActionButton) findViewById(R.id.fab_route_bsheet);
 
             // Main content
             final SliderLayout sheetContentSlider = (SliderLayout) findViewById(R.id.slider);
@@ -726,7 +762,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                     public void onClick(View v) {
                         try {
                             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                            drawPathToMarker(markerDataModels.get(currentMarkerID).getLatLng());
+                            drawPathToMarker(markerPrimaryModels.get(currentMarkerID).getLatLng());
                         } catch (Exception ex) {
                             Log.e(TAG, "sheetFABRoute -> onclick(): ", ex);
                         }
@@ -753,7 +789,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                                 if (isOnTop) {
                                     sheetOverlapHead.setVisibility(View.INVISIBLE);
                                 } else {
-                                    AnimationSupport.Fade.fadeOut(activityContext, sheetOverlapHead);
+                                    //AnimationSupport.Fade.fadeOut(activityContext, sheetOverlapHead);
+                                    sheetOverlapHead.setVisibility(View.INVISIBLE);
                                 }
 
                                 sheetToolbar.setVisibility(View.INVISIBLE);
@@ -772,19 +809,20 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                             }
 
                             case BottomSheetBehavior.STATE_COLLAPSED: {
-                                AnimationSupport.Fade.fadeIn(activityContext, sheetOverlapHead);
-                                sheetOverlapHeadTitle.setText(markerDataModels.get(currentMarkerID).getNameShort());
-                                sheetOverlapHeadSubtitle.setText(markerDataModels.get(currentMarkerID).getNameFull());
+                                //AnimationSupport.Fade.fadeIn(activityContext, sheetOverlapHead);
+                                sheetOverlapHead.setVisibility(View.VISIBLE);
+                                sheetOverlapHeadTitle.setText(markerPrimaryModels.get(currentMarkerID).getNameShort());
+                                sheetOverlapHeadSubtitle.setText(markerPrimaryModels.get(currentMarkerID).getNameFull());
 
-                                sheetCollapsingToolbarTitle.setText(markerDataModels.get(currentMarkerID).getNameShort());
+                                sheetCollapsingToolbarTitle.setText(markerPrimaryModels.get(currentMarkerID).getNameShort());
 
-                                sheetToolbarTitle.setText(markerDataModels.get(currentMarkerID).getNameFull());
+                                sheetToolbarTitle.setText(markerPrimaryModels.get(currentMarkerID).getNameFull());
                                 sheetToolbar.setVisibility(View.INVISIBLE);
 
                                 sheetFABRoute.setVisibility(View.VISIBLE);
 
                                 /************************** Main container ********************/
-                                sheetContentExpandText.setText(markerDataModels.get(currentMarkerID).getInformation());
+                                sheetContentExpandText.setText(markerPrimaryModels.get(currentMarkerID).getInformation());
 
                                 FABMyLocation.hide();
 
@@ -842,7 +880,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
-    public void openBottomSheet(String title, String subTitle, String info) {
+    public void openBottomSheet(String nameShort, String nameFull, String information) {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         try {
@@ -853,12 +891,12 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
             final ExpandableTextView sheetContentExpandText = (ExpandableTextView) findViewById(R.id.text_expandable);
 
-            sheetOverlapHeadTitle.setText(title);
-            sheetOverlapHeadSubtitle.setText(subTitle);
-            sheetToolbarTitle.setText(subTitle);
-            sheetCollapsingToolbarTitle.setText(title);
+            sheetOverlapHeadTitle.setText(nameShort);
+            sheetOverlapHeadSubtitle.setText(nameFull);
+            sheetToolbarTitle.setText(nameFull);
+            sheetCollapsingToolbarTitle.setText(nameShort);
 
-            sheetContentExpandText.setText(info);
+            sheetContentExpandText.setText(information);
         } catch (Exception ex) {
             Log.e(TAG, "openBottomSheet() -> ", ex);
         }
@@ -892,11 +930,16 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     private void zoomToMarker(Marker marker) {
         currentMarkerID = markerHashMap.get(marker).getId() - 1;
 
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+                .target(marker.getPosition())
+                .zoom(18)
+                .tilt(90)
+                .build()));
+
         marker.showInfoWindow();
-        googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
 
         openBottomSheet(
-                markerHashMap.get(marker).getLabel(),
+                markerHashMap.get(marker).getNameShort(),
                 markerHashMap.get(marker).getNameFull(),
                 markerHashMap.get(marker).getInformation()
         );
@@ -966,61 +1009,46 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         return new MapsDistanceDataModel(minId, minimalDistance);
     }
 
+    /**
+     * Create new instance fo GoogleApiClient & LocationRequest
+     */
     private void initGoogleApiClient() {
-        // Create an instance of GoogleAPIClient.
         if (googleApiClient == null) {
             googleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                         @Override
                         public void onConnected(Bundle bundle) {
-                            /*Log.d(TAG, "googleApiClient/ onConnected()");
+                            Log.d(TAG, "GoogleApiClient -> onConnected()");
 
-                            LocationRequest mLocationRequest = new LocationRequest();
-                            mLocationRequest.setInterval(1000);
-                            mLocationRequest.setFastestInterval(1000);
-                            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                            mLocationRequest.setSmallestDisplacement(0);
+                            if (sharedPrefUtils.getSignedState()) {
+                                LocationRequest locationRequest = new LocationRequest();
+                                locationRequest.setInterval(1000);
+                                locationRequest.setFastestInterval(1000);
+                                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                                locationRequest.setSmallestDisplacement(0);
 
-                            try {
-                                LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, mLocationRequest, new LocationListener() {
-                                    @Override
-                                    public void onLocationChanged(Location location) {
-                                        double distance = GoogleMapUtils.getDistanceBetweenPoints(
-                                                new LatLng(location.getLatitude(), location.getLongitude()), new LatLng(50.437476, 30.428322));
-
-                                        Log.d(TAG, "getDistanceBetweenPoints()/ Distance to NAU == " + distance);
-
-                                        if (distance <= 1.0) {
-                                            Log.d(TAG, "You are in NAU area");
+                                try {
+                                    LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, new LocationListener() {
+                                        @Override
+                                        public void onLocationChanged(Location location) {
+                                            new RegisterLocationTask(location, sharedPrefUtils.getToken()).execute();
                                         }
-
-                                        MapsDistanceDataModel minDistance = findMinDistance(getMyCoordinate(), university.getCorps());
-                                        isSnackBarDistanceShowing = true;
-                                        final Snackbar snackbarD = Snackbar.make(rootView, university.getCorpsLabel().get(minDistance.getMinId())
-                                                + " -> " + minDistance.getDistance(), Snackbar.LENGTH_INDEFINITE);
-                                        snackbarD.setAction("Ok. bro", new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                snackbarD.dismiss();
-                                                isSnackBarDistanceShowing = false;
-                                            }
-                                        }).show();
-                                    }
-                                });
-                            } catch (SecurityException e) {
-                                e.printStackTrace();
-                            }*/
+                                    });
+                                } catch (SecurityException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
 
                         @Override
                         public void onConnectionSuspended(int i) {
-                            Log.d(TAG, "googleApiClient/ onConnectionSuspended()");
+                            Log.d(TAG, "GoogleApiClient -> onConnectionSuspended()");
                         }
                     })
                     .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
                         @Override
-                        public void onConnectionFailed(ConnectionResult connectionResult) {
-                            Log.d(TAG, "googleApiClient/ onConnectionFailed()");
+                        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                            Log.d(TAG, "GoogleApiClient() -> onConnectionFailed() -> " + connectionResult.getErrorMessage());
                         }
                     })
                     .addApi(LocationServices.API)
@@ -1028,6 +1056,236 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         }
 
         googleApiClient.connect();
+    }
+
+    public class RegisterLocationTask extends AsyncTask<Void, Void, String> {
+        private APIHTTPUtils httpUtils = new APIHTTPUtils();
+        private HashMap<String, String> params = new HashMap<>();
+        private Location location;
+        private String token;
+
+        public RegisterLocationTask(Location location, String token) {
+            this.location = location;
+            this.token = token;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            Log.d(TAG, "RegisterLocationTask -> onPreExecute() -> Preparing to send location...");
+        }
+
+        @Override
+        protected String doInBackground(Void... args) {
+            Log.d(TAG, "RegisterLocationTask -> doInBackground() -> Sending started");
+
+            if (location != null && !token.trim().equalsIgnoreCase("")) {
+                params.put("token", token);
+                params.put("lat", Double.toString(location.getLatitude()));
+                params.put("lng", Double.toString(location.getLongitude()));
+            } else {
+                Log.e(TAG, "RegisterLocationTask -> doInBackground() -> Bad token of LatLng");
+                return null;
+            }
+
+            return httpUtils.sendPostRequestWithParams(APIUrl.RequestUrl.REGISTER_LOCATION, params);
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            if (response == null) {
+                Log.e(TAG, "RegisterLocationTask -> onPostExecute() -> response is null");
+                return;
+            }
+
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                String errorStatus = jsonObject.getString("error");
+                if (errorStatus.equalsIgnoreCase("true")) {
+                    Log.e(TAG, "RegisterLocationTask -> onPostExecute() -> Error occurred while sending coordinates" +
+                            "Error message: " + jsonObject.getString("error_msg"));
+                } else if (errorStatus.equalsIgnoreCase("false")) {
+                    // Coordinates sent successfully
+                    Log.d(TAG, "RegisterLocationTask -> onPostExecute() -> Coordinates sent successfully" +
+                            "\nLatitude: " + location.getLatitude() +
+                            "\nLongitude: " + location.getLongitude() +
+                            "\nToken: " + token);
+                } else {
+                    Log.e(TAG, "RegisterLocationTask -> onPostExecute() -> Unknown error");
+                }
+            } catch (Exception ex) {
+                Log.e(TAG, "RegisterLocationTask -> onPostExecute() -> ", ex);
+            }
+        }
+    }
+
+    public class DisconnectLocationTask extends AsyncTask<Void, Void, String> {
+        private APIHTTPUtils httpUtils = new APIHTTPUtils();
+        private HashMap<String, String> params = new HashMap<>();
+        private String token;
+
+        public DisconnectLocationTask(String token) {
+            this.token = token;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            Log.d(TAG, "DisconnectLocationTask -> onPreExecute() -> Preparing to send disconnecting request...");
+        }
+
+        @Override
+        protected String doInBackground(Void... args) {
+            Log.d(TAG, "DisconnectLocationTask -> doInBackground() -> Sending started");
+
+            if (!token.trim().equalsIgnoreCase("")) {
+                params.put("token", token);
+            } else {
+                Log.e(TAG, "DisconnectLocationTask -> doInBackground() -> Token is empty");
+                return null;
+            }
+
+            return httpUtils.sendPostRequestWithParams(APIUrl.RequestUrl.DISCONNECT_LOCATION, params);
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            if (response == null) {
+                Log.e(TAG, "DisconnectLocationTask -> onPostExecute() -> response is null");
+                tryAgain();
+                return;
+            }
+
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                String errorStatus = jsonObject.getString("error");
+                if (errorStatus.equalsIgnoreCase("true")) {
+                    Log.e(TAG, "DisconnectLocationTask -> onPostExecute() -> Error occurred while disconnecting.\nTrying again..." +
+                            "Error message: " + jsonObject.getString("error_msg"));
+
+                    tryAgain();
+                } else if (errorStatus.equalsIgnoreCase("false")) {
+                    Log.d(TAG, "DisconnectLocationTask -> onPostExecute() -> Location disconnected" +
+                            "\nToken: " + token);
+                } else {
+                    Log.e(TAG, "DisconnectLocationTask -> onPostExecute() -> Unknown error");
+                }
+            } catch (Exception ex) {
+                Log.e(TAG, "DisconnectLocationTask -> onPostExecute() -> ", ex);
+            }
+        }
+
+        private void tryAgain() {
+            DisconnectLocationTask disconnectLocationTask = new DisconnectLocationTask(token);
+            disconnectLocationTask.execute();
+        }
+    }
+
+    public class UsersLocationsLoaderTask extends AsyncTask<Void, Void, String> {
+        private APIHTTPUtils httpUtils = new APIHTTPUtils();
+        private HashMap<String, String> params = new HashMap<>();
+        private ArrayList<MarkerDataModel> markerDataModels = new ArrayList<>();
+
+        @Override
+        protected void onPreExecute() {
+            Log.d(TAG, "UsersLocationsLoaderTask -> onPreExecute() -> Preparing to send disconnecting request...");
+        }
+
+        @Override
+        protected String doInBackground(Void... args) {
+            Log.d(TAG, "UsersLocationsLoaderTask -> doInBackground() -> Sending started");
+
+            String response = httpUtils.sendPostRequestWithParams(APIUrl.RequestUrl.GET_LOCATIONS, params);
+            Log.d(TAG, "UsersLocationsLoaderTask -> doInBackground() -> Server response: " + response);
+
+            if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                return APIHTTPUtils.ERROR_CONNECTION;
+            } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                return APIHTTPUtils.ERROR_SERVER;
+            } else if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                return APIHTTPUtils.ERROR_CONNECTION_TIMED_OUT;
+            } else {
+                try {
+
+                    JSONArray jsonArray = new JSONArray(response);
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                        markerDataModels.add(new MarkerDataModel(
+                                MarkerDataModel.TYPE_PEOPLE,
+                                jsonObject.getInt("id"),
+                                jsonObject.getDouble("lat"),
+                                jsonObject.getDouble("lng"),
+                                jsonObject.getString("photo_url"),
+                                jsonObject.getString("user_unique_id"),
+                                jsonObject.getString("registered_at")
+                        ));
+
+                        Log.d(TAG, "UsersLocationsLoaderTask -> doInBackground() -> Added new MarkerDataModel with: " +
+                                "\ntype: " + MarkerDataModel.TYPE_PEOPLE +
+                                "\nid: " + jsonObject.getInt("id") +
+                                "\nlat: " + jsonObject.getDouble("lat") +
+                                "\nlng: " + jsonObject.getDouble("lng") +
+                                "\nphoto_url: " + jsonObject.getString("photo_url") +
+                                "\nuser_unique_id: " + jsonObject.getString("user_unique_id") +
+                                "\nregistered_at: " + jsonObject.getString("registered_at"));
+
+                    }
+
+                } catch (Exception ex) {
+                    Log.e(TAG, "UsersLocationsLoaderTask -> doInBackground() -> ", ex);
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            if (response != null) {
+                if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_SERVER)) {
+                    Log.e(TAG, "UsersLocationsLoaderTask -> onPostExecute() -> ERROR_SERVER");
+                    return;
+                }
+                if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                    Log.e(TAG, "UsersLocationsLoaderTask -> onPostExecute() -> ERROR_CONNECTION");
+                    return;
+                }
+                if (response.equalsIgnoreCase(APIHTTPUtils.ERROR_CONNECTION)) {
+                    Log.e(TAG, "UsersLocationsLoaderTask -> onPostExecute() -> ERROR_CONNECTION");
+                    return;
+                }
+            }
+
+            for (int i = 0; i < markerDataModels.size(); i++) {
+                MarkerDataModel markerDataModel = markerDataModels.get(i);
+
+                final Marker marker = googleMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(markerDataModel.getLat(), markerDataModel.getLng()))
+                        .title(markerDataModel.getUniqueId()));
+
+                Glide
+                        .with(activityContext)
+                        .load(markerDataModel.getPhotoUrl())
+                        .asBitmap()
+                        .override(
+                                (int) Utils.convertDpToPixel(40, activityContext),
+                                (int) Utils.convertDpToPixel(40, activityContext)
+                        )
+                        .into(new SimpleTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                Log.d(TAG, "Glide -> Bitmap loaded: " +
+                                        "\nWidth: " + resource.getWidth() +
+                                        "\nHeight: " + resource.getHeight()
+                                );
+                                marker.setIcon(BitmapDescriptorFactory.fromBitmap(resource));
+                            }
+                        });
+
+                markerDataModel.setMarker(marker);
+                markerHashMap.put(marker, markerDataModel);
+            }
+        }
     }
 
     private void hideKeyboard() {
@@ -1044,5 +1302,4 @@ public class MapsActivity extends BaseNavigationDrawerActivity
             }
         }
     }
-
 }

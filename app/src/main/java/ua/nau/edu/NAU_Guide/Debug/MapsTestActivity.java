@@ -76,7 +76,6 @@ import ua.nau.edu.Support.System.HardwareChecks;
 import ua.nau.edu.Support.System.Utils;
 import ua.nau.edu.Support.View.AnimationSupport;
 import ua.nau.edu.Support.View.SearchViewUtils;
-import ua.nau.edu.University.NAU;
 
 public class MapsTestActivity extends BaseNavigationDrawerActivity
         implements SearchView.OnQueryTextListener {
@@ -519,6 +518,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
 
                         markerDataModels.add(new MarkerDataModel(
+                                1,
                                 jsonObject.getInt("id"),
                                 jsonObject.getDouble("lat"),
                                 jsonObject.getDouble("lng"),
@@ -570,7 +570,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
 
                         Glide
                                 .with(activityContext)
-                                .load(markerDataModel.getIcon())
+                                .load(markerDataModel.getPhotoUrl())
                                 .asBitmap()
                                 .into(new SimpleTarget<Bitmap>() {
                                     @Override
@@ -668,7 +668,7 @@ public class MapsTestActivity extends BaseNavigationDrawerActivity
             final ImageView sheetCollapsingToolbarBackground = (ImageView) bottomSheetFrame.findViewById(R.id.backdrop);
             final Toolbar sheetToolbar = (Toolbar) bottomSheetFrame.findViewById(R.id.toolbar_bsheet);
             final TextView sheetToolbarTitle = (TextView) findViewById(R.id.toolbar_title_bsheet);
-            final android.support.design.widget.FloatingActionButton sheetFABRoute = (android.support.design.widget.FloatingActionButton) findViewById(R.id.fab_route_bsheet);
+            final FloatingActionButton sheetFABRoute = (FloatingActionButton) findViewById(R.id.fab_route_bsheet);
 
             // Main content
             final SliderLayout sheetContentSlider = (SliderLayout) findViewById(R.id.slider);

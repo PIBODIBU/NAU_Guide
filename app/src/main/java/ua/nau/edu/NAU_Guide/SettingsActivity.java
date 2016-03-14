@@ -13,21 +13,28 @@ import android.widget.LinearLayout;
 import ua.nau.edu.Dialogs.Settings.DebugListDialog;
 import ua.nau.edu.Dialogs.Settings.MapLayerDialog;
 import ua.nau.edu.Dialogs.Settings.PrefsListDialog;
+import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 
 public class SettingsActivity extends BaseToolbarActivity {
 
     public static final String TAG = "SettingsActivity";
+
+    SharedPrefUtils sharedPrefUtils;
+
     private LinearLayout rootView;
 
     private ImageButton itemDebug;
     private ImageButton itemPrefs;
     private ImageButton itemMapLayer;
     private AppCompatCheckBox itemMapPeople;
+    private AppCompatCheckBox itemMapMyLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        sharedPrefUtils = new SharedPrefUtils(this);
 
         getToolbar();
         setToolbarTitle("Настройки");
@@ -37,6 +44,7 @@ public class SettingsActivity extends BaseToolbarActivity {
         itemPrefs = (ImageButton) findViewById(R.id.itemPrefs);
         itemMapLayer = (ImageButton) findViewById(R.id.itemMapLayer);
         itemMapPeople = (AppCompatCheckBox) findViewById(R.id.itemMapPeople);
+        itemMapMyLocation = (AppCompatCheckBox) findViewById(R.id.itemMapMyLocation);
 
         itemDebug.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,6 +79,14 @@ public class SettingsActivity extends BaseToolbarActivity {
                 else
                     Snackbar.make(rootView, "Unchecked", Snackbar.LENGTH_SHORT).show();
 
+            }
+        });
+
+        itemMapMyLocation.setChecked(sharedPrefUtils.getMyLocationVisibility());
+        itemMapMyLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                sharedPrefUtils.setMyLocationVisibility(isChecked);
             }
         });
     }

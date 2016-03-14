@@ -144,14 +144,14 @@
                             android:layout_marginEnd="4dp"
                             android:layout_marginRight="4dp"
                             android:layout_marginTop="4dp"
-                            android:layout_toLeftOf="@+id/itemMapMy"
-                            android:layout_toStartOf="@+id/itemMapMy"
+                            android:layout_toLeftOf="@+id/itemMapMyLocation"
+                            android:layout_toStartOf="@+id/itemMapMyLocation"
                             android:text="Показавать мое месторасположение на карте"
                             android:textColor="@color/colorTextSecondary"
                             android:textSize="14sp" />
 
                         <android.support.v7.widget.AppCompatCheckBox
-                            android:id="@+id/itemMapMy"
+                            android:id="@+id/itemMapMyLocation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"

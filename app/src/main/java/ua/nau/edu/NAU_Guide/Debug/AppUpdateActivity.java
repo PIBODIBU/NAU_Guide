@@ -39,10 +39,7 @@ public class AppUpdateActivity extends BaseNavigationDrawerActivity {
     private TextView versionAvailableTV;
     private AppCompatButton button;
     private MaterialProgressBar progressBarDet;
-    private MaterialProgressBar progressBarIntdet;
-
-    private String currentVersion;
-    private String availableVersion;
+    private MaterialProgressBar progressBarIndet;
 
     private UpdateUtils updateUtils;
     private final CheckUtils checkUtils = new CheckUtils();
@@ -60,7 +57,7 @@ public class AppUpdateActivity extends BaseNavigationDrawerActivity {
         versionAvailableTV = (TextView) findViewById(R.id.version_available);
         button = (AppCompatButton) findViewById(R.id.update_check);
         progressBarDet = (MaterialProgressBar) findViewById(R.id.progressBar_det);
-        progressBarIntdet = (MaterialProgressBar) findViewById(R.id.progressBar_indet);
+        progressBarIndet = (MaterialProgressBar) findViewById(R.id.progressBar_indet);
 
         String currentVersion = versionCurrentTV.getText() + getString(R.string.app_version);
         versionCurrentTV.setText(currentVersion);
@@ -104,7 +101,7 @@ public class AppUpdateActivity extends BaseNavigationDrawerActivity {
 
         @Override
         protected void onPreExecute() {
-            progressBarIntdet.setVisibility(View.VISIBLE);
+            progressBarIndet.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -128,11 +125,11 @@ public class AppUpdateActivity extends BaseNavigationDrawerActivity {
                     String availableVersion = versionAvailableTV.getText() + jsonObject.getString("version");
 
                     versionAvailableTV.setText(availableVersion);
-                    progressBarIntdet.setVisibility(View.INVISIBLE);
+                    progressBarIndet.setVisibility(View.INVISIBLE);
                     button.setText(BUTTON_UPDATE);
 
                 } else {
-                    progressBarIntdet.setVisibility(View.INVISIBLE);
+                    progressBarIndet.setVisibility(View.INVISIBLE);
                     Log.e(TAG, "Error while sending post request. Error message: " + jsonObject.getString("error_msg"));
                 }
             } catch (JSONException ex) {

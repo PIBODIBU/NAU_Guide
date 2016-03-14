@@ -4,7 +4,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -19,7 +18,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.vk.sdk.api.VKApi;
@@ -29,6 +27,7 @@ import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -36,6 +35,8 @@ import java.util.HashMap;
 
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.API.APIHTTPUtils;
+import ua.nau.edu.API.APIUrl;
+import ua.nau.edu.Dialogs.NewAppVersionDialog;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.RecyclerViews.MainActivity.MainActivityAdapter;
 import ua.nau.edu.RecyclerViews.MainActivity.MainActivityDataModel;
@@ -47,7 +48,7 @@ public class MainActivity extends BaseNavigationDrawerActivity {
     public MainActivity() {
     }
 
-    private static final String TAG = "MainActivity";
+    private final String TAG = getClass().getSimpleName();
 
     private static final String JUST_SIGNED_KEY = EnumSharedPreferences.JUST_SIGNED_KEY.toString();
     private static final String EXIT_KEY = EnumSharedPreferences.EXIT.toString();
@@ -74,11 +75,6 @@ public class MainActivity extends BaseNavigationDrawerActivity {
             finish();
         }
 
-        getDrawer(
-                sharedPrefUtils.getName(),
-                sharedPrefUtils.getEmail()
-        );
-
         if (!sharedPrefUtils.getToken().equals(""))
             checkToken(sharedPrefUtils.getToken());
 
@@ -87,9 +83,12 @@ public class MainActivity extends BaseNavigationDrawerActivity {
 
         rootView = (RelativeLayout) findViewById(R.id.main_activity);
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-        recyclerView.setHasFixedSize(true);
-
         layoutManager = new LinearLayoutManager(this);
+        try {
+            recyclerView.setHasFixedSize(true);
+        } catch (NullPointerException ex) {
+            Log.e(TAG, "onCreate() -> ", ex);
+        }
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -105,9 +104,15 @@ public class MainActivity extends BaseNavigationDrawerActivity {
                     UniData.getCorpsGerb().get(i)
             ));
         }
-
         adapter = new MainActivityAdapter(data, this, this);
         recyclerView.setAdapter(adapter);
+
+        getDrawer(
+                sharedPrefUtils.getName(),
+                sharedPrefUtils.getEmail()
+        );
+
+        checkVersion(getString(R.string.app_version));
 
         /******************************************************
          * GOOGLE SERVICE, IF YOU KNOW WHAT I'M TALKING ABOUT *
@@ -138,16 +143,9 @@ public class MainActivity extends BaseNavigationDrawerActivity {
         }
         return false;
     }
+
     /******************************************************
      ******************************************************/
-
-    public static int pxToDp(int px) {
-        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
-    }
-
-    public static int dpToPx(int dp) {
-        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
-    }
 
     public View getRootView() {
         return rootView;
@@ -217,24 +215,6 @@ public class MainActivity extends BaseNavigationDrawerActivity {
         dialog.show();
     }
 
-    public void toastShowLong(String TEXT) {
-        Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_LONG).show();
-    }
-
-    public void toastShowShort(String TEXT) {
-        Toast.makeText(getApplicationContext(), TEXT, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
     @Override
     protected void onResume() {
         getCurrentSelection();
@@ -280,7 +260,7 @@ public class MainActivity extends BaseNavigationDrawerActivity {
                 HashMap<String, String> data = new HashMap<>();
                 data.put("token", params[0]);
 
-                String response = apiUtils.sendPostRequestWithParams("http://nauguide.esy.es/include/checkToken.php", data);
+                String response = apiUtils.sendPostRequestWithParams(APIUrl.RequestUrl.CHECK_TOKEN, data);
 
                 if (response.equalsIgnoreCase("error_connection")) {
                     Log.e(TAG, "Can't check token: No Internet avalible");
@@ -321,4 +301,45 @@ public class MainActivity extends BaseNavigationDrawerActivity {
         }.execute(token);
     }
 
+    private void checkVersion(final String version) {
+        new AsyncTask<Void, Void, String>() {
+
+            private final APIHTTPUtils httpUtils = new APIHTTPUtils();
+            private final String currentVersion = version;
+
+            @Override
+            protected String doInBackground(Void... params) {
+                HashMap<String, String> requestGetVersionParams = new HashMap<>();
+                requestGetVersionParams.put("action", "getVersion");
+
+                return httpUtils.sendPostRequestWithParams(APIUrl.RequestUrl.API, requestGetVersionParams);
+            }
+
+            @Override
+            protected void onPostExecute(String response) {
+                try {
+                    Log.d(TAG, "CheckUtils -> Server response:\n" + response);
+
+                    JSONObject jsonObject = new JSONObject(response);
+
+                    if (jsonObject.getString("error").equalsIgnoreCase("false")) {
+                        String newVersion = jsonObject.getString("version");
+
+                        Log.d(TAG, "Available version: " + newVersion);
+                        Log.d(TAG, "Current version: " + currentVersion);
+
+                        if (!newVersion.trim().equalsIgnoreCase(currentVersion)) {
+                            NewAppVersionDialog dialog = new NewAppVersionDialog();
+                            dialog.init(MainActivity.this, MainActivity.this, newVersion);
+                            dialog.show(getSupportFragmentManager(), "NewAppVersionDialog");
+                        }
+                    } else {
+                        Log.e(TAG, "Error while checking version. Error message: " + jsonObject.getString("error_msg"));
+                    }
+                } catch (JSONException ex) {
+                    Log.e(TAG, "onCreate() -> onPostExecute() -> ", ex);
+                }
+            }
+        }.execute();
+    }
 }

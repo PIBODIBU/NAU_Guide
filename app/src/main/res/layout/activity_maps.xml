@@ -16,21 +16,15 @@
         tools:context="ua.nau.edu.NAU_Guide.MapsActivity"
         tools:layout="@layout/fragment_maps" />
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <include
-            android:id="@+id/toolbar"
-            layout="@layout/toolbar" />
-    </android.support.design.widget.AppBarLayout>
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right|end"
+        android:layout_gravity="bottom|end"
         android:layout_marginBottom="@dimen/fab_margin_map"
         android:layout_marginEnd="@dimen/fab_margin_map"
         android:layout_marginRight="@dimen/fab_margin_map"

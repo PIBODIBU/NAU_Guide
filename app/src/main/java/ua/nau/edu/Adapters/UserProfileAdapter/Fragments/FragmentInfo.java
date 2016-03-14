@@ -229,7 +229,7 @@ public class FragmentInfo extends Fragment {
                 HashMap<String, String> data = new HashMap<>();
                 data.put("unique_id", params[0]);
 
-                String response = apiUtils.sendPostRequestWithParams(APIUrl.RequestUrl.GET_PAGE, data);
+                String response = apiUtils.sendPostRequestWithParams(APIUrl.RequestUrl.GET_USER_PAGE, data);
 
                 if (response.equalsIgnoreCase("error_connection")) {
                     supportActivity.runOnUiThread(new Runnable() {

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -95,6 +96,25 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
 
         TextView title = (TextView) findViewById(R.id.toolbar_title);
         title.setText(text);
+    }
+
+    /**
+     * Initialize new Drawer with position right of screen
+     *
+     * @param items - PrimaryDrawerItems, which will be added to Drawer
+     */
+    public void getSupportDrawer(PrimaryDrawerItem... items) {
+        new DrawerBuilder()
+                .withActivity(this)
+                .withActionBarDrawerToggle(false)
+                .withActionBarDrawerToggleAnimated(false)
+                .withHeaderDivider(false)
+                .addDrawerItems(
+                        items
+                )
+                .withDrawerWidthPx(getResources().getDisplayMetrics().widthPixels)
+                .withDrawerGravity(Gravity.END)
+                .append(drawer);
     }
 
     /**

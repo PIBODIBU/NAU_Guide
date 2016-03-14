@@ -32,6 +32,7 @@
         android:layout_marginRight="16dp"
         android:hint="Логин"
         app:errorEnabled="true"
+        app:errorTextAppearance="@style/AppTheme.TextInputLayout.ErrorAppearance"
         app:theme="@style/AppTheme.TextInputLayout">
 
         <android.support.v7.widget.AppCompatEditText
@@ -39,7 +40,7 @@
             android:layout_height="wrap_content"
             android:inputType="text"
             android:maxLines="1"
-            android:textColor="@color/black"
+            android:textColor="@color/colorTextPrimary"
             app:theme="@style/AppTheme.TextInputLayout.EditText" />
 
     </android.support.design.widget.TextInputLayout>
@@ -54,6 +55,7 @@
         android:layout_marginTop="8dp"
         android:hint="Пароль"
         app:errorEnabled="true"
+        app:errorTextAppearance="@style/AppTheme.TextInputLayout.ErrorAppearance"
         app:theme="@style/AppTheme.TextInputLayout">
 
         <android.support.v7.widget.AppCompatEditText
@@ -61,7 +63,7 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:maxLines="1"
-            android:textColor="@color/black"
+            android:textColor="@color/colorTextPrimary"
             app:theme="@style/AppTheme.TextInputLayout.EditText" />
 
     </android.support.design.widget.TextInputLayout>

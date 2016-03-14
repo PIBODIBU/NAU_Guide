@@ -8,24 +8,41 @@ import com.google.android.gms.maps.model.Marker;
 
 public class MarkerDataModel {
 
+    public MarkerDataModel() {
+    }
+
     private final String TAG = "MarkerDataModel";
 
-    private Marker marker;
+    public static final int TYPE_PRIMARY = 1;
+    public static final int TYPE_PEOPLE = 2;
 
+    private int type;
     private int id;
     private double lat;
     private double lng;
+    private Marker marker;
+
+    /**
+     * TYPE_PRIMARY
+     **/
     private String icon;
     private String label;
     private String nameShort;
     private String nameFull;
     private String phone;
-
     private String information;
     private String website;
     private String sliderImages;
 
-    public MarkerDataModel(int id,
+    /**
+     * TYPE_PEOPLE
+     **/
+    private String photoUrl;
+    private String uniqueId;
+    private String registerTime;
+
+    public MarkerDataModel(int type,
+                           int id,
                            double lat,
                            double lng,
                            String icon,
@@ -36,6 +53,8 @@ public class MarkerDataModel {
                            String information,
                            String website,
                            String sliderImages) {
+
+        this.type = type;
         this.id = id;
         this.lat = lat;
         this.lng = lng;
@@ -49,9 +68,28 @@ public class MarkerDataModel {
         this.sliderImages = sliderImages;
     }
 
+    public MarkerDataModel(int type,
+                           int id,
+                           double lat,
+                           double lng,
+                           String photoUrl,
+                           String uniqueId,
+                           String registerTime) {
+        this.type = type;
+        this.lat = lat;
+        this.lng = lng;
+        this.photoUrl = photoUrl;
+        this.uniqueId = uniqueId;
+        this.registerTime = registerTime;
+    }
+
     /**
      * Getters
      */
+
+    public int getType() {
+        return type;
+    }
 
     @Nullable
     public Marker getMarker() {
@@ -69,6 +107,10 @@ public class MarkerDataModel {
     public double getLng() {
         return lng;
     }
+
+    /**
+     * TYPE_PRIMARY
+     **/
 
     public String getIcon() {
         return icon;
@@ -100,6 +142,22 @@ public class MarkerDataModel {
 
     public String getWebsite() {
         return website;
+    }
+
+
+    /**
+     * TYPE_PEOPLE
+     **/
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    public String getRegisterTime() {
+        return registerTime;
     }
 
 

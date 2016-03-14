@@ -13,6 +13,14 @@ public class APIUrl {
         /**
          * Required params:
          * <p/>
+         * username - username of user for login
+         * password - user's password for login
+         */
+        public static final String LOGIN_URL = "http://nauguide.esy.es/include/login.php";
+
+        /**
+         * Required params:
+         * <p/>
          * token - user access token
          * post_id - id of post to delete
          */
@@ -34,6 +42,13 @@ public class APIUrl {
 
         /**
          * Required params:
+         * <p/>
+         * No params is required
+         */
+        public static final String GET_USER_ALL = "http://nauguide.esy.es/include/getUsers.php";
+
+        /**
+         * Required params:
          */
         public static final String GET_POST_ALL = "http://nauguide.esy.es/include/getPostAll.php";
 
@@ -49,8 +64,39 @@ public class APIUrl {
 
         /**
          * Required params:
+         * <p/>
+         * unique_id - unique id of user
          */
-        public static final String GET_PAGE = "http://nauguide.esy.es/include/getLector.php";
+        public static final String GET_USER_PAGE = "http://nauguide.esy.es/include/getUser.php";
+
+        /**
+         * Required params:
+         * <p/>
+         * token - token for check
+         */
+        public static String CHECK_TOKEN = "http://nauguide.esy.es/include/checkToken.php";
+
+        /**
+         * Required params:
+         * <p/>
+         * token - user's token
+         * lat - user's latitude
+         * lng - user's longitude
+         */
+        public static String REGISTER_LOCATION = "http://nauguide.esy.es/include/registerLocation";
+
+        /**
+         * Required params:
+         * <p/>
+         * token - user's token
+         */
+        public static String DISCONNECT_LOCATION = "http://nauguide.esy.es/include/disconnectLocation";
+
+        /**
+         * Required params:
+         * <p/>
+         */
+        public static String GET_LOCATIONS = "http://nauguide.esy.es/include/getLocations";
     }
 
     public static class ImageUrl {

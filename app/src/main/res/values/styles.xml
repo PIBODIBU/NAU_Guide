@@ -32,7 +32,9 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:windowIsFloating">false</item>
-        <item name="android:windowAnimationStyle">@style/AppTheme.MaterialDialogSheet.MaterialDialogSheetAnimation</item>
+        <item name="android:windowAnimationStyle">
+            @style/AppTheme.MaterialDialogSheet.MaterialDialogSheetAnimation
+        </item>
     </style>
 
     <style name="AppTheme.MaterialDialogSheet.MaterialDialogSheetAnimation">
@@ -91,6 +93,10 @@
         <item name="android:textColorLink">@color/colorAppPrimary</item>
     </style>
 
+    <style name="AppTheme.TextInputLayout.ErrorAppearance" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/md_red_500</item>
+        <item name="android:textSize">12sp</item>
+    </style>
 
     <style name="AppTheme.TextInputLayout.EditText">// EditText in TextInputLayout
         <item name="android:textSize">15sp</item>

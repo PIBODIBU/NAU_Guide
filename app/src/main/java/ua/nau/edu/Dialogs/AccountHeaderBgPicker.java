@@ -38,7 +38,7 @@ public class AccountHeaderBgPicker extends DialogFragment {
 
         dialogBuilder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View mainLayout = inflater.inflate(R.layout.accountheader_bg_picker, null);
+        View mainLayout = inflater.inflate(R.layout.dialog_bg_picker, null);
         final SliderLayout sliderLayout = (SliderLayout) mainLayout.findViewById(R.id.slider);
 
         /**

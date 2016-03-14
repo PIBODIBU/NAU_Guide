@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.HashMap;
 
+import ua.nau.edu.API.APIUrl;
 import ua.nau.edu.Enum.EnumSharedPreferences;
 import ua.nau.edu.API.APIHTTPUtils;
 import ua.nau.edu.API.APIDialogs;
@@ -48,7 +49,6 @@ import ua.nau.edu.Support.SharedPrefUtils.SharedPrefUtils;
 
 public class LoginActivity extends BaseToolbarActivity {
 
-    private static final String LOGIN_URL = "http://nauguide.esy.es/include/log.php";
     private static final String TAG = "LoginActivity";
 
     /***
@@ -325,7 +325,7 @@ public class LoginActivity extends BaseToolbarActivity {
                 data.put("password", params[1]);
 
                 APIHTTPUtils httpUtils = new APIHTTPUtils();
-                return httpUtils.sendPostRequestWithParams(LOGIN_URL, data);
+                return httpUtils.sendPostRequestWithParams(APIUrl.RequestUrl.LOGIN_URL, data);
             }
 
             @Override

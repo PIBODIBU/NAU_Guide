@@ -17,5 +17,5 @@
     <dimen name="settings_title_padding_bottom">8dp</dimen>
 
     <dimen name="fab_margin_default">8dp</dimen>
-    <dimen name="fab_margin_map">24dp</dimen>
+    <dimen name="fab_margin_map">16dp</dimen>
 </resources>
