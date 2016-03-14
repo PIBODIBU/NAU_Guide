@@ -14,8 +14,6 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -68,6 +66,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import ua.nau.edu.API.APIDialogs;
 import ua.nau.edu.API.APIHTTPUtils;
@@ -75,6 +75,7 @@ import ua.nau.edu.API.APIUrl;
 import ua.nau.edu.NAU_Guide.Debug.MapsDistanceDataModel;
 import ua.nau.edu.RecyclerViews.MapsActivity.Search.MapsSearchAdapter;
 import ua.nau.edu.RecyclerViews.MapsActivity.Search.MapsSearchDataModel;
+import ua.nau.edu.Support.Glide.CircleTransform;
 import ua.nau.edu.Support.GoogleMap.GoogleMapUtils;
 import ua.nau.edu.Support.GoogleMap.MarkerDataModel;
 import ua.nau.edu.Support.GoogleMap.RouteDrawer.Route;
@@ -116,9 +117,11 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     private BottomSheetBehavior bottomSheetBehavior;
 
     private ArrayList<MarkerDataModel> markerPrimaryModels = new ArrayList<>();
-    private HashMap<Marker, MarkerDataModel> markerHashMap = new HashMap<>();
+    private HashMap<Marker, MarkerDataModel> markerAllHashMap = new HashMap<>();
+    private ArrayList<Marker> markerPeopleArrayList = new ArrayList<>();
 
     private int idFromIntent;
+    private Timer usersLocationsLoaderTaskTimer = new Timer();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,7 +150,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         );
 
         FABMyLocation = (FloatingActionButton) findViewById(R.id.fab_location);
-
         FABMyLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,30 +157,56 @@ public class MapsActivity extends BaseNavigationDrawerActivity
             }
         });
 
-        getSupportDrawer(
+        View view = getLayoutInflater().inflate(R.layout.drawer_view, null);
+        TextView textView = (TextView) view.findViewById(R.id.text);
+
+        getSupportDrawer(textView,
                 new PrimaryDrawerItem()
                         .withName("Show people")
+                        .withIdentifier(1)
                         .withIcon(GoogleMaterial.Icon.gmd_people)
                         .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                            private boolean isTimerStarted = false;
+
                             @Override
                             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                                UsersLocationsLoaderTask usersLocationsLoaderTask = new UsersLocationsLoaderTask();
-                                usersLocationsLoaderTask.execute();
+                                if (!isTimerStarted) {
+                                    Log.d(TAG, "onItemClick() -> Timer started");
+
+                                    isTimerStarted = true;
+                                    usersLocationsLoaderTaskTimer = new Timer();
+                                    TimerTask doAsynchronousTask = new TimerTask() {
+                                        @Override
+                                        public void run() {
+                                            UsersLocationsLoaderTask usersLocationsLoaderTask = new UsersLocationsLoaderTask();
+                                            usersLocationsLoaderTask.execute();
+                                        }
+                                    };
+                                    usersLocationsLoaderTaskTimer.schedule(doAsynchronousTask, 0, 5 * 1000);
+                                } else {
+                                    Log.d(TAG, "onItemClick() -> Timer canceled");
+
+                                    isTimerStarted = false;
+                                    usersLocationsLoaderTaskTimer.cancel();
+                                }
                                 return false;
                             }
                         }),
                 new PrimaryDrawerItem()
-                        .withName("Test Item")
+                        .withName("Push me hard")
+                        .withIdentifier(2)
                         .withIcon(GoogleMaterial.Icon.gmd_people)
                         .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                             @Override
                             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                                 Snackbar.make(rootView, "Hi, bro!", Snackbar.LENGTH_LONG).show();
-                                drawerItem.withSetSelected(false);
+                                getSupportDrawer().deselect(2);
                                 return false;
                             }
                         })
         );
+
+        getSupportDrawer().setSelection(-1);
     }
 
     private void setUpRecyclerView() {
@@ -200,10 +228,18 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     @Override
     protected void onDestroy() {
         try {
+            Log.d(TAG, "Canceling Timer...");
+            usersLocationsLoaderTaskTimer.cancel();
+        } catch (NullPointerException ex) {
+            Log.d(TAG, "Can't cancel Timer -> ", ex);
+        }
+
+
+        try {
             Log.d(TAG, "Disconnecting GoogleClientApi...");
             googleApiClient.disconnect();
         } catch (NullPointerException ex) {
-            Log.d(TAG, "Can't disconnect. GoogleClientApi == null", ex);
+            Log.d(TAG, "Can't disconnect -> ", ex);
         }
 
         try {
@@ -622,7 +658,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                         }
 
                         markerDataModel.setMarker(marker);
-                        markerHashMap.put(marker, markerDataModel);
+                        markerAllHashMap.put(marker, markerDataModel);
                     }
                 }
                 loadingDialog.dismiss();
@@ -662,19 +698,22 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                MarkerDataModel markerDataModel = markerHashMap.get(marker);
-                Log.d(TAG, "onMarkerClick() -> " + markerDataModel.getType());
-
+                MarkerDataModel markerDataModel = markerAllHashMap.get(marker);
+                try {
+                    Log.d(TAG, "onMarkerClick() -> " + markerDataModel.getType());
+                } catch (Exception ex) {
+                    Log.e(TAG, "onMarkerClick() -> ", ex);
+                }
                 switch (markerDataModel.getType()) {
                     case MarkerDataModel.TYPE_PRIMARY: {
-                        currentMarkerID = markerHashMap.get(marker).getId() - 1;
+                        currentMarkerID = markerAllHashMap.get(marker).getId() - 1;
 
                         openBottomSheet(
                                 markerDataModel.getNameShort(),
                                 markerDataModel.getNameFull(),
                                 markerDataModel.getInformation()
                         );
-                        Log.d(TAG, "onMarkerClick() -> \nLabel: " + markerHashMap.get(marker).getNameShort() + "\nId: " + markerDataModel.getId());
+                        Log.d(TAG, "onMarkerClick() -> \nLabel: " + markerAllHashMap.get(marker).getNameShort() + "\nId: " + markerDataModel.getId());
 
                         // Manually open the window
                         marker.showInfoWindow();
@@ -683,7 +722,12 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                     }
                     case MarkerDataModel.TYPE_PEOPLE: {
                         Log.d(TAG, "onMarkerClick() -> Marker type: TYPE_PEOPLE");
-                        Snackbar.make(rootView, markerDataModel.getUniqueId() + "\n" + markerDataModel.getRegisterTime(), Snackbar.LENGTH_LONG).show();
+                        try {
+                            closeBottomSheet();
+                            Snackbar.make(rootView, markerDataModel.getUniqueId() + "\n" + markerDataModel.getRegisterTime(), Snackbar.LENGTH_LONG).show();
+                        } catch (Exception ex) {
+                            Log.e(TAG, "onMarkerClick() -> MarkerDataModel.TYPE_PEOPLE -> ", ex);
+                        }
                         break;
                     }
                 }
@@ -928,7 +972,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
      * @param marker marker for zooming
      */
     private void zoomToMarker(Marker marker) {
-        currentMarkerID = markerHashMap.get(marker).getId() - 1;
+        currentMarkerID = markerAllHashMap.get(marker).getId() - 1;
 
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
                 .target(marker.getPosition())
@@ -939,9 +983,9 @@ public class MapsActivity extends BaseNavigationDrawerActivity
         marker.showInfoWindow();
 
         openBottomSheet(
-                markerHashMap.get(marker).getNameShort(),
-                markerHashMap.get(marker).getNameFull(),
-                markerHashMap.get(marker).getInformation()
+                markerAllHashMap.get(marker).getNameShort(),
+                markerAllHashMap.get(marker).getNameFull(),
+                markerAllHashMap.get(marker).getInformation()
         );
     }
 
@@ -1170,10 +1214,17 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                 }
             } catch (Exception ex) {
                 Log.e(TAG, "DisconnectLocationTask -> onPostExecute() -> ", ex);
+                Log.d(TAG, "Exception! Trying again...");
+                tryAgain();
             }
         }
 
         private void tryAgain() {
+            try {
+                Thread.sleep(5 * 1000);
+            } catch (InterruptedException ex) {
+                Log.e(TAG, "DisconnectLocationTask -> tryAgain() -> ", ex);
+            }
             DisconnectLocationTask disconnectLocationTask = new DisconnectLocationTask(token);
             disconnectLocationTask.execute();
         }
@@ -1256,6 +1307,12 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                 }
             }
 
+            for (int i = 0; i < markerPeopleArrayList.size(); i++) {
+                markerAllHashMap.remove(markerPeopleArrayList.get(i));
+                markerPeopleArrayList.get(i).remove();
+            }
+            markerPeopleArrayList.clear();
+
             for (int i = 0; i < markerDataModels.size(); i++) {
                 MarkerDataModel markerDataModel = markerDataModels.get(i);
 
@@ -1271,6 +1328,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                                 (int) Utils.convertDpToPixel(40, activityContext),
                                 (int) Utils.convertDpToPixel(40, activityContext)
                         )
+                        .transform(new CircleTransform(activityContext))
                         .into(new SimpleTarget<Bitmap>() {
                             @Override
                             public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
@@ -1283,7 +1341,8 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                         });
 
                 markerDataModel.setMarker(marker);
-                markerHashMap.put(marker, markerDataModel);
+                markerAllHashMap.put(marker, markerDataModel);
+                markerPeopleArrayList.add(marker);
             }
         }
     }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -20,6 +21,7 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.ContainerDrawerItem;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
@@ -103,8 +105,10 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
      *
      * @param items - PrimaryDrawerItems, which will be added to Drawer
      */
-    public void getSupportDrawer(PrimaryDrawerItem... items) {
-        new DrawerBuilder()
+    Drawer supportDrawer;
+
+    public void getSupportDrawer(View view, PrimaryDrawerItem... items) {
+        supportDrawer = new DrawerBuilder()
                 .withActivity(this)
                 .withActionBarDrawerToggle(false)
                 .withActionBarDrawerToggleAnimated(false)
@@ -112,9 +116,18 @@ public class BaseNavigationDrawerActivity extends AppCompatActivity {
                 .addDrawerItems(
                         items
                 )
+                .addDrawerItems(
+                        new ContainerDrawerItem()
+                                .withView(view)
+                )
+                .withMultiSelect(true)
                 .withDrawerWidthPx(getResources().getDisplayMetrics().widthPixels)
                 .withDrawerGravity(Gravity.END)
                 .append(drawer);
+    }
+
+    public Drawer getSupportDrawer() {
+        return supportDrawer;
     }
 
     /**
