@@ -2,16 +2,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/AppTheme.ToolBar"
     android:layout_width="match_parent"
-    android:layout_height="56dp"
+    android:layout_height="?attr/actionBarSize"
     android:layout_alignParentTop="true"
     android:background="@color/colorAppPrimary"
     android:gravity="center"
+    android:minHeight="?attr/actionBarSize"
     app:elevation="0dp">
 
     <TextView
         android:id="@+id/toolbar_title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:gravity="center"
         android:textColor="@color/white"
         android:textSize="@dimen/abc_text_size_title_material_toolbar"

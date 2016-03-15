@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/search"
-        android:gravity="center"
+        android:gravity="center_vertical"
         android:icon="@drawable/ic_search_white_24dp"
         android:title="@string/search_title"
         app:actionViewClass="android.support.v7.widget.SearchView"
@@ -12,7 +12,7 @@
 
     <item
         android:id="@+id/location"
-        android:gravity="center"
+        android:gravity="center_vertical"
         android:icon="@drawable/ic_my_location_white_24dp"
         android:title="Мое местоположение"
         app:showAsAction="always" />

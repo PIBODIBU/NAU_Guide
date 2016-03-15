@@ -103,6 +103,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     private SearchView searchView;
 
     private CoordinatorLayout rootView;
+    private View bottomSheetFrame;
 
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap; // Might be null if Google Play services APK is not available
@@ -139,9 +140,10 @@ public class MapsActivity extends BaseNavigationDrawerActivity
 
         methodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         rootView = (CoordinatorLayout) findViewById(R.id.root_view);
+        bottomSheetFrame = rootView.findViewById(R.id.bottom_sheet);
 
-        setUpMapIfNeeded();
         initBottomSheet();
+        setUpMapIfNeeded();
         setUpRecyclerView();
 
         getDrawer(
@@ -632,11 +634,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                                                     "\nHeight: " + resource.getHeight()
                                             );
                                             marker.setIcon(BitmapDescriptorFactory.fromBitmap(resource));
-                                            try {
-                                                ((FloatingActionButton) findViewById(R.id.fab_route_bsheet)).hide();
-                                            } catch (NullPointerException ex) {
-                                                Log.e(TAG, "setUpMap() ->", ex);
-                                            }
                                             zoomToMarker(marker);
                                         }
                                     });
@@ -699,12 +696,21 @@ public class MapsActivity extends BaseNavigationDrawerActivity
             @Override
             public boolean onMarkerClick(Marker marker) {
                 MarkerDataModel markerDataModel = markerAllHashMap.get(marker);
+                int type;
+
                 try {
                     Log.d(TAG, "onMarkerClick() -> " + markerDataModel.getType());
                 } catch (Exception ex) {
                     Log.e(TAG, "onMarkerClick() -> ", ex);
                 }
-                switch (markerDataModel.getType()) {
+
+                try {
+                    type = markerDataModel.getType();
+                } catch (Exception ex) {
+                    type = -1;
+                }
+
+                switch (type) {
                     case MarkerDataModel.TYPE_PRIMARY: {
                         currentMarkerID = markerAllHashMap.get(marker).getId() - 1;
 
@@ -730,6 +736,11 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                         }
                         break;
                     }
+                    default: {
+                        // Type == -1
+                        marker.showInfoWindow();
+                        break;
+                    }
                 }
 
                 // Animate to center
@@ -752,6 +763,46 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                 }
             }
         });
+
+        googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            private Marker marker;
+
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                markerAllHashMap.remove(marker);
+
+                if (marker == null) {
+                    marker = googleMap.addMarker(new MarkerOptions()
+                            .title("New Event")
+                            .snippet(Double.toString(latLng.latitude) + ", " + Double.toString(latLng.longitude))
+                            .position(latLng)
+                            .draggable(true));
+                } else {
+                    marker.setPosition(latLng);
+                    marker.setSnippet(Double.toString(latLng.latitude) + ", " + Double.toString(latLng.longitude));
+                }
+
+                markerAllHashMap.put(marker, null);
+            }
+        });
+
+        googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+
+            }
+
+            @Override
+            public void onMarkerDrag(Marker marker) {
+                Snackbar.make(rootView, marker.getPosition().toString(), Snackbar.LENGTH_INDEFINITE).show();
+            }
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+
+            }
+        });
+
     }
 
     public void setMarkerPrimaryModels(ArrayList<MarkerDataModel> markerModels) {
@@ -763,9 +814,6 @@ public class MapsActivity extends BaseNavigationDrawerActivity
      */
     private void initBottomSheet() {
         new AsyncTask<Void, Void, Void>() {
-
-            // Root View
-            View bottomSheetFrame = rootView.findViewById(R.id.bottom_sheet);
 
             // Overlaping head
             final LinearLayout sheetOverlapHead = (LinearLayout) findViewById(R.id.head_bsheet);
@@ -863,7 +911,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                                 sheetToolbarTitle.setText(markerPrimaryModels.get(currentMarkerID).getNameFull());
                                 sheetToolbar.setVisibility(View.INVISIBLE);
 
-                                sheetFABRoute.setVisibility(View.VISIBLE);
+                                sheetFABRoute.show();
 
                                 /************************** Main container ********************/
                                 sheetContentExpandText.setText(markerPrimaryModels.get(currentMarkerID).getInformation());
@@ -874,7 +922,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                             }
 
                             case BottomSheetBehavior.STATE_HIDDEN: {
-                                sheetFABRoute.setVisibility(View.GONE);
+                                sheetFABRoute.hide();
 
                                 FABMyLocation.show();
 
@@ -904,18 +952,20 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                 });
 
                 bottomSheetBehavior.setPeekHeight((int) Utils.convertDpToPixel(100f, activityContext));
-                try {
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                } catch (Exception ex) {
-                    Log.e(TAG, "", ex);
-                }
 
                 return null;
             }
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
+                try {
+                    if (idFromIntent == -1) {
+                        Log.d(TAG, "BottomSheetBehavior -> hiding BottomSheet");
+                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         }.execute();
     }
@@ -925,6 +975,7 @@ public class MapsActivity extends BaseNavigationDrawerActivity
     }
 
     public void openBottomSheet(String nameShort, String nameFull, String information) {
+        Log.d(TAG, "BottomSheetBehavior -> opening BottomSheet");
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         try {
@@ -1126,6 +1177,11 @@ public class MapsActivity extends BaseNavigationDrawerActivity
                 params.put("token", token);
                 params.put("lat", Double.toString(location.getLatitude()));
                 params.put("lng", Double.toString(location.getLongitude()));
+                if (sharedPrefUtils.getMyLocationVisibility()) {
+                    params.put("visibility", "1");
+                } else {
+                    params.put("visibility", "0");
+                }
             } else {
                 Log.e(TAG, "RegisterLocationTask -> doInBackground() -> Bad token of LatLng");
                 return null;
